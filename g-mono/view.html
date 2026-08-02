@@ -37,7 +37,7 @@
         </div>
     </main>
 
-    <script type="module">
+        <script type="module">
         import { db, doc, getDoc, collection, getDocs } from "../web-info/firebase.js";
 
         const urlParams = new URLSearchParams(window.location.search);
@@ -90,6 +90,14 @@
 
             const game = docSnap.data();
             const players = game.players || [];
+            
+            // Sort players automatically by net cash (earnings/cash) in descending order (highest to lowest)
+            const sortedPlayers = [...players].sort((a, b) => {
+                const cashA = Number(a.earnings || a.cash || 0);
+                const cashB = Number(b.earnings || b.cash || 0);
+                return cashB - cashA;
+            });
+
             const registeredCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
             const isRanked = registeredCount >= 2;
 
@@ -122,6 +130,7 @@
                         <table class="w-full text-left text-sm border-collapse">
                             <thead>
                                 <tr class="text-slate-400 border-b border-slate-700 text-xs uppercase tracking-wider">
+                                    <th class="py-2.5 px-3">Rank</th>
                                     <th class="py-2.5 px-3">Player</th>
                                     <th class="py-2.5 px-3 text-center">Member Type</th>
                                     <th class="py-2.5 px-3 text-right">Net Cash ($)</th>
@@ -129,8 +138,13 @@
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-700/50 text-xs">
-                                ${players.map(p => {
-                                    const isWinner = p.isWinner || false;
+                                ${sortedPlayers.map((p, index) => {
+                                    const rank = index + 1;
+                                    let rankBadge = `<span class="font-mono font-bold text-slate-400">#${rank}</span>`;
+                                    if (rank === 1) rankBadge = `<span class="text-amber-400 font-bold flex items-center gap-1">🥇 1st</span>`;
+                                    else if (rank === 2) rankBadge = `<span class="text-slate-300 font-bold flex items-center gap-1">🥈 2nd</span>`;
+                                    else if (rank === 3) rankBadge = `<span class="text-amber-600 font-bold flex items-center gap-1">🥉 3rd</span>`;
+
                                     const cities = p.cities || 0;
                                     const stations = p.stations || 0;
                                     const totalProps = (Number(cities) + Number(stations));
@@ -138,8 +152,8 @@
 
                                     return `
                                         <tr class="hover:bg-slate-800/40">
-                                            <td class="py-3 px-3 font-semibold text-white flex items-center gap-2">
-                                                ${isWinner ? '<span class="text-amber-400 text-base" title="Winner">🥇</span>' : '<span class="text-slate-600">👤</span>'}
+                                            <td class="py-3 px-3">${rankBadge}</td>
+                                            <td class="py-3 px-3 font-semibold text-white">
                                                 <a href="view.html?player=${encodeURIComponent(p.name)}" class="hover:underline text-amber-400 font-bold">
                                                     ${p.name}
                                                 </a>
@@ -276,7 +290,7 @@
                                                     <span class="material-icons text-xs">open_in_new</span>
                                                 </a>
                                             </td>
-                                            <td class="py-3 px-3 text-slate-300 font-mono">${m.date}</td>
+                                           <td class="py-3 px-3 text-slate-300 font-mono">${m.date}</td>
                                             <td class="py-3 px-3 text-slate-300">${m.location}</td>
                                             <td class="py-3 px-3 text-center font-bold ${m.isWinner ? 'text-emerald-400' : 'text-slate-500'}">
                                                 ${m.isWinner ? '🥇 Winner' : 'Participant'}
@@ -318,5 +332,6 @@
 
         initInspector();
     </script>
+
 </body>
 </html>
