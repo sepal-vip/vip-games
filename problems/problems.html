@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Problem & Issue Tracker Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="../index.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+                <span class="material-icons text-base">arrow_back</span> Portal Gateway
+            </a>
+            <div class="flex items-center gap-3">
+                <a href="rules.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-800/60 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1">
+                    <span class="material-icons text-sm">settings_suggest</span> Automation Rules
+                </a>
+                <a href="../account/history.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 px-3 py-1.5 rounded-xl transition flex items-center gap-1">
+                    <span class="material-icons text-sm">history</span> Audit Records
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
+        
+        <header class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                    🛠️ Problem & Incident Management
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Log system issues, assign severity, track workflow statuses, and execute attached rules.</p>
+            </div>
+            <button id="openAddProblemBtn" class="px-4 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition flex items-center gap-1 shadow-lg shadow-rose-600/20">
+                <span class="material-icons text-base">report_problem</span> Report New Problem
+            </button>
+        </header>
+
+        <div id="addProblemModal" class="hidden bg-slate-800/90 border border-rose-500/50 p-5 rounded-2xl space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                    <span class="material-icons text-sm">add_alert</span> Log System Problem
+                </h3>
+                <button type="button" id="closeAddProblemBtn" class="text-slate-400 hover:text-white">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+
+            <form id="problemForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Problem Title</label>
+                    <input type="text" id="probTitle" required placeholder="e.g. Database connection timeout during peak load" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Category</label>
+                    <select id="probCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
+                        <option value="Infrastructure">Infrastructure</option>
+                        <option value="Database">Database</option>
+                        <option value="Application">Application</option>
+                        <option value="Security">Security</option>
+                        <option value="Monopoly Suite">Monopoly Suite</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Priority Level</label>
+                    <select id="probPriority" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
+                        <option value="Low">Low Priority</option>
+                        <option value="Medium" selected>Medium Priority</option>
+                        <option value="High">High Severity</option>
+                        <option value="Critical">Critical Emergency</option>
+                    </select>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Detailed Description</label>
+                    <input type="text" id="probDesc" placeholder="Describe symptoms, impact, or reproduction steps..." class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
+                </div>
+
+                <div class="md:col-span-3 flex justify-end gap-2 pt-2">
+                    <button type="submit" class="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition">
+                        Save & Log Problem
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 bg-slate-800/80 p-4 rounded-xl border border-slate-700/60">
+            <div class="md:col-span-2 relative">
+                <span class="material-icons absolute left-3 top-2.5 text-slate-500 text-sm">search</span>
+                <input type="text" id="searchInput" placeholder="Search problems by title, ID, or category..." class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-rose-500">
+            </div>
+
+            <div>
+                <select id="statusFilter" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-rose-500">
+                    <option value="ALL">All Statuses</option>
+                    <option value="Open">Open</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Pending Review">Pending Review</option>
+                    <option value="Resolved">Resolved</option>
+                </select>
+            </div>
+
+            <div>
+                <select id="priorityFilter" class="w-full bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-rose-500">
+                    <option value="ALL">All Priorities</option>
+                    <option value="Critical">Critical Only</option>
+                    <option value="High">High Only</option>
+                    <option value="Medium">Medium Only</option>
+                    <option value="Low">Low Only</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="problemsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <p class="text-xs text-slate-400 col-span-full py-8 text-center">Loading reported problems...</p>
+        </div>
+
+    </main>
+
+    <script type="module">
+        import { db, collection, getDocs, doc, setDoc, updateDoc } from "../web-info/firebase.js";
+
+        const openAddProblemBtn = document.getElementById('openAddProblemBtn');
+        const closeAddProblemBtn = document.getElementById('closeAddProblemBtn');
+        const addProblemModal = document.getElementById('addProblemModal');
+        const problemForm = document.getElementById('problemForm');
+        const problemsContainer = document.getElementById('problemsContainer');
+        const searchInput = document.getElementById('searchInput');
+        const statusFilter = document.getElementById('statusFilter');
+        const priorityFilter = document.getElementById('priorityFilter');
+
+        let allProblems = [
+            { id: "PRB-101", title: "API Rate Limit Exceeded", priority: "High", category: "Infrastructure", status: "Open", desc: "Third-party quota reached during peak match recording." },
+            { id: "PRB-102", title: "Database Sync Delay", priority: "Medium", category: "Database", status: "In Progress", desc: "Leaderboards take 2-3 seconds to compute live." },
+            { id: "PRB-103", title: "August 2026 Property Field Overlap", priority: "Critical", category: "Monopoly Suite", status: "Pending Review", desc: "Stations count exceeds 6 on certain screen resolutions." }
+        ];
+
+        openAddProblemBtn.addEventListener('click', () => addProblemModal.classList.remove('hidden'));
+        closeAddProblemBtn.addEventListener('click', () => addProblemModal.classList.add('hidden'));
+
+        async function fetchProblems() {
+            try {
+                const snapshot = await getDocs(collection(db, "problems"));
+                if (!snapshot.empty) {
+                    const fetched = [];
+                    snapshot.forEach(d => fetched.push({ id: d.id, ...d.data() }));
+                    allProblems = fetched;
+                }
+            } catch(e) {
+                // Fallback to local sample array
+            }
+            renderProblems();
+        }
+
+        function renderProblems() {
+            const searchVal = searchInput.value.toLowerCase().trim();
+            const statusVal = statusFilter.value;
+            const priorityVal = priorityFilter.value;
+
+            const filtered = allProblems.filter(p => {
+                const matchSearch = p.id.toLowerCase().includes(searchVal) ||
+                                    p.title.toLowerCase().includes(searchVal) ||
+                                    p.category.toLowerCase().includes(searchVal);
+                if (!matchSearch) return false;
+                if (statusVal !== 'ALL' && p.status !== statusVal) return false;
+                if (priorityVal !== 'ALL' && p.priority !== priorityVal) return false;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                problemsContainer.innerHTML = `<p class="text-xs text-slate-400 col-span-full py-8 text-center">No problems matching selected filters.</p>`;
+                return;
+            }
+
+            problemsContainer.innerHTML = filtered.map(p => {
+                const priorityColor = p.priority === 'Critical' ? 'bg-red-950 text-red-300 border-red-800' :
+                                      p.priority === 'High' ? 'bg-rose-950 text-rose-300 border-rose-800' :
+                                      p.priority === 'Medium' ? 'bg-amber-950 text-amber-300 border-amber-800' :
+                                      'bg-slate-800 text-slate-300 border-slate-700';
+
+                const statusColor = p.status === 'Resolved' ? 'bg-emerald-950 text-emerald-400 border-emerald-800' :
+                                    p.status === 'In Progress' ? 'bg-sky-950 text-sky-400 border-sky-800' :
+                                    p.status === 'Pending Review' ? 'bg-purple-950 text-purple-400 border-purple-800' :
+                                    'bg-amber-950 text-amber-400 border-amber-800';
+
+                return `
+                    <div class="bg-slate-800/80 border border-slate-700/60 rounded-xl p-4 space-y-3 flex flex-col justify-between hover:border-rose-500/40 transition shadow-lg">
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-start">
+                                <span class="font-mono text-xs font-bold text-rose-400">${p.id}</span>
+                                <div class="flex gap-1.5">
+                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded border uppercase ${priorityColor}">${p.priority}</span>
+                                    <span class="text-[9px] font-bold px-2 py-0.5 rounded border uppercase ${statusColor}">${p.status}</span>
+                                </div>
+                            </div>
+                            <h3 class="font-bold text-white text-sm">${p.title}</h3>
+                            <p class="text-xs text-slate-400 line-clamp-2">${p.desc || 'No description provided.'}</p>
+                        </div>
+
+                        <div class="pt-3 border-t border-slate-700/50 flex justify-between items-center text-xs">
+                            <span class="text-[10px] text-slate-500 font-mono">Module: ${p.category}</span>
+                            <div class="flex items-center gap-1">
+                                <label class="text-[10px] text-slate-400 mr-1">Status:</label>
+                                <select onchange="updateProblemStatus('${p.id}', this.value)" class="bg-slate-900 border border-slate-700 text-slate-200 text-[11px] rounded px-2 py-1 focus:outline-none focus:border-rose-500">
+                                    <option value="Open" ${p.status === 'Open' ? 'selected' : ''}>Open</option>
+                                    <option value="In Progress" ${p.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
+                                    <option value="Pending Review" ${p.status === 'Pending Review' ? 'selected' : ''}>Pending Review</option>
+                                    <option value="Resolved" ${p.status === 'Resolved' ? 'selected' : ''}>Resolved</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.updateProblemStatus = async (id, newStatus) => {
+            const idx = allProblems.findIndex(p => p.id === id);
+            if (idx !== -1) {
+                allProblems[idx].status = newStatus;
+                renderProblems();
+
+                try {
+                    await setDoc(doc(db, "problems", id), { status: newStatus }, { merge: true });
+                } catch(e) {}
+            }
+        };
+
+        problemForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newId = `PRB-${allProblems.length + 101}`;
+            const newObj = {
+                id: newId,
+                title: document.getElementById('probTitle').value,
+                category: document.getElementById('probCategory').value,
+                priority: document.getElementById('probPriority').value,
+                desc: document.getElementById('probDesc').value,
+                status: "Open",
+                createdAt: new Date().toISOString()
+            };
+
+            allProblems.unshift(newObj);
+            renderProblems();
+            addProblemModal.classList.add('hidden');
+            problemForm.reset();
+
+            try {
+                await setDoc(doc(db, "problems", newId), newObj);
+            } catch(e) {}
+        });
+
+        searchInput.addEventListener('input', renderProblems);
+        statusFilter.addEventListener('change', renderProblems);
+        priorityFilter.addEventListener('change', renderProblems);
+
+        fetchProblems();
+    </script>
+</body>
+</html>

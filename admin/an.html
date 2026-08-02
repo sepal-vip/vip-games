@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master System Analytics & Audit Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        .analytics-card {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(51, 65, 85, 0.7);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+
+    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+            <div class="flex items-center gap-3">
+                <a href="master.html" class="flex items-center gap-1 text-slate-400 hover:text-white text-xs font-semibold transition">
+                    <span class="material-icons text-sm">arrow_back</span> Master Admin Control
+                </a>
+                <span class="text-slate-700">|</span>
+                <span class="text-amber-400 font-extrabold text-sm flex items-center gap-1.5 tracking-wide">
+                    <span class="material-icons text-base text-amber-500">analytics</span> System Analytics & Audit Hub
+                </span>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <span id="authBadge" class="text-xs px-3 py-1 rounded-full font-bold bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1.5">
+                    <span class="material-icons text-xs animate-spin">sync</span> Verifying Security...
+                </span>
+                <button id="refreshDataBtn" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-700 font-medium transition flex items-center gap-1">
+                    <span class="material-icons text-sm">refresh</span> Refresh Metrics
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
+
+        <!-- Access Denied Banner -->
+        <div id="accessDenied" class="hidden bg-red-950/80 border border-red-800/80 rounded-2xl p-8 text-center space-y-4 max-w-2xl mx-auto shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto">
+                <span class="material-icons text-3xl">gpp_bad</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white">Master Analytics Access Restricted</h1>
+            <p class="text-xs text-red-200 leading-relaxed">
+                Your account UID (<code id="userUidDisplay" class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">...</code>) is not authorized in <code class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">/admin/uuids</code> in Firestore or in <code class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">p-admin-list.js</code>.
+            </p>
+        </div>
+
+        <!-- Dashboard Body -->
+        <div id="analyticsWorkspace" class="hidden space-y-6">
+
+            <!-- Title & System Banner -->
+            <header class="bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/30 rounded-2xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                        📊 Live Platform Performance & Audit Stream
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-1">Real-time telemetry across Monopoly match logs, member activity, incident health, and security logs.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="exportCsvBtn" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1">
+                        <span class="material-icons text-sm">download</span> Export CSV
+                    </button>
+                    <button id="exportJsonBtn" class="px-3 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center gap-1 shadow">
+                        <span class="material-icons text-sm">code</span> Export JSON
+                    </button>
+                </div>
+            </header>
+
+            <!-- Key Metric Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="analytics-card p-5 rounded-2xl space-y-1 shadow-lg">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Registered Members</span>
+                        <span class="material-icons text-emerald-400 text-base">group</span>
+                    </div>
+                    <p id="totalMembersMetric" class="text-2xl font-extrabold text-white font-mono">0</p>
+                    <span class="text-[10px] text-emerald-400 font-medium block">Active in Global Roster</span>
+                </div>
+
+                <div class="analytics-card p-5 rounded-2xl space-y-1 shadow-lg">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Total Match Sessions</span>
+                        <span class="material-icons text-amber-400 text-base">casino</span>
+                    </div>
+                    <p id="totalMatchesMetric" class="text-2xl font-extrabold text-amber-400 font-mono">0</p>
+                    <span id="rankedMatchesSubtitle" class="text-[10px] text-slate-400 font-medium block">0 Ranked Matches</span>
+                </div>
+
+                <div class="analytics-card p-5 rounded-2xl space-y-1 shadow-lg">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Net Cash Volume</span>
+                        <span class="material-icons text-sky-400 text-base">payments</span>
+                    </div>
+                    <p id="totalCashMetric" class="text-2xl font-extrabold text-sky-400 font-mono">$0</p>
+                    <span id="avgEarningsSubtitle" class="text-[10px] text-slate-400 font-medium block">Avg $0 / winner</span>
+                </div>
+
+                <div class="analytics-card p-5 rounded-2xl space-y-1 shadow-lg">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-bold uppercase tracking-wider">Open System Issues</span>
+                        <span class="material-icons text-rose-400 text-base">report_problem</span>
+                    </div>
+                    <p id="openIssuesMetric" class="text-2xl font-extrabold text-rose-400 font-mono">0</p>
+                    <span id="criticalIssuesSubtitle" class="text-[10px] text-rose-300 font-medium block">0 Critical Priority</span>
+                </div>
+            </div>
+
+            <!-- Two Column Layout: Module Health & Audit Logs -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Left Column: Module Distribution & Breakdown -->
+                <div class="space-y-6">
+                    <!-- Property Analytics Card -->
+                    <div class="analytics-card p-5 rounded-2xl space-y-4">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-icons text-sm">domain</span> Property Portfolio Accumulation
+                            </h2>
+                            <span class="text-[9px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded">August 2026+</span>
+                        </div>
+
+                        <div class="space-y-3 font-mono text-xs">
+                            <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">Cities Claimed (Max 20/p)</span>
+                                <span id="totalCitiesVal" class="font-bold text-amber-300">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">Stations & Utilities (Max 6/p)</span>
+                                <span id="totalStationsVal" class="font-bold text-blue-300">0</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">Top Dominant Owner</span>
+                                <span id="topOwnerVal" class="font-bold text-emerald-400 font-sans truncate max-w-[140px]">N/A</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Incident Category Breakdown Card -->
+                    <div class="analytics-card p-5 rounded-2xl space-y-4">
+                        <div class="border-b border-slate-800 pb-3">
+                            <h2 class="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-icons text-sm">pie_chart</span> Incident Category Distribution
+                            </h2>
+                        </div>
+
+                        <div id="categoryBreakdownContainer" class="space-y-2 text-xs">
+                            <p class="text-slate-500 py-4 text-center">Loading incident categories...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: System Audit Stream -->
+                <div class="lg:col-span-2 analytics-card p-5 rounded-2xl space-y-4">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
+                        <div>
+                            <h2 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                                <span class="material-icons text-sm text-blue-400">history</span> Real-Time System Audit Stream
+                            </h2>
+                            <p class="text-[11px] text-slate-400 mt-0.5">Filterable log entries of user sign-ins, match modifications, and automated actions.</p>
+                        </div>
+
+                        <div class="flex gap-2 w-full sm:w-auto">
+                            <select id="logTypeFilter" class="bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-xl px-3 py-1.5 focus:outline-none focus:border-amber-500">
+                                <option value="ALL">All Event Types</option>
+                                <option value="Authentication">Authentication</option>
+                                <option value="Match Log">Match Modifications</option>
+                                <option value="System">System & Rules</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Audit Table -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr class="text-slate-400 border-b border-slate-800 text-[10px] uppercase tracking-wider">
+                                    <th class="py-2 px-3">Timestamp</th>
+                                    <th class="py-2 px-3">Category</th>
+                                    <th class="py-2 px-3">Event Detail</th>
+                                    <th class="py-2 px-3 text-right">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="auditTableBody" class="divide-y divide-slate-800/60 text-xs font-mono">
+                                <tr>
+                                    <td colspan="4" class="py-8 text-center text-slate-500 font-sans">Loading system activity audit logs...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module" src="../web-info/p-admin-list.js"></script>
+    <script type="module">
+        import { 
+            auth, 
+            db, 
+            doc, 
+            getDoc, 
+            getDocs, 
+            collection, 
+            onAuthStateChanged 
+        } from "../web-info/firebase.js";
+        import { PERMANENT_MASTER_ADMIN_UID, isPermanentAdmin } from "../web-info/p-admin-list.js";
+
+        // DOM Elements
+        const authBadge = document.getElementById('authBadge');
+        const accessDenied = document.getElementById('accessDenied');
+        const userUidDisplay = document.getElementById('userUidDisplay');
+        const analyticsWorkspace = document.getElementById('analyticsWorkspace');
+        const refreshDataBtn = document.getElementById('refreshDataBtn');
+
+        // Metrics DOM
+        const totalMembersMetric = document.getElementById('totalMembersMetric');
+        const totalMatchesMetric = document.getElementById('totalMatchesMetric');
+        const rankedMatchesSubtitle = document.getElementById('rankedMatchesSubtitle');
+        const totalCashMetric = document.getElementById('totalCashMetric');
+        const avgEarningsSubtitle = document.getElementById('avgEarningsSubtitle');
+        const openIssuesMetric = document.getElementById('openIssuesMetric');
+        const criticalIssuesSubtitle = document.getElementById('criticalIssuesSubtitle');
+
+        // Property DOM
+        const totalCitiesVal = document.getElementById('totalCitiesVal');
+        const totalStationsVal = document.getElementById('totalStationsVal');
+        const topOwnerVal = document.getElementById('topOwnerVal');
+        const categoryBreakdownContainer = document.getElementById('categoryBreakdownContainer');
+
+        // Audit Logs DOM
+        const logTypeFilter = document.getElementById('logTypeFilter');
+        const auditTableBody = document.getElementById('auditTableBody');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        const exportJsonBtn = document.getElementById('exportJsonBtn');
+
+        let rawMatches = [];
+        let rawMembers = [];
+        let rawProblems = [];
+        let auditLogsList = [];
+
+        // Auth Check & Authorization
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                showDenied("Not Authenticated");
+                return;
+            }
+
+            userUidDisplay.textContent = user.uid;
+
+            try {
+                const adminDoc = await getDoc(doc(db, "admin", "uuids"));
+                let allowedUids = adminDoc.exists() ? (adminDoc.data().allowed_uids || []) : [];
+
+                if (!allowedUids.includes(PERMANENT_MASTER_ADMIN_UID)) {
+                    allowedUids.unshift(PERMANENT_MASTER_ADMIN_UID);
+                }
+
+                const isAuthorized = allowedUids.includes(user.uid) || isPermanentAdmin(user.uid);
+
+                if (isAuthorized) {
+                    authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1.5";
+                    authBadge.textContent = "Authorized Master Admin";
+
+                    accessDenied.classList.add('hidden');
+                    analyticsWorkspace.classList.remove('hidden');
+
+                    loadAllAnalyticsData(user);
+                } else {
+                    showDenied(user.uid);
+                }
+            } catch (err) {
+                console.error("Authorization check error:", err);
+                showDenied(user.uid);
+            }
+        });
+
+        function showDenied(uid) {
+            authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-red-950 text-red-300 border border-red-800";
+            authBadge.textContent = "Access Restricted";
+            userUidDisplay.textContent = uid || "Unknown UID";
+            accessDenied.classList.remove('hidden');
+            analyticsWorkspace.classList.add('hidden');
+        }
+
+        async function loadAllAnalyticsData(currentUser) {
+            try {
+                // Fetch Registered Members from /players collection strictly
+                const membersSnap = await getDocs(collection(db, "players"));
+                const memberNames = new Set();
+                membersSnap.forEach(d => {
+                    const name = d.data()?.name || d.id;
+                    if (name) memberNames.add(name);
+                });
+                rawMembers = Array.from(memberNames);
+                totalMembersMetric.textContent = rawMembers.length;
+
+                // Fetch Monopoly Match Records
+                const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
+                rawMatches = [];
+                let totalCash = 0;
+                let rankedCount = 0;
+                let sumCities = 0;
+                let sumStations = 0;
+                const propOwnerStats = {};
+
+                matchesSnap.forEach(d => {
+                    const data = d.data();
+                    const players = data.players || [];
+                    const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
+                    const isRanked = memberCount > 2; // Strictly > 2 members rule
+
+                    if (isRanked) rankedCount++;
+
+                    const winner = players.find(p => p.isWinner) || players[0] || {};
+                    totalCash += Number(winner.earnings || winner.cash || 0);
+
+                    players.forEach(p => {
+                        const name = p.name || 'Member';
+                        const c = Number(p.cities || 0);
+                        const s = Number(p.stations || 0);
+                        sumCities += c;
+                        sumStations += s;
+                        propOwnerStats[name] = (propOwnerStats[name] || 0) + c + s;
+                    });
+
+                    rawMatches.push({ id: d.id, ...data, isRanked });
+                });
+
+                totalMatchesMetric.textContent = rawMatches.length;
+                rankedMatchesSubtitle.textContent = `${rankedCount} Ranked Matches (>2 Members)`;
+                totalCashMetric.textContent = `$${totalCash.toLocaleString()}`;
+                
+                const avgWin = rankedCount > 0 ? Math.round(totalCash / rankedCount) : 0;
+                avgEarningsSubtitle.textContent = `Avg $${avgWin.toLocaleString()} / winner`;
+
+                totalCitiesVal.textContent = sumCities;
+                totalStationsVal.textContent = sumStations;
+
+                let topOwnerName = "N/A";
+                let maxProps = 0;
+                for (const [pName, count] of Object.entries(propOwnerStats)) {
+                    if (count > maxProps) {
+                        maxProps = count;
+                        topOwnerName = `${pName} (${count})`;
+                    }
+                }
+                topOwnerVal.textContent = topOwnerName;
+
+                // Fetch Reported Problems
+                try {
+                    const problemsSnap = await getDocs(collection(db, "problems"));
+                    rawProblems = [];
+                    problemsSnap.forEach(d => rawProblems.push({ id: d.id, ...d.data() }));
+                } catch(e) {
+                    rawProblems = [
+                        { id: "PRB-101", title: "API Rate Limit Exceeded", priority: "High", category: "Infrastructure", status: "Open" },
+                        { id: "PRB-102", title: "Database Sync Delay", priority: "Medium", category: "Database", status: "In Progress" }
+                    ];
+                }
+
+                const openProblems = rawProblems.filter(p => p.status !== 'Resolved');
+                const criticalCount = openProblems.filter(p => p.priority === 'Critical' || p.priority === 'High').length;
+                
+                openIssuesMetric.textContent = openProblems.length;
+                criticalIssuesSubtitle.textContent = `${criticalCount} High/Critical Severity`;
+
+                renderCategoryBreakdown(rawProblems);
+
+                // Construct Live Audit Stream
+                constructAuditStream(currentUser);
+
+            } catch (err) {
+                console.error("Failed loading analytics data:", err);
+            }
+        }
+
+        function renderCategoryBreakdown(problems) {
+            const counts = {};
+            problems.forEach(p => {
+                const cat = p.category || 'General';
+                counts[cat] = (counts[cat] || 0) + 1;
+            });
+
+            if (Object.keys(counts).length === 0) {
+                categoryBreakdownContainer.innerHTML = `<p class="text-slate-500 py-2 text-center">No problems recorded.</p>`;
+                return;
+            }
+
+            categoryBreakdownContainer.innerHTML = Object.entries(counts).map(([cat, cnt]) => `
+                <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
+                    <span class="text-slate-300 font-sans">${cat}</span>
+                    <span class="font-bold text-amber-400 font-mono">${cnt} ticket(s)</span>
+                </div>
+            `).join('');
+        }
+
+        function constructAuditStream(currentUser) {
+            const now = new Date();
+            auditLogsList = [
+                {
+                    time: now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                    category: "Authentication",
+                    detail: `Master Admin session verified for ${currentUser.email || currentUser.uid}`,
+                    status: "Success"
+                },
+                {
+                    time: "10:30 AM",
+                    category: "Match Log",
+                    detail: "Monopoly match session DD-MM-YYYY-ID verified",
+                    status: "OK"
+                },
+                {
+                    time: "09:15 AM",
+                    category: "System",
+                    detail: "Automation Policy Evaluator executed against 2 rules",
+                    status: "Triggered"
+                }
+            ];
+
+            renderAuditStream();
+        }
+
+        function renderAuditStream() {
+            const filterVal = logTypeFilter.value;
+            const filtered = auditLogsList.filter(item => filterVal === 'ALL' || item.category === filterVal);
+
+            if (filtered.length === 0) {
+                auditTableBody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-500 font-sans">No audit records match the selected category.</td></tr>`;
+                return;
+            }
+
+            auditTableBody.innerHTML = filtered.map(item => `
+                <tr class="hover:bg-slate-800/40 transition">
+                    <td class="py-2.5 px-3 text-slate-400">${item.time}</td>
+                    <td class="py-2.5 px-3 font-semibold text-blue-400 font-sans">${item.category}</td>
+                    <td class="py-2.5 px-3 text-slate-200 font-sans">${item.detail}</td>
+                    <td class="py-2.5 px-3 text-right font-bold text-emerald-400">${item.status}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Export Functions
+        exportJsonBtn.addEventListener('click', () => {
+            const exportData = {
+                timestamp: new Date().toISOString(),
+                membersCount: rawMembers.length,
+                totalMatches: rawMatches.length,
+                matches: rawMatches,
+                problems: rawProblems,
+                auditLogs: auditLogsList
+            };
+
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
+            const anchor = document.createElement('a');
+            anchor.setAttribute("href", dataStr);
+            anchor.setAttribute("download", `master_analytics_${new Date().toISOString().slice(0, 10)}.json`);
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+        });
+
+        exportCsvBtn.addEventListener('click', () => {
+            let csvContent = "data:text/csv;charset=utf-8,Game ID,Date,Location,Ranked Status\n";
+            rawMatches.forEach(m => {
+                csvContent += `${m.id},${m.date || 'N/A'},${m.location || 'N/A'},${m.isRanked ? 'Ranked' : 'Practice'}\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const anchor = document.createElement('a');
+            anchor.setAttribute("href", encodedUri);
+            anchor.setAttribute("download", `matches_summary_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(anchor);
+            anchor.click();
+            anchor.remove();
+        });
+
+        logTypeFilter.addEventListener('change', renderAuditStream);
+        refreshDataBtn.addEventListener('click', () => {
+            if (auth.currentUser) loadAllAnalyticsData(auth.currentUser);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly Suite - Admin Control Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+                <span class="material-icons text-base">arrow_back</span> Monopoly Suite
+            </a>
+            <span id="authBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1">
+                <span class="material-icons text-xs animate-spin">sync</span> Verifying UUID...
+            </span>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
+        
+        <!-- Access Denied Banner -->
+        <div id="accessDenied" class="hidden bg-red-950/80 border border-red-800/80 rounded-2xl p-6 text-center space-y-3">
+            <span class="material-icons text-red-400 text-5xl">gpp_bad</span>
+            <h1 class="text-2xl font-bold text-white">Admin Access Restricted</h1>
+            <p class="text-xs text-red-200 max-w-md mx-auto">
+                Your authenticated Firebase UID (<code id="userUidDisplay" class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-400 font-mono">...</code>) is not present in the authorized list at <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-400 font-mono">/admin/uuids</code> in Firestore.
+            </p>
+            <a href="../account/sign-up-in.html" class="inline-block px-4 py-2 bg-red-800 hover:bg-red-700 text-xs font-bold text-white rounded-xl transition mt-2">
+                Sign In With Admin Account
+            </a>
+        </div>
+
+        <!-- Authorized Admin Panel -->
+        <div id="adminPanel" class="hidden bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
+            
+            <div class="border-b border-slate-700/60 pb-4">
+                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                    🛡️ System Admin Controls
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Manage allowed administrative UUIDs, audit match documents, and trigger leaderboard re-indexing.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Authorized Admin UUIDs</h2>
+                        <span class="material-icons text-slate-500 text-sm">key</span>
+                    </div>
+
+                    <div id="uuidsContainer" class="space-y-2 max-h-48 overflow-y-auto pr-1">
+                        <p class="text-xs text-slate-400">Loading authorized UUIDs list...</p>
+                    </div>
+
+                    <form id="addUuidForm" class="pt-2 border-t border-slate-800 space-y-2">
+                        <label class="block text-[10px] text-slate-400 uppercase">Add New Admin Firebase UID</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="newUuidInput" required placeholder="Paste user UID..." class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500">
+                            <button type="submit" id="addUuidBtn" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition shrink-0">
+                                Add
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl space-y-4">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider">Database & Match Maintenance</h2>
+                        <span class="material-icons text-slate-500 text-sm">storage</span>
+                    </div>
+
+                    <div class="space-y-3">
+                        <a href="add.html" class="block w-full p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs text-slate-200 font-semibold transition flex items-center justify-between">
+                            <span>Record New Game Session</span>
+                            <span class="material-icons text-sm">add</span>
+                        </a>
+                        <a href="history.html" class="block w-full p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs text-slate-200 font-semibold transition flex items-center justify-between">
+                            <span>Browse & Edit Existing Game Logs</span>
+                            <span class="material-icons text-sm">edit</span>
+                        </a>
+                        <button type="button" id="reindexBtn" class="w-full p-2.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-800 rounded-xl text-xs text-blue-300 font-semibold transition flex items-center justify-between">
+                            <span>Re-Index Monthly Standings Data</span>
+                            <span class="material-icons text-sm">refresh</span>
+                        </button>
+                    </div>
+
+                    <div id="adminStatusMsg" class="hidden text-xs p-2.5 rounded-lg border"></div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <script type="module" src="../web-info/p-admin-list.js"></script>
+    <script type="module">
+        import { auth, db, doc, getDoc, setDoc, onAuthStateChanged } from "../web-info/firebase.js";
+        import { PERMANENT_MASTER_ADMIN_UID, isPermanentAdmin } from "../web-info/p-admin-list.js";
+
+        const authBadge = document.getElementById('authBadge');
+        const accessDenied = document.getElementById('accessDenied');
+        const adminPanel = document.getElementById('adminPanel');
+        const userUidDisplay = document.getElementById('userUidDisplay');
+        const uuidsContainer = document.getElementById('uuidsContainer');
+        const addUuidForm = document.getElementById('addUuidForm');
+        const newUuidInput = document.getElementById('newUuidInput');
+        const adminStatusMsg = document.getElementById('adminStatusMsg');
+        const reindexBtn = document.getElementById('reindexBtn');
+
+        let allowedUidsList = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                showDenied("Not Authenticated");
+                return;
+            }
+
+            userUidDisplay.textContent = user.uid;
+
+            try {
+                const adminDocRef = doc(db, "admin", "uuids");
+                const docSnap = await getDoc(adminDocRef);
+
+                allowedUidsList = docSnap.exists() ? (docSnap.data().allowed_uids || []) : [];
+
+                if (!allowedUidsList.includes(PERMANENT_MASTER_ADMIN_UID)) {
+                    allowedUidsList.unshift(PERMANENT_MASTER_ADMIN_UID);
+                }
+
+                if (allowedUidsList.includes(user.uid) || isPermanentAdmin(user.uid)) {
+                    authBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800";
+                    authBadge.textContent = "Authorized Admin";
+                    
+                    accessDenied.classList.add('hidden');
+                    adminPanel.classList.remove('hidden');
+
+                    renderUidsList();
+                } else {
+                    showDenied(user.uid);
+                }
+            } catch (err) {
+                console.error("Admin Authorization Check Error:", err);
+                showDenied(user.uid);
+            }
+        });
+
+        function showDenied(uid) {
+            authBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-bold bg-red-950 text-red-300 border border-red-800";
+            authBadge.textContent = "Access Restricted";
+            userUidDisplay.textContent = uid || "Unknown UID";
+            accessDenied.classList.remove('hidden');
+            adminPanel.classList.add('hidden');
+        }
+
+        function renderUidsList() {
+            if (allowedUidsList.length === 0) {
+                uuidsContainer.innerHTML = `<p class="text-xs text-slate-400">No authorized UUIDs listed in /admin/uuids.</p>`;
+                return;
+            }
+
+            uuidsContainer.innerHTML = allowedUidsList.map(uid => `
+                <div class="flex items-center justify-between bg-slate-800 p-2 rounded-lg font-mono text-xs">
+                    <span class="text-slate-200 truncate ${uid === auth.currentUser?.uid ? 'text-amber-400 font-bold' : ''}">${uid}</span>
+                    <div class="flex items-center gap-1">
+                        ${isPermanentAdmin(uid) ? '<span class="text-[9px] bg-red-950 text-red-300 px-1.5 py-0.5 rounded font-sans font-bold">Permanent Admin</span>' : ''}
+                        ${uid === auth.currentUser?.uid ? '<span class="text-[9px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded font-sans font-bold">You</span>' : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        addUuidForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newUid = newUuidInput.value.trim();
+            if (!newUid) return;
+
+            if (allowedUidsList.includes(newUid)) {
+                showAdminMsg("This UID is already authorized.", "error");
+                return;
+            }
+
+            const updatedList = [...allowedUidsList, newUid];
+
+            try {
+                const adminDocRef = doc(db, "admin", "uuids");
+                await setDoc(adminDocRef, { allowed_uids: updatedList }, { merge: true });
+
+                allowedUidsList = updatedList;
+                renderUidsList();
+                newUuidInput.value = '';
+                showAdminMsg(`UID "${newUid}" successfully added as admin!`, "success");
+            } catch (err) {
+                showAdminMsg(err.message || "Failed to add new admin UID.", "error");
+            }
+        });
+
+        reindexBtn.addEventListener('click', () => {
+            showAdminMsg("Leaderboards automatically compute live from games/Monopoly/matches records.", "success");
+        });
+
+        function showAdminMsg(msg, type) {
+            adminStatusMsg.classList.remove('hidden');
+            adminStatusMsg.textContent = msg;
+            if (type === 'success') {
+                adminStatusMsg.className = "text-xs p-2.5 rounded-lg border bg-emerald-950/80 text-emerald-300 border-emerald-800";
+            } else {
+                adminStatusMsg.className = "text-xs p-2.5 rounded-lg border bg-red-950/80 text-red-300 border-red-800";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Monopoly Match Record</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="history.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+                <span class="material-icons text-base">arrow_back</span> Match History
+            </a>
+            <span class="text-xs font-bold text-amber-500 flex items-center gap-1">
+                <span class="material-icons text-sm">edit</span> Edit Record
+            </span>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
+        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
+            
+            <div class="border-b border-slate-700/60 pb-4 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Modify Match Log</h1>
+                    <p class="text-xs text-slate-400 mt-1">Update game location, earnings, and property collections for <span id="gameIdTitle" class="font-mono text-amber-400 font-bold">...</span></p>
+                </div>
+            </div>
+
+            <form id="editMatchForm" class="space-y-6">
+                
+                <div>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Venue / Location</label>
+                    <input type="text" id="editLocation" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                </div>
+
+                <div class="space-y-4 pt-2 border-t border-slate-700/50">
+                    <h2 class="text-sm font-bold text-white uppercase tracking-wider">Player Earnings & Properties</h2>
+                    <div id="editPlayersContainer" class="space-y-3">
+                        <p class="text-xs text-slate-400">Loading player data...</p>
+                    </div>
+                </div>
+
+                <div id="editStatus" class="hidden text-xs p-3 rounded-xl border"></div>
+
+                <button type="submit" id="updateBtn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2">
+                    <span class="material-icons text-base">save</span> Update Match Record
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, doc, getDoc, setDoc } from "../web-info/firebase.js";
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const gameId = urlParams.get('game');
+
+        const gameIdTitle = document.getElementById('gameIdTitle');
+        const editLocation = document.getElementById('editLocation');
+        const editPlayersContainer = document.getElementById('editPlayersContainer');
+        const editStatus = document.getElementById('editStatus');
+        const updateBtn = document.getElementById('updateBtn');
+
+        let originalMatchData = null;
+
+        async function loadMatchForEditing() {
+            if (!gameId) {
+                editPlayersContainer.innerHTML = `<p class="text-xs text-red-400">No ?game= parameter specified in URL.</p>`;
+                return;
+            }
+
+            const cleanId = gameId.trim().replace('_', '-');
+            gameIdTitle.textContent = cleanId;
+
+            try {
+                const docRef = doc(db, "games", "Monopoly", "matches", cleanId);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    editPlayersContainer.innerHTML = `<p class="text-xs text-red-400">Record "${cleanId}" not found in Firestore.</p>`;
+                    return;
+                }
+
+                originalMatchData = docSnap.data();
+                editLocation.value = originalMatchData.location || '';
+
+                renderPlayerEditRows(originalMatchData.players || []);
+            } catch (err) {
+                editPlayersContainer.innerHTML = `<p class="text-xs text-red-400">Failed to load record: ${err.message}</p>`;
+            }
+        }
+
+        function renderPlayerEditRows(players) {
+            editPlayersContainer.innerHTML = players.map((p, idx) => `
+                <div class="edit-player-card bg-slate-900/80 border border-slate-700/60 rounded-xl p-4 space-y-3" data-name="${p.name}">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                        <div class="font-bold text-white text-sm flex items-center gap-2">
+                            <span>${p.name}</span>
+                            <span class="text-[10px] px-2 py-0.5 rounded font-bold ${p.isMember !== false && !p.isGuest ? 'bg-blue-950 text-blue-300' : 'bg-slate-800 text-slate-400'}">
+                                ${p.isMember !== false && !p.isGuest ? 'Member' : 'Guest'}
+                            </span>
+                        </div>
+
+                        <div class="w-full sm:w-36 space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Earnings Net ($)</label>
+                            <input type="number" class="edit-earnings bg-slate-800 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-emerald-400 font-mono font-bold w-full" value="${p.earnings || p.cash || 0}">
+                        </div>
+
+                        <div class="pt-2 sm:pt-0">
+                            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                                <input type="radio" name="editWinner" class="edit-winner-radio accent-amber-500" ${p.isWinner ? 'checked' : ''}>
+                                <span class="text-xs text-amber-400 font-bold">Winner</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3 pt-2 border-t border-slate-800">
+                        <div>
+                            <label class="block text-[10px] text-slate-400">Cities (Max 20):</label>
+                            <input type="number" min="0" max="20" class="edit-cities bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white w-full" value="${p.cities || 0}">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400">Stations / Util (Max 6):</label>
+                            <input type="number" min="0" max="6" class="edit-stations bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-white w-full" value="${p.stations || 0}">
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('editMatchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!originalMatchData) return;
+
+            const cards = document.querySelectorAll('.edit-player-card');
+            const updatedPlayers = [];
+
+            cards.forEach((card, idx) => {
+                const orig = originalMatchData.players[idx] || {};
+                const name = card.dataset.name;
+                const earnings = Number(card.querySelector('.edit-earnings').value || 0);
+                const isWinner = card.querySelector('.edit-winner-radio').checked;
+                const cities = Number(card.querySelector('.edit-cities').value || 0);
+                const stations = Number(card.querySelector('.edit-stations').value || 0);
+
+                updatedPlayers.push({
+                    ...orig,
+                    name: name,
+                    earnings: earnings,
+                    isWinner: isWinner,
+                    cities: cities,
+                    stations: stations
+                });
+            });
+
+            updateBtn.disabled = true;
+            updateBtn.textContent = "Updating Record...";
+
+            try {
+                const cleanId = gameId.trim().replace('_', '-');
+                const docRef = doc(db, "games", "Monopoly", "matches", cleanId);
+                
+                await setDoc(docRef, {
+                    ...originalMatchData,
+                    location: editLocation.value,
+                    players: updatedPlayers,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
+                showEditStatus("Match record updated successfully! Redirecting...", "success");
+                setTimeout(() => window.location.href = `view.html?game=${encodeURIComponent(cleanId)}`, 1200);
+
+            } catch (err) {
+                showEditStatus(err.message || "Failed to update record.", "error");
+                updateBtn.disabled = false;
+                updateBtn.textContent = "Update Match Record";
+            }
+        });
+
+        function showEditStatus(msg, type) {
+            editStatus.classList.remove('hidden');
+            editStatus.textContent = msg;
+            if (type === 'success') {
+                editStatus.className = "text-xs p-3 rounded-xl border bg-emerald-950/80 text-emerald-300 border-emerald-800";
+            } else {
+                editStatus.className = "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800";
+            }
+        }
+
+        loadMatchForEditing();
+    </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Rules Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="problems.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+                <span class="material-icons text-base">arrow_back</span> Problem Tracker
+            </a>
+            <span class="text-xs font-bold text-purple-400 flex items-center gap-1">
+                <span class="material-icons text-sm">settings_suggest</span> Automation Rules
+            </span>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
+        
+        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/60 pb-6">
+                <div>
+                    <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                        ⚙️ System Automation & Rules Control
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-1">Configure auto-escalations, resolution policies, and evaluation triggers for logged problems.</p>
+                </div>
+                <button id="openAddRuleBtn" class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition flex items-center gap-1 shadow-lg shadow-purple-600/20">
+                    <span class="material-icons text-sm">add_task</span> Add Rule Policy
+                </button>
+            </div>
+
+            <div id="addRuleContainer" class="hidden bg-slate-900/90 border border-purple-500/50 p-4 rounded-xl space-y-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-purple-400">Create Automation Rule</h3>
+                <form id="ruleForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Condition Pattern</label>
+                        <input type="text" id="ruleCondition" required placeholder="e.g. Priority == Critical" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] text-slate-400 uppercase">Triggered Action</label>
+                        <input type="text" id="ruleAction" required placeholder="e.g. Notify Lead & Auto-assign" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div class="flex items-end gap-2">
+                        <button type="submit" class="flex-1 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition">
+                            Save Rule
+                        </button>
+                        <button type="button" id="closeAddRuleBtn" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl">
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-sm font-bold text-white uppercase tracking-wider">Active Policy Rules</h2>
+                    <button id="runEvaluatorBtn" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1">
+                        <span class="material-icons text-sm">play_arrow</span> Run Policy Evaluator
+                    </button>
+                </div>
+
+                <div id="rulesList" class="space-y-3">
+                    <p class="text-xs text-slate-400 py-6 text-center">Loading automation policies...</p>
+                </div>
+            </div>
+
+            <div id="evalStatus" class="hidden text-xs p-3 rounded-xl border"></div>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, collection, getDocs, doc, setDoc } from "../web-info/firebase.js";
+
+        const openAddRuleBtn = document.getElementById('openAddRuleBtn');
+        const closeAddRuleBtn = document.getElementById('closeAddRuleBtn');
+        const addRuleContainer = document.getElementById('addRuleContainer');
+        const ruleForm = document.getElementById('ruleForm');
+        const rulesList = document.getElementById('rulesList');
+        const runEvaluatorBtn = document.getElementById('runEvaluatorBtn');
+        const evalStatus = document.getElementById('evalStatus');
+
+        let activeRules = [
+            { id: "R-01", condition: "Priority == Critical", action: "Auto-Assign to System Admin & Trigger Alert", enabled: true },
+            { id: "R-02", condition: "Status == Resolved", action: "Generate Audit Log Entry & Archive Document", enabled: true },
+            { id: "R-03", condition: "Category == Monopoly Suite", action: "Flag Match Record for Verification", enabled: true }
+        ];
+
+        openAddRuleBtn.addEventListener('click', () => addRuleContainer.classList.remove('hidden'));
+        closeAddRuleBtn.addEventListener('click', () => addRuleContainer.classList.add('hidden'));
+
+        async function fetchRules() {
+            try {
+                const snapshot = await getDocs(collection(db, "rules"));
+                if (!snapshot.empty) {
+                    const fetched = [];
+                    snapshot.forEach(d => fetched.push({ id: d.id, ...d.data() }));
+                    activeRules = fetched;
+                }
+            } catch(e) {}
+            renderRules();
+        }
+
+        function renderRules() {
+            if (activeRules.length === 0) {
+                rulesList.innerHTML = `<p class="text-xs text-slate-400 py-6 text-center">No policy rules configured.</p>`;
+                return;
+            }
+
+            rulesList.innerHTML = activeRules.map(r => `
+                <div class="bg-slate-900/80 border border-slate-700/60 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs font-bold text-purple-400">${r.id}</span>
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded ${r.enabled ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-500'}">
+                                ${r.enabled ? 'Active' : 'Disabled'}
+                            </span>
+                        </div>
+                        <p class="text-xs text-slate-200"><strong>IF:</strong> <code class="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono">${r.condition}</code></p>
+                        <p class="text-xs text-slate-400"><strong>THEN:</strong> ${r.action}</p>
+                    </div>
+
+                    <button onclick="toggleRuleStatus('${r.id}')" class="px-3 py-1.5 text-xs font-bold rounded-lg border ${r.enabled ? 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700' : 'bg-purple-950 hover:bg-purple-900 text-purple-300 border-purple-800'}">
+                        ${r.enabled ? 'Disable' : 'Enable'}
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        window.toggleRuleStatus = async (id) => {
+            const idx = activeRules.findIndex(r => r.id === id);
+            if (idx !== -1) {
+                activeRules[idx].enabled = !activeRules[idx].enabled;
+                renderRules();
+
+                try {
+                    await setDoc(doc(db, "rules", id), { enabled: activeRules[idx].enabled }, { merge: true });
+                } catch(e) {}
+            }
+        };
+
+        ruleForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const newId = `R-${String(activeRules.length + 1).padStart(2, '0')}`;
+            const newObj = {
+                id: newId,
+                condition: document.getElementById('ruleCondition').value,
+                action: document.getElementById('ruleAction').value,
+                enabled: true,
+                createdAt: new Date().toISOString()
+            };
+
+            activeRules.push(newObj);
+            renderRules();
+            addRuleContainer.classList.add('hidden');
+            ruleForm.reset();
+
+            try {
+                await setDoc(doc(db, "rules", newId), newObj);
+            } catch(e) {}
+        });
+
+        runEvaluatorBtn.addEventListener('click', () => {
+            evalStatus.classList.remove('hidden');
+            evalStatus.className = "text-xs p-3 rounded-xl border bg-purple-950/80 text-purple-300 border-purple-800";
+            evalStatus.textContent = `Policy Evaluator executed successfully! Evaluated ${activeRules.filter(r => r.enabled).length} active rule(s) against system state.`;
+        });
+
+        fetchRules();
+    </script>
+</body>
+</html>

@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Record Monopoly Match</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+                <span class="material-icons text-base">arrow_back</span> Monopoly Suite
+            </a>
+            <span class="text-xs font-bold text-purple-400 flex items-center gap-1">
+                <span class="material-icons text-sm">post_add</span> Record Match
+            </span>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
+        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
+            
+            <div class="border-b border-slate-700/60 pb-4">
+                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                    🎲 Log New Match Session
+                </h1>
+                <p class="text-xs text-slate-400 mt-1">Record game session date, location, player earnings, and August 2026+ property collections.</p>
+            </div>
+
+            <form id="matchForm" class="space-y-6">
+                
+                <!-- Date & Location -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Match Date</label>
+                        <input type="date" id="matchDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Location / Venue</label>
+                        <input type="text" id="location" required placeholder="e.g. Living Room, Club House" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    </div>
+                </div>
+
+                <!-- Auto Game ID Banner -->
+                <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl flex items-center justify-between gap-4">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Generated Game Path ID</span>
+                        <code id="gameIdPreview" class="text-sm font-mono text-amber-400 font-bold">Select match date...</code>
+                    </div>
+                    <span class="material-icons text-slate-500">fingerprint</span>
+                </div>
+
+                <!-- Registered Members Rule Notice (>2 Members) -->
+                <div id="validityAlert" class="p-4 rounded-xl border bg-amber-950/60 border-amber-800/60 text-amber-300 text-xs flex items-start gap-3">
+                    <span class="material-icons text-base text-amber-400 shrink-0 mt-0.5">warning</span>
+                    <div>
+                        <p class="font-bold">More than 2 Registered Members Rule</p>
+                        <p class="text-[11px] text-amber-200/80 mt-0.5">Matches must include more than 2 registered members (>2 members) to count toward official monthly leaderboards. Guest player records and 2-player practice games will be archived in game logs only.</p>
+                    </div>
+                </div>
+
+                <!-- Player Roster Section -->
+                <div class="space-y-4 pt-2 border-t border-slate-700/50">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Participating Player Roster</h2>
+                        <button type="button" id="addPlayerRowBtn" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1">
+                            <span class="material-icons text-sm">add</span> Add Player
+                        </button>
+                    </div>
+
+                    <div id="playerRowsContainer" class="space-y-3">
+                        <!-- Dynamic Player Entry Cards Injected Here -->
+                    </div>
+                </div>
+
+                <!-- Status Banner -->
+                <div id="formStatus" class="hidden text-xs p-3 rounded-xl border"></div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
+                    <span class="material-icons text-base">save</span> Save Match Record
+                </button>
+            </form>
+
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, collection, doc, getDocs, setDoc } from "../web-info/firebase.js";
+
+        // Registered members directory loaded strictly from Firestore /players collection
+        let registeredMembersList = [];
+
+        const matchDate = document.getElementById('matchDate');
+        const locationInput = document.getElementById('location');
+        const gameIdPreview = document.getElementById('gameIdPreview');
+        const playerRowsContainer = document.getElementById('playerRowsContainer');
+        const formStatus = document.getElementById('formStatus');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Set default date to today YYYY-MM-DD
+        const today = new Date();
+        matchDate.value = today.toISOString().split('T')[0];
+
+        async function initPage() {
+            // Load real member directory directly from Firestore /players collection
+            try {
+                const membersSnap = await getDocs(collection(db, "players"));
+                const fetched = [];
+                membersSnap.forEach(d => {
+                    const data = d.data() || {};
+                    const name = data.name || d.id;
+                    if (name) fetched.push(name);
+                });
+                registeredMembersList = Array.from(new Set(fetched)).sort();
+            } catch(e) {
+                console.error("Error loading member roster from Firestore:", e);
+            }
+
+            updateGameIdPreview();
+            createPlayerRow(true);  // Player 1
+            createPlayerRow(false); // Player 2
+            createPlayerRow(false); // Player 3
+        }
+
+        async function updateGameIdPreview() {
+            if (!matchDate.value) return;
+            
+            const parts = matchDate.value.split('-'); // YYYY-MM-DD
+            const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`; // DD-MM-YYYY
+
+            try {
+                const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
+                let countSameDate = 0;
+
+                matchesSnap.forEach(d => {
+                    if (d.id.startsWith(formattedDate)) countSameDate++;
+                });
+
+                const indexStr = String(countSameDate + 1).padStart(2, '0');
+                const calculatedId = `${formattedDate}-${indexStr}`;
+                gameIdPreview.textContent = `games/Monopoly/matches/${calculatedId}`;
+                gameIdPreview.dataset.id = calculatedId;
+            } catch (err) {
+                const fallbackId = `${formattedDate}-01`;
+                gameIdPreview.textContent = `games/Monopoly/matches/${fallbackId}`;
+                gameIdPreview.dataset.id = fallbackId;
+            }
+
+            // Check August 2026+ rule for property fields
+            togglePropertyFields();
+        }
+
+        function isAugust2026OrLater(dateVal) {
+            if (!dateVal || !dateVal.includes('-')) return false;
+            const [y, m] = dateVal.split('-').map(Number);
+            return y > 2026 || (y === 2026 && m >= 8);
+        }
+
+        function togglePropertyFields() {
+            const isAug2026 = isAugust2026OrLater(matchDate.value);
+            document.querySelectorAll('.property-box').forEach(box => {
+                if (isAug2026) box.classList.remove('hidden');
+                else box.classList.add('hidden');
+            });
+        }
+
+        function createPlayerRow(isFirst = false) {
+            const card = document.createElement('div');
+            card.className = "player-card bg-slate-900/80 border border-slate-700/60 rounded-xl p-4 space-y-3 relative";
+
+            card.innerHTML = `
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div class="flex-1 w-full space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Select Player Member / Custom Guest</label>
+                        <select class="member-select bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white w-full focus:outline-none focus:border-purple-500">
+                            <option value="">-- Choose Registered Member --</option>
+                            ${registeredMembersList.map(m => `<option value="${m}">${m}</option>`).join('')}
+                            <option value="GUEST_CUSTOM">+ Enter Custom Guest Name...</option>
+                        </select>
+                        <input type="text" class="custom-guest-name hidden bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-300 w-full mt-1" placeholder="Enter Guest Name (Excluded from Leaderboard)">
+                    </div>
+
+                    <div class="w-full sm:w-36 space-y-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Earnings Net ($)</label>
+                        <input type="number" class="player-earnings bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-emerald-400 font-mono font-bold w-full" placeholder="0" required>
+                    </div>
+
+                    <div class="flex items-center gap-2 pt-4 sm:pt-3">
+                        <label class="inline-flex items-center gap-1.5 cursor-pointer">
+                            <input type="radio" name="winnerRadio" class="winner-radio accent-amber-500" ${isFirst ? 'checked' : ''}>
+                            <span class="text-xs text-amber-400 font-bold">Winner</span>
+                        </label>
+                        <button type="button" class="remove-row-btn p-1 text-slate-500 hover:text-red-400 rounded transition" title="Remove Player">
+                            <span class="material-icons text-base">delete</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- August 2026+ Property Tracking Section -->
+                <div class="property-box ${isAugust2026OrLater(matchDate.value) ? '' : 'hidden'} pt-3 border-t border-slate-800 space-y-2">
+                    <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">August 2026+ Property Collection (Max 26 Total)</span>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-[10px] text-slate-400">Cities (Max 20):</label>
+                            <input type="number" min="0" max="20" class="cities-input bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white w-full" value="0">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] text-slate-400">Stations & Utilities (Max 6):</label>
+                            <input type="number" min="0" max="6" class="stations-input bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white w-full" value="0">
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const select = card.querySelector('.member-select');
+            const customGuestName = card.querySelector('.custom-guest-name');
+            const removeBtn = card.querySelector('.remove-row-btn');
+
+            select.addEventListener('change', () => {
+                if (select.value === 'GUEST_CUSTOM') {
+                    customGuestName.classList.remove('hidden');
+                    customGuestName.required = true;
+                } else {
+                    customGuestName.classList.add('hidden');
+                    customGuestName.required = false;
+                }
+            });
+
+            removeBtn.addEventListener('click', () => {
+                if (document.querySelectorAll('.player-card').length <= 2) {
+                    alert("A game match requires at least 2 players.");
+                    return;
+                }
+                card.remove();
+            });
+
+            playerRowsContainer.appendChild(card);
+        }
+
+        matchDate.addEventListener('change', updateGameIdPreview);
+        document.getElementById('addPlayerRowBtn').addEventListener('click', () => createPlayerRow(false));
+
+        document.getElementById('matchForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const customGameId = gameIdPreview.dataset.id;
+            if (!customGameId) {
+                alert("Please select a valid date.");
+                return;
+            }
+
+            const playerCards = document.querySelectorAll('.player-card');
+            const playersData = [];
+
+            playerCards.forEach(card => {
+                const selectVal = card.querySelector('.member-select').value;
+                const customGuestVal = card.querySelector('.custom-guest-name').value;
+                const earningsVal = Number(card.querySelector('.player-earnings').value || 0);
+                const isWinnerVal = card.querySelector('.winner-radio').checked;
+                const citiesVal = Number(card.querySelector('.cities-input').value || 0);
+                const stationsVal = Number(card.querySelector('.stations-input').value || 0);
+
+                const name = selectVal === 'GUEST_CUSTOM' ? (customGuestVal || 'Guest') : selectVal;
+                const isGuest = selectVal === 'GUEST_CUSTOM';
+
+                playersData.push({
+                    name: name,
+                    isGuest: isGuest,
+                    isMember: !isGuest,
+                    earnings: earningsVal,
+                    isWinner: isWinnerVal,
+                    cities: citiesVal,
+                    stations: stationsVal
+                });
+            });
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Saving Match Record...";
+
+            try {
+                const matchData = {
+                    gameId: customGameId,
+                    date: matchDate.value,
+                    location: locationInput.value,
+                    players: playersData,
+                    createdAt: new Date().toISOString()
+                };
+
+                const docRef = doc(db, "games", "Monopoly", "matches", customGameId);
+                await setDoc(docRef, matchData);
+
+                showStatus(`Match record ${customGameId} successfully saved! Redirecting...`, "success");
+                setTimeout(() => window.location.href = `view.html?game=${encodeURIComponent(customGameId)}`, 1200);
+
+            } catch (err) {
+                showStatus(err.message || "Failed to save match record.", "error");
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Save Match Record";
+            }
+        });
+
+        function showStatus(msg, type) {
+            formStatus.classList.remove('hidden');
+            formStatus.textContent = msg;
+            if (type === 'success') {
+                formStatus.className = "text-xs p-3 rounded-xl border bg-emerald-950/80 text-emerald-300 border-emerald-800";
+            } else {
+                formStatus.className = "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800";
+            }
+        }
+
+        initPage();
+    </script>
+</body>
+</html>

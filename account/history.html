@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Activity Logs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+    
+    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="overview.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+                <span class="material-icons text-base">arrow_back</span> Back to Overview
+            </a>
+            <span class="text-xs font-mono text-slate-400">Account Audit Logs</span>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
+        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-700/60 pb-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-white">Account Activity History</h1>
+                    <p class="text-xs text-slate-400 mt-1">Review authenticated actions, sign-in sessions, and profile activity.</p>
+                </div>
+                <button id="refreshBtn" class="p-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-slate-200 transition" title="Refresh logs">
+                    <span class="material-icons text-sm">refresh</span>
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead>
+                        <tr class="text-slate-400 border-b border-slate-700 text-xs uppercase tracking-wider">
+                            <th class="py-3 px-2">Timestamp</th>
+                            <th class="py-3 px-2">Event Type</th>
+                            <th class="py-3 px-2">Description</th>
+                            <th class="py-3 px-2 text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody" class="divide-y divide-slate-700/50 text-xs">
+                        <tr>
+                            <td colspan="4" class="py-6 text-center text-slate-400">Loading account activity...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { auth, db, collection, getDocs, query, where, orderBy, limit, onAuthStateChanged } from "../web-info/firebase.js";
+
+        const logsTableBody = document.getElementById('logsTableBody');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "sign-up-in.html";
+                return;
+            }
+
+            fetchUserLogs(user);
+        });
+
+        async function fetchUserLogs(user) {
+            try {
+                // Fetch user specific activity or construct current session log entry
+                const now = new Date();
+                const currentSessionLog = {
+                    time: now.toLocaleString(),
+                    type: "Authentication",
+                    description: `Active session verified for ${user.email || user.uid}`,
+                    status: "Success"
+                };
+
+                const logs = [currentSessionLog];
+
+                // Attempt fetching saved logs if present
+                try {
+                    const q = query(collection(db, "account_logs"), where("uid", "==", user.uid), orderBy("timestamp", "desc"), limit(20));
+                    const snapshot = await getDocs(q);
+                    snapshot.forEach(docSnap => {
+                        const data = docSnap.data();
+                        logs.push({
+                            time: data.timestamp ? new Date(data.timestamp.toDate()).toLocaleString() : "N/A",
+                            type: data.type || "Action",
+                            description: data.description || "Account action recorded",
+                            status: data.status || "OK"
+                        });
+                    });
+                } catch(e) {
+                    // Fallback to local session view if collection is empty
+                }
+
+                renderLogs(logs);
+            } catch (err) {
+                logsTableBody.innerHTML = `<tr><td colspan="4" class="py-4 text-center text-red-400">Unable to load activity logs.</td></tr>`;
+            }
+        }
+
+        function renderLogs(logs) {
+            logsTableBody.innerHTML = logs.map(log => `
+                <tr class="hover:bg-slate-700/30">
+                    <td class="py-3 px-2 font-mono text-slate-300">${log.time}</td>
+                    <td class="py-3 px-2 font-semibold text-blue-400">${log.type}</td>
+                    <td class="py-3 px-2 text-slate-200">${log.description}</td>
+                    <td class="py-3 px-2 text-right font-medium text-emerald-400">${log.status}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('refreshBtn')?.addEventListener('click', () => {
+            if (auth.currentUser) fetchUserLogs(auth.currentUser);
+        });
+    </script>
+</body>
+</html>
