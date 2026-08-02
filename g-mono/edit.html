@@ -15,39 +15,126 @@
             <button type="submit" class="w-full bg-amber-500 py-2 rounded">Update</button>
         </form>
     </div>
-    <script type="module">
-        import { db, doc, getDoc, setDoc } from "../web-info/firebase.js";
-        const gameId = new URLSearchParams(window.location.search).get('game');
-        const container = document.getElementById('playersRowsContainer');
+        <script type="module">
+        import { db, collection, getDocs } from "../web-info/firebase.js";
 
-        async function load() {
-            const snap = await getDoc(doc(db, "games", "Monopoly", "matches", gameId));
-            const data = snap.data();
-            document.getElementById('matchDate').value = data.date;
-            document.getElementById('matchLocation').value = data.location;
-            data.players.forEach(p => {
-                container.innerHTML += `
-                    <div class="flex gap-2 mb-2">
-                        <input class="player-name bg-slate-950 border p-2 flex-1" value="${p.name}">
-                        <input type="text" inputmode="decimal" class="player-score bg-slate-950 border p-2 w-24" value="${p.score}">
-                    </div>`;
-            });
+        const searchInput = document.getElementById('searchInput');
+        const typeFilter = document.getElementById('typeFilter');
+        const historyTableBody = document.getElementById('historyTableBody');
+
+        let allMatches = [];
+
+        async function fetchMatchHistory() {
+            try {
+                const matchesRef = collection(db, "games", "Monopoly", "matches");
+                const snapshot = await getDocs(matchesRef);
+
+                allMatches = [];
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const players = data.players || [];
+                    const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
+                    const winnerObj = players.find(p => p.isWinner) || players[0] || {};
+                    const gameDate = data.date || docSnap.id.substring(0, 10);
+
+                    allMatches.push({
+                        id: docSnap.id,
+                        date: gameDate,
+                        parsedDate: parseDateForSorting(gameDate),
+                        location: data.location || 'N/A',
+                        playersCount: players.length,
+                        memberCount: memberCount,
+                        isRanked: memberCount >= 2, // Updated to >= 2 members rule
+                        winner: winnerObj.name || 'N/A',
+                        players: players
+                    });
+                });
+
+                // Sort descending by playing date (newest first)
+                allMatches.sort((a, b) => b.parsedDate - a.parsedDate);
+                renderHistory();
+            } catch (err) {
+                console.error("Fetch History Error:", err);
+                historyTableBody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-red-400">Unable to load match logs from Firestore.</td></tr>`;
+            }
         }
-        
-        document.getElementById('editMatchForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const players = Array.from(document.querySelectorAll('.player-name')).map((n, i) => ({
-                name: n.value,
-                score: parseFloat(document.querySelectorAll('.player-score')[i].value)
-            }));
-            await setDoc(doc(db, "games", "Monopoly", "matches", gameId), {
-                date: document.getElementById('matchDate').value,
-                location: document.getElementById('matchLocation').value,
-                players: players
-            }, {merge: true});
-            window.location.href = "g-mono.html";
-        });
-        load();
+
+        // Helper function to convert various date string formats (DD-MM-YYYY, YYYY-MM-DD, etc.) into a timestamp for sorting
+        function parseDateForSorting(dateStr) {
+            if (!dateStr) return 0;
+            const parts = dateStr.split(/[-/]/);
+            if (parts.length === 3) {
+                // If format starts with YYYY (e.g. YYYY-MM-DD)
+                if (parts[0].length === 4) {
+                    return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+                }
+                // Default DD-MM-YYYY format
+                return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+            }
+            return new Date(dateStr).getTime() || 0;
+        }
+
+        function renderHistory() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const filterVal = typeFilter.value;
+
+            const filtered = allMatches.filter(m => {
+                const matchesSearch = m.id.toLowerCase().includes(searchTerm) ||
+                                     m.location.toLowerCase().includes(searchTerm) ||
+                                     m.winner.toLowerCase().includes(searchTerm) ||
+                                     m.players.some(p => p.name?.toLowerCase().includes(searchTerm));
+
+                if (!matchesSearch) return false;
+
+                if (filterVal === 'ranked') return m.isRanked;
+                if (filterVal === 'unranked') return !m.isRanked;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                historyTableBody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">No matching game records found.</td></tr>`;
+                return;
+            }
+
+            historyTableBody.innerHTML = filtered.map(m => `
+                <tr class="hover:bg-slate-800/40 transition">
+                    <td class="py-3 px-3 font-mono font-bold text-amber-400">
+                        <a href="view.html?game=${encodeURIComponent(m.id)}" class="hover:underline flex items-center gap-1">
+                            <span>${m.id}</span>
+                            <span class="material-icons text-xs">open_in_new</span>
+                        </a>
+                    </td>
+                    <td class="py-3 px-3 font-mono text-slate-300">${m.date}</td>
+                    <td class="py-3 px-3 text-slate-200">${m.location}</td>
+                    <td class="py-3 px-3 text-center font-mono text-slate-300">${m.playersCount}</td>
+                    <td class="py-3 px-3 font-semibold text-white flex items-center gap-1">
+                        <span>🥇</span>
+                        <a href="view.html?player=${encodeURIComponent(m.winner)}" class="hover:underline text-amber-300">${m.winner}</a>
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${m.isRanked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">
+                            ${m.isRanked ? 'Ranked' : 'Practice'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="view.html?game=${encodeURIComponent(m.id)}" class="p-1 text-slate-400 hover:text-white rounded transition" title="Inspect Game">
+                                <span class="material-icons text-base">visibility</span>
+                            </a>
+                            <a href="edit.html?game=${encodeURIComponent(m.id)}" class="p-1 text-slate-400 hover:text-amber-400 rounded transition" title="Edit Record">
+                                <span class="material-icons text-base">edit</span>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        searchInput.addEventListener('input', renderHistory);
+        typeFilter.addEventListener('change', renderHistory);
+
+        fetchMatchHistory();
     </script>
+
 </body>
 </html>
