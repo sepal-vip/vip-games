@@ -3,209 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Monopoly Match</title>
+    <title>Edit Match</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style>
-        body { font-family: 'Google Sans', sans-serif; }
-    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
-
-    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="g-mono.html" class="flex items-center gap-1 text-slate-400 hover:text-white text-xs font-semibold transition">
-                <span class="material-icons text-sm">arrow_back</span> Monopoly Suite
-            </a>
-            <span class="text-amber-400 font-extrabold text-sm flex items-center gap-1.5">
-                <span class="material-icons text-base text-amber-500">edit</span> Edit Match Record
-            </span>
-        </div>
-    </nav>
-
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-6">
-            <div class="border-b border-slate-800 pb-4 flex justify-between items-center">
-                <div>
-                    <h1 class="text-xl font-extrabold text-white">Edit Match: <span id="gameIdTitle" class="text-amber-400 font-mono">...</span></h1>
-                    <p class="text-xs text-slate-400 mt-1">Update scores and player standings. Ranks auto-calculate upon save.</p>
-                </div>
-            </div>
-
-            <form id="editMatchForm" class="space-y-6">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Match Date</label>
-                        <input type="date" id="matchDate" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Venue / Location</label>
-                        <input type="text" id="matchLocation" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                    </div>
-                </div>
-
-                <div class="space-y-3 pt-2 border-t border-slate-800">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Players & Final Scores</h2>
-                        </div>
-                        <button type="button" id="addPlayerRowBtn" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1">
-                            <span class="material-icons text-sm">person_add</span> Add Player
-                        </button>
-                    </div>
-
-                    <div id="playersRowsContainer" class="space-y-3">
-                        <p class="text-xs text-slate-500">Loading player records...</p>
-                    </div>
-                </div>
-
-                <div id="formStatusMsg" class="hidden text-xs p-3 rounded-xl border"></div>
-
-                <div class="pt-4 border-t border-slate-800 flex justify-end gap-3">
-                    <a href="g-mono.html" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition">Cancel</a>
-                    <button type="submit" class="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition shadow-lg">
-                        Update Match Record
-                    </button>
-                </div>
-            </form>
-        </div>
-    </main>
-
+<body class="bg-slate-950 p-4">
+    <div class="max-w-2xl mx-auto bg-slate-900 p-6 rounded-2xl">
+        <form id="editMatchForm" class="space-y-4">
+            <input type="date" id="matchDate" class="w-full bg-slate-950 border p-2 rounded">
+            <input type="text" id="matchLocation" class="w-full bg-slate-950 border p-2 rounded">
+            <div id="playersRowsContainer"></div>
+            <button type="submit" class="w-full bg-amber-500 py-2 rounded">Update</button>
+        </form>
+    </div>
     <script type="module">
         import { db, doc, getDoc, setDoc } from "../web-info/firebase.js";
+        const gameId = new URLSearchParams(window.location.search).get('game');
+        const container = document.getElementById('playersRowsContainer');
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const gameId = urlParams.get('game');
-
-        const gameIdTitle = document.getElementById('gameIdTitle');
-        const matchDate = document.getElementById('matchDate');
-        const matchLocation = document.getElementById('matchLocation');
-        const playersRowsContainer = document.getElementById('playersRowsContainer');
-        const addPlayerRowBtn = document.getElementById('addPlayerRowBtn');
-        const editMatchForm = document.getElementById('editMatchForm');
-        const formStatusMsg = document.getElementById('formStatusMsg');
-
-        if (!gameId) {
-            window.location.href = "g-mono.html";
+        async function load() {
+            const snap = await getDoc(doc(db, "games", "Monopoly", "matches", gameId));
+            const data = snap.data();
+            document.getElementById('matchDate').value = data.date;
+            document.getElementById('matchLocation').value = data.location;
+            data.players.forEach(p => {
+                container.innerHTML += `
+                    <div class="flex gap-2 mb-2">
+                        <input class="player-name bg-slate-950 border p-2 flex-1" value="${p.name}">
+                        <input type="text" inputmode="decimal" class="player-score bg-slate-950 border p-2 w-24" value="${p.score}">
+                    </div>`;
+            });
         }
-
-        gameIdTitle.textContent = gameId;
-
-        async function loadMatch() {
-            try {
-                const docSnap = await getDoc(doc(db, "games", "Monopoly", "matches", gameId));
-                if (!docSnap.exists()) {
-                    showMsg("Match record not found.", "error");
-                    return;
-                }
-                const data = docSnap.data();
-                matchDate.value = data.date || '';
-                matchLocation.value = data.location || '';
-
-                playersRowsContainer.innerHTML = '';
-                (data.players || []).forEach(p => {
-                    addPlayerRow(p.name, p.score, p.isMember !== false);
-                });
-            } catch (err) {
-                showMsg("Failed to load match record from Firestore.", "error");
-            }
-        }
-
-        function addPlayerRow(name = "", score = 0, isMember = true) {
-            const rowId = 'p_row_' + Math.random().toString(36).substr(2, 9);
-            const div = document.createElement('div');
-            div.className = "player-row bg-slate-950 border border-slate-800 p-3 rounded-xl grid grid-cols-1 sm:grid-cols-12 gap-3 items-center";
-            div.id = rowId;
-
-            div.innerHTML = `
-                <div class="sm:col-span-5">
-                    <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Player Name</label>
-                    <input type="text" class="player-name w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white" placeholder="Player Name" value="${name}" required>
-                </div>
-                <div class="sm:col-span-4">
-                    <label class="block text-[9px] font-bold text-slate-500 uppercase mb-1">Final Score / Cash ($)</label>
-                    <input type="text" inputmode="decimal" class="player-score w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-mono" placeholder="e.g. 520 or -150" value="${score}" required>
-                </div>
-                <div class="sm:col-span-2 flex items-center pt-4 sm:pt-0">
-                    <label class="flex items-center gap-2 cursor-pointer text-xs text-slate-300">
-                        <input type="checkbox" class="player-member rounded border-slate-700 bg-slate-900 text-amber-500 focus:ring-0" ${isMember ? 'checked' : ''}>
-                        <span>Member</span>
-                    </label>
-                </div>
-                <div class="sm:col-span-1 flex justify-end">
-                    <button type="button" onclick="document.getElementById('${rowId}').remove()" class="p-1.5 text-slate-500 hover:text-red-400 transition" title="Remove Player">
-                        <span class="material-icons text-base">delete</span>
-                    </button>
-                </div>
-            `;
-            playersRowsContainer.appendChild(div);
-        }
-
-        addPlayerRowBtn.addEventListener('click', () => addPlayerRow("", 0, true));
-
-        editMatchForm.addEventListener('submit', async (e) => {
+        
+        document.getElementById('editMatchForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const dateVal = matchDate.value;
-            const locVal = matchLocation.value.trim();
-
-            const rows = playersRowsContainer.querySelectorAll('.player-row');
-            let playersList = [];
-            rows.forEach(r => {
-                const name = r.querySelector('.player-name').value.trim();
-                const scoreStr = r.querySelector('.player-score').value.trim();
-                const isMember = r.querySelector('.player-member').checked;
-                const score = parseFloat(scoreStr) || 0;
-                if (name) {
-                    playersList.push({ name, score, isMember });
-                }
-            });
-
-            // Sort descending to auto-rank
-            playersList.sort((a, b) => b.score - a.score);
-
-            // Assign ranks
-            playersList.forEach((p, idx) => {
-                const pos = idx + 1;
-                let suffix = "th";
-                if (pos === 1) suffix = "st 🥇";
-                else if (pos === 2) suffix = "nd 🥈";
-                else if (pos === 3) suffix = "rd 🥉";
-                else if (pos === 4) suffix = "th";
-
-                p.rank = `${pos}${suffix}`;
-            });
-
-            const matchData = {
-                id: gameId,
-                date: dateVal,
-                location: locVal,
-                players: playersList,
-                updatedAt: new Date().toISOString()
-            };
-
-            try {
-                await setDoc(doc(db, "games", "Monopoly", "matches", gameId), matchData, { merge: true });
-                showMsg("Match record updated successfully! Redirecting...", "success");
-                setTimeout(() => {
-                    window.location.href = "g-mono.html";
-                }, 1500);
-            } catch (err) {
-                showMsg(err.message || "Failed to update match record.", "error");
-            }
+            const players = Array.from(document.querySelectorAll('.player-name')).map((n, i) => ({
+                name: n.value,
+                score: parseFloat(document.querySelectorAll('.player-score')[i].value)
+            }));
+            await setDoc(doc(db, "games", "Monopoly", "matches", gameId), {
+                date: document.getElementById('matchDate').value,
+                location: document.getElementById('matchLocation').value,
+                players: players
+            }, {merge: true});
+            window.location.href = "g-mono.html";
         });
-
-        function showMsg(txt, type) {
-            formStatusMsg.classList.remove('hidden');
-            formStatusMsg.textContent = txt;
-            if (type === 'success') {
-                formStatusMsg.className = "text-xs p-3 rounded-xl border bg-emerald-950/80 text-emerald-300 border-emerald-800 font-medium";
-            } else {
-                formStatusMsg.className = "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800 font-medium";
-            }
-        }
-
-        loadMatch();
+        load();
     </script>
 </body>
 </html>
