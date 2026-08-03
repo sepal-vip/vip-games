@@ -80,16 +80,13 @@
 
                 // Load matches to compute stats
                 const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
-                matchesData = [];
-                matchesSnap.forEach(d => matchesData.push(d.id, d.data()));
-
-                // Also parse match objects correctly
                 const allMatches = [];
                 matchesSnap.forEach(d => allMatches.push({ id: d.id, ...d.data() }));
                 matchesData = allMatches;
 
                 renderPlayers();
             } catch (err) {
+                console.error("Directory Load Error:", err);
                 playersGrid.innerHTML = `<div class="col-span-full py-12 text-center text-red-400 font-bold">Failed to load member directory.</div>`;
             }
         }
@@ -114,16 +111,18 @@
 
                 matchesData.forEach(m => {
                     const players = m.players || [];
-                    const memberCount = players.filter(p => p.isMember !== false).length;
+                    const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
                     const isRanked = memberCount > 2;
 
                     players.forEach((p, idx) => {
                         if ((p.name || '').toLowerCase() === name.toLowerCase()) {
                             totalPlayed++;
                             if (isRanked) rankedPlayed++;
-                            if (idx === 0) wins++;
-                            totalScore += (p.score || 0);
-                            if (p.score > bestScore) bestScore = p.score;
+                            if (p.isWinner || idx === 0) wins++;
+                            
+                            const cashVal = Number(p.cash ?? p.earnings ?? 0);
+                            totalScore += cashVal;
+                            if (cashVal > bestScore) bestScore = cashVal;
                         }
                     });
                 });
@@ -132,21 +131,21 @@
                 const winRate = totalPlayed > 0 ? ((wins / totalPlayed) * 100).toFixed(1) : "0.0";
 
                 return `
-                    <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4 shadow-xl flex flex-col justify-between">
+                    <a href="view.html?player=${encodeURIComponent(name)}" class="bg-slate-900/80 border border-slate-800 hover:border-amber-500/50 rounded-2xl p-6 space-y-4 shadow-xl flex flex-col justify-between transition group">
                         <div class="space-y-3">
                             <div class="flex justify-between items-start">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg">
+                                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-bold text-lg group-hover:bg-amber-500 group-hover:text-slate-950 transition">
                                         ${name.charAt(0).toUpperCase()}
                                     </div>
                                     <div>
-                                        <h2 class="text-base font-extrabold text-white">${name}</h2>
+                                        <h2 class="text-base font-extrabold text-white group-hover:text-amber-400 transition">${name}</h2>
                                         <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-blue-950 text-blue-300 border border-blue-800">
                                             Registered Member
                                         </span>
                                     </div>
                                 </div>
-                                <span class="material-icons text-slate-600">verified</span>
+                                <span class="material-icons text-slate-600 group-hover:text-amber-400 transition">open_in_new</span>
                             </div>
 
                             <div class="grid grid-cols-3 gap-2 pt-2 text-center font-mono">
@@ -175,7 +174,7 @@
                                 <strong class="text-amber-400">$${bestScore.toLocaleString()}</strong>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 `;
             }).join('');
         }

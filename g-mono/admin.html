@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monopoly Suite - Admin Control Panel</title>
+    <title>Monopoly Suite - Game Admin Control Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -17,7 +17,7 @@
                 <span class="material-icons text-base">arrow_back</span> Monopoly Suite
             </a>
             <span id="authBadge" class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1">
-                <span class="material-icons text-xs animate-spin">sync</span> Verifying UUID...
+                <span class="material-icons text-xs animate-spin">sync</span> Verifying UID...
             </span>
         </div>
     </nav>
@@ -27,7 +27,7 @@
         <!-- Access Denied Banner -->
         <div id="accessDenied" class="hidden bg-red-950/80 border border-red-800/80 rounded-2xl p-6 text-center space-y-3">
             <span class="material-icons text-red-400 text-5xl">gpp_bad</span>
-            <h1 class="text-2xl font-bold text-white">Admin Access Restricted</h1>
+            <h1 class="text-2xl font-bold text-white">Monopoly Admin Access Restricted</h1>
             <p class="text-xs text-red-200 max-w-md mx-auto">
                 Your authenticated Firebase UID (<code id="userUidDisplay" class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-400 font-mono">...</code>) is not present in the authorized list at <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-400 font-mono">/admin/uuids</code> in Firestore.
             </p>
@@ -36,21 +36,27 @@
             </a>
         </div>
 
-        <!-- Authorized Admin Panel -->
+        <!-- Authorized Monopoly Admin Panel -->
         <div id="adminPanel" class="hidden bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
             
-            <div class="border-b border-slate-700/60 pb-4">
-                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                    🛡️ System Admin Controls
-                </h1>
-                <p class="text-xs text-slate-400 mt-1">Manage allowed administrative UUIDs, audit match documents, and trigger leaderboard re-indexing.</p>
+            <div class="border-b border-slate-700/60 pb-4 flex justify-between items-center">
+                <div>
+                    <h1 class="text-2xl font-bold text-white flex items-center gap-2">
+                        🎲 Monopoly Admin Control Center
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-1">Manage game sub-admins, review session logs, and run database consistency checks.</p>
+                </div>
+                <div class="text-right font-mono text-xs text-slate-400">
+                    Target Collection: <strong class="text-amber-400">games/Monopoly/matches</strong>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
+                <!-- Authorized Admin UUIDs Management -->
                 <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl space-y-4">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Authorized Admin UUIDs</h2>
+                        <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Authorized Monopoly Admins</h2>
                         <span class="material-icons text-slate-500 text-sm">key</span>
                     </div>
 
@@ -59,7 +65,7 @@
                     </div>
 
                     <form id="addUuidForm" class="pt-2 border-t border-slate-800 space-y-2">
-                        <label class="block text-[10px] text-slate-400 uppercase">Add New Admin Firebase UID</label>
+                        <label class="block text-[10px] text-slate-400 uppercase">Authorize New Admin Firebase UID</label>
                         <div class="flex gap-2">
                             <input type="text" id="newUuidInput" required placeholder="Paste user UID..." class="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500">
                             <button type="submit" id="addUuidBtn" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-lg transition shrink-0">
@@ -69,9 +75,10 @@
                     </form>
                 </div>
 
+                <!-- Database & Monopoly Maintenance Tools -->
                 <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl space-y-4">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider">Database & Match Maintenance</h2>
+                        <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider">Monopoly Maintenance & Audit</h2>
                         <span class="material-icons text-slate-500 text-sm">storage</span>
                     </div>
 
@@ -81,12 +88,12 @@
                             <span class="material-icons text-sm">add</span>
                         </a>
                         <a href="history.html" class="block w-full p-2.5 bg-slate-800 hover:bg-slate-700 rounded-xl text-xs text-slate-200 font-semibold transition flex items-center justify-between">
-                            <span>Browse & Edit Existing Game Logs</span>
+                            <span>Browse & Edit Match History Logs</span>
                             <span class="material-icons text-sm">edit</span>
                         </a>
-                        <button type="button" id="reindexBtn" class="w-full p-2.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-800 rounded-xl text-xs text-blue-300 font-semibold transition flex items-center justify-between">
-                            <span>Re-Index Monthly Standings Data</span>
-                            <span class="material-icons text-sm">refresh</span>
+                        <button type="button" id="auditMatchesBtn" class="w-full p-2.5 bg-blue-950/80 hover:bg-blue-900 border border-blue-800 rounded-xl text-xs text-blue-300 font-semibold transition flex items-center justify-between">
+                            <span>Audit Match Database Integrity</span>
+                            <span class="material-icons text-sm">rule</span>
                         </button>
                     </div>
 
@@ -100,7 +107,7 @@
 
     <script type="module" src="../web-info/p-admin-list.js"></script>
     <script type="module">
-        import { auth, db, doc, getDoc, setDoc, onAuthStateChanged } from "../web-info/firebase.js";
+        import { auth, db, doc, getDoc, setDoc, collection, getDocs, onAuthStateChanged } from "../web-info/firebase.js";
         import { PERMANENT_MASTER_ADMIN_UID, isPermanentAdmin } from "../web-info/p-admin-list.js";
 
         const authBadge = document.getElementById('authBadge');
@@ -111,7 +118,7 @@
         const addUuidForm = document.getElementById('addUuidForm');
         const newUuidInput = document.getElementById('newUuidInput');
         const adminStatusMsg = document.getElementById('adminStatusMsg');
-        const reindexBtn = document.getElementById('reindexBtn');
+        const auditMatchesBtn = document.getElementById('auditMatchesBtn');
 
         let allowedUidsList = [];
 
@@ -135,7 +142,7 @@
 
                 if (allowedUidsList.includes(user.uid) || isPermanentAdmin(user.uid)) {
                     authBadge.className = "text-xs px-2.5 py-0.5 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800";
-                    authBadge.textContent = "Authorized Admin";
+                    authBadge.textContent = "Monopoly Admin";
                     
                     accessDenied.classList.add('hidden');
                     adminPanel.classList.remove('hidden');
@@ -167,13 +174,30 @@
             uuidsContainer.innerHTML = allowedUidsList.map(uid => `
                 <div class="flex items-center justify-between bg-slate-800 p-2 rounded-lg font-mono text-xs">
                     <span class="text-slate-200 truncate ${uid === auth.currentUser?.uid ? 'text-amber-400 font-bold' : ''}">${uid}</span>
-                    <div class="flex items-center gap-1">
-                        ${isPermanentAdmin(uid) ? '<span class="text-[9px] bg-red-950 text-red-300 px-1.5 py-0.5 rounded font-sans font-bold">Permanent Admin</span>' : ''}
+                    <div class="flex items-center gap-1.5">
+                        ${isPermanentAdmin(uid) ? '<span class="text-[9px] bg-red-950 text-red-300 px-1.5 py-0.5 rounded font-sans font-bold">Master</span>' : ''}
                         ${uid === auth.currentUser?.uid ? '<span class="text-[9px] bg-amber-950 text-amber-300 px-1.5 py-0.5 rounded font-sans font-bold">You</span>' : ''}
+                        ${!isPermanentAdmin(uid) ? `<button type="button" onclick="window.removeAdminUuid('${uid}')" class="text-slate-400 hover:text-red-400 p-0.5" title="Revoke Access"><span class="material-icons text-sm">close</span></button>` : ''}
                     </div>
                 </div>
             `).join('');
         }
+
+        window.removeAdminUuid = async function(uidToRemove) {
+            if (!confirm(`Are you sure you want to remove admin access for UID: ${uidToRemove}?`)) return;
+
+            const updatedList = allowedUidsList.filter(id => id !== uidToRemove);
+            try {
+                const adminDocRef = doc(db, "admin", "uuids");
+                await setDoc(adminDocRef, { allowed_uids: updatedList }, { merge: true });
+
+                allowedUidsList = updatedList;
+                renderUidsList();
+                showAdminMsg(`Successfully revoked admin access for ${uidToRemove}.`, "success");
+            } catch (err) {
+                showAdminMsg(err.message || "Failed to remove admin UID.", "error");
+            }
+        };
 
         addUuidForm.addEventListener('submit', async (e) => {
             e.preventDefault();
@@ -194,14 +218,31 @@
                 allowedUidsList = updatedList;
                 renderUidsList();
                 newUuidInput.value = '';
-                showAdminMsg(`UID "${newUid}" successfully added as admin!`, "success");
+                showAdminMsg(`UID "${newUid}" successfully added as Monopoly admin!`, "success");
             } catch (err) {
                 showAdminMsg(err.message || "Failed to add new admin UID.", "error");
             }
         });
 
-        reindexBtn.addEventListener('click', () => {
-            showAdminMsg("Leaderboards automatically compute live from games/Monopoly/matches records.", "success");
+        auditMatchesBtn.addEventListener('click', async () => {
+            showAdminMsg("Scanning games/Monopoly/matches database...", "success");
+            try {
+                const snapshot = await getDocs(collection(db, "games", "Monopoly", "matches"));
+                let totalMatches = 0;
+                let unrankedCount = 0;
+
+                snapshot.forEach(docSnap => {
+                    totalMatches++;
+                    const data = docSnap.data();
+                    const players = data.players || [];
+                    const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
+                    if (memberCount <= 2) unrankedCount++;
+                });
+
+                showAdminMsg(`Audit Complete: Found ${totalMatches} total match logs (${unrankedCount} unranked practice sessions).`, "success");
+            } catch (err) {
+                showAdminMsg("Failed to complete match database audit.", "error");
+            }
         });
 
         function showAdminMsg(msg, type) {

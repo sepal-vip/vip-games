@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monopoly Suite - Monthly Overview</title>
+    <title>Monopoly Suite - Performance Overview</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -12,57 +12,103 @@
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
 
     <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
                 <span class="material-icons text-base">arrow_back</span> Monopoly Suite
             </a>
             <span class="text-xs font-bold text-sky-400 flex items-center gap-1">
-                <span class="material-icons text-sm">query_stats</span> Monthly Overview
+                <span class="material-icons text-sm">query_stats</span> Performance Overview
             </span>
         </div>
     </nav>
 
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6">
         <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
             
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/60 pb-6">
+            <!-- Header & Timeframe Selector Bar -->
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-700/60 pb-6">
                 <div>
                     <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                        📊 Monthly Performance Summary
+                        📊 Comprehensive Performance Overview
                     </h1>
-                    <p class="text-xs text-slate-400 mt-1">Aggregated statistics, cash circulation, and property ownership breakdown for all game matches (Ranked + Practice).</p>
+                    <p id="timeframeSubtitle" class="text-xs text-slate-400 mt-1">Aggregated career statistics, cash circulation, and property analytics across custom timeframes.</p>
                 </div>
 
+                <!-- Timeframe Navigation Tabs -->
+                <div class="flex flex-wrap rounded-xl bg-slate-900/80 p-1 border border-slate-700/60 gap-1" id="timeframeNav">
+                    <button data-tf="month" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-sky-500 text-slate-950 transition">Monthly</button>
+                    <button data-tf="year" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Yearly</button>
+                    <button data-tf="28days" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Last 28 Days</button>
+                    <button data-tf="lastyear" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Last Year</button>
+                    <button data-tf="lifetime" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Lifetime</button>
+                </div>
+            </div>
+
+            <!-- Sub-filters (Month/Year dropdowns) -->
+            <div id="filterBar" class="flex flex-wrap items-center gap-4 bg-slate-900/80 p-4 rounded-xl border border-slate-700/50">
+                <div id="monthGroup">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Month</label>
+                    <select id="monthSelect" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500">
+                        <option value="08">August</option>
+                        <option value="07">July</option>
+                        <option value="06">June</option>
+                        <option value="05">May</option>
+                    </select>
+                </div>
+                <div id="yearGroup">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Year</label>
+                    <select id="yearSelect" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500">
+                        <option value="2026">2026</option>
+                        <option value="2025">2025</option>
+                    </select>
+                </div>
+                <div class="text-xs text-sky-400 font-mono ml-auto">
+                    <span id="dateRangeIndicator">Period: August 2026</span>
+                </div>
+            </div>
+
+            <!-- Personal User Linked Stats Banner (Hidden if not logged in or profile unmatched) -->
+            <div id="userPersonalCard" class="hidden bg-gradient-to-r from-sky-950/50 via-slate-900 to-slate-900 border border-sky-500/40 rounded-xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div class="flex items-center gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Month</label>
-                        <select id="monthSelect" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500">
-                            <option value="08">August</option>
-                            <option value="07">July</option>
-                            <option value="06">June</option>
-                            <option value="05">May</option>
-                        </select>
+                    <div class="w-10 h-10 rounded-xl bg-sky-500/20 border border-sky-500/30 text-sky-400 flex items-center justify-center font-bold">
+                        <span class="material-icons">person</span>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Year</label>
-                        <select id="yearSelect" class="bg-slate-900 border border-slate-700 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500">
-                            <option value="2026">2026</option>
-                            <option value="2025">2025</option>
-                        </select>
+                        <span class="text-[10px] font-bold text-sky-400 uppercase tracking-wider block">Linked Account Stats (<span id="linkedPlayerName">User</span>)</span>
+                        <h3 class="text-sm font-bold text-white" id="userSummarySubtitle">Your Performance in this Period</h3>
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-3 text-center font-mono text-xs w-full sm:w-auto">
+                    <div class="bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800">
+                        <span class="text-[9px] text-slate-400 block font-sans">Matches</span>
+                        <span id="userStatMatches" class="font-bold text-white">0</span>
+                    </div>
+                    <div class="bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800">
+                        <span class="text-[9px] text-slate-400 block font-sans">Wins</span>
+                        <span id="userStatWins" class="font-bold text-amber-400">0</span>
+                    </div>
+                    <div class="bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800">
+                        <span class="text-[9px] text-slate-400 block font-sans">Win Rate</span>
+                        <span id="userStatWinRate" class="font-bold text-emerald-400">0%</span>
+                    </div>
+                    <div class="bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800">
+                        <span class="text-[9px] text-slate-400 block font-sans">Net Cash</span>
+                        <span id="userStatCash" class="font-bold text-sky-400">$0</span>
                     </div>
                 </div>
             </div>
 
+            <!-- General Overview Metric Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl text-center space-y-1">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Games</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Games Played</span>
                     <p id="totalGames" class="text-2xl font-bold text-white font-mono">0</p>
                     <span id="rankedBreakdownSubtitle" class="text-[10px] text-emerald-400 font-medium block">0 Ranked / 0 Practice</span>
                 </div>
                 <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl text-center space-y-1">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Cash Flow</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Cash Circulation</span>
                     <p id="totalCash" class="text-2xl font-bold text-emerald-400 font-mono">$0</p>
-                    <span class="text-[10px] text-slate-400 font-medium block">Net Volume</span>
+                    <span class="text-[10px] text-slate-400 font-medium block">Winner Net Volume</span>
                 </div>
                 <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl text-center space-y-1">
                     <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Top Champion</span>
@@ -70,13 +116,14 @@
                     <span id="topWins" class="text-[10px] text-slate-400 font-medium block">0 Wins</span>
                 </div>
                 <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl text-center space-y-1">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Avg Earnings / Game</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Avg Winner Payout</span>
                     <p id="avgEarnings" class="text-2xl font-bold text-sky-400 font-mono">$0</p>
-                    <span class="text-[10px] text-slate-400 font-medium block">Per Winner</span>
+                    <span class="text-[10px] text-slate-400 font-medium block">Per Victory</span>
                 </div>
             </div>
 
-            <div id="augustPropertySection" class="bg-slate-900/80 border border-slate-700/50 p-5 rounded-xl space-y-4">
+            <!-- Property Portfolio Analytics -->
+            <div id="propertySection" class="bg-slate-900/80 border border-slate-700/50 p-5 rounded-xl space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-3">
                     <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                         <span class="material-icons text-sm">domain</span> Property Portfolio Analytics (August 2026+ Tracking)
@@ -102,8 +149,9 @@
                 </div>
             </div>
 
+            <!-- Matches Table -->
             <div class="space-y-3 pt-2">
-                <h2 class="text-sm font-bold text-white uppercase tracking-wider">All Matches This Month</h2>
+                <h2 class="text-sm font-bold text-white uppercase tracking-wider">Matching Game Logs</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm border-collapse">
                         <thead>
@@ -116,9 +164,9 @@
                                 <th class="py-2.5 px-3 text-right">Winner Earnings ($)</th>
                             </tr>
                         </thead>
-                        <tbody id="monthlyTableBody" class="divide-y divide-slate-700/50 text-xs font-mono">
+                        <tbody id="overviewTableBody" class="divide-y divide-slate-700/50 text-xs font-mono">
                             <tr>
-                                <td colspan="6" class="py-8 text-center text-slate-400 font-sans">Loading monthly summary...</td>
+                                <td colspan="6" class="py-8 text-center text-slate-400 font-sans">Loading overview matches...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -129,10 +177,28 @@
     </main>
 
     <script type="module">
-        import { db, collection, getDocs } from "../web-info/firebase.js";
+        import { db, auth, collection, getDocs, onAuthStateChanged } from "../web-info/firebase.js";
 
+        let activeTimeframe = "month";
+        let currentUserEmailOrName = null;
+        let allRegisteredMembers = [];
+
+        const tfButtons = document.querySelectorAll('.tf-btn');
+        const filterBar = document.getElementById('filterBar');
+        const monthGroup = document.getElementById('monthGroup');
+        const yearGroup = document.getElementById('yearGroup');
         const monthSelect = document.getElementById('monthSelect');
         const yearSelect = document.getElementById('yearSelect');
+        const timeframeSubtitle = document.getElementById('timeframeSubtitle');
+        const dateRangeIndicator = document.getElementById('dateRangeIndicator');
+
+        const userPersonalCard = document.getElementById('userPersonalCard');
+        const linkedPlayerName = document.getElementById('linkedPlayerName');
+        const userStatMatches = document.getElementById('userStatMatches');
+        const userStatWins = document.getElementById('userStatWins');
+        const userStatWinRate = document.getElementById('userStatWinRate');
+        const userStatCash = document.getElementById('userStatCash');
+
         const totalGames = document.getElementById('totalGames');
         const rankedBreakdownSubtitle = document.getElementById('rankedBreakdownSubtitle');
         const totalCash = document.getElementById('totalCash');
@@ -142,10 +208,60 @@
         const totalCities = document.getElementById('totalCities');
         const totalStations = document.getElementById('totalStations');
         const topPropertyOwner = document.getElementById('topPropertyOwner');
-        const monthlyTableBody = document.getElementById('monthlyTableBody');
+        const overviewTableBody = document.getElementById('overviewTableBody');
 
-        async function loadMonthlyOverview() {
-            monthlyTableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-sans">Computing monthly statistics...</td></tr>`;
+        // Listen to Auth State to link personal user stats
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUserEmailOrName = user.email ? user.email.split('@')[0] : null;
+            }
+            await fetchMembersAndOverview();
+        });
+
+        tfButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                tfButtons.forEach(b => {
+                    b.className = "tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition";
+                });
+                e.target.className = "tf-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-sky-500 text-slate-950 transition";
+                activeTimeframe = e.target.dataset.tf;
+
+                if (activeTimeframe === 'lifetime') {
+                    filterBar.style.display = 'none';
+                } else {
+                    filterBar.style.display = 'flex';
+                    monthGroup.style.display = (activeTimeframe === 'year' || activeTimeframe === 'lastyear') ? 'none' : 'block';
+                    yearGroup.style.display = (activeTimeframe === '28days') ? 'none' : 'block';
+                }
+                fetchMembersAndOverview();
+            });
+        });
+
+        async function fetchMembersAndOverview() {
+            try {
+                const membersSnap = await getDocs(collection(db, "players"));
+                allRegisteredMembers = [];
+                membersSnap.forEach(d => allRegisteredMembers.push(d.id.toLowerCase()));
+            } catch (e) {
+                console.error("Error loading players:", e);
+            }
+            loadOverviewData();
+        }
+
+        function parseDateToTimestamp(dateStr) {
+            if (!dateStr) return 0;
+            const parts = dateStr.split(/[-/]/);
+            if (parts.length === 3) {
+                if (parts[0].length === 4) {
+                    return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+                }
+                return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
+            }
+            return new Date(dateStr).getTime() || 0;
+        }
+
+        async function loadOverviewData() {
+            overviewTableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-sans">Computing overview statistics...</td></tr>`;
 
             try {
                 const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
@@ -159,14 +275,19 @@
                 
                 const playerWins = {};
                 const playerProperties = {};
-                const monthlyMatches = [];
+                const playerStats = {};
+                const matchingMatches = [];
+
+                const now = new Date();
+                const currentTimestamp = now.getTime();
+                const twentyEightDaysAgo = currentTimestamp - (28 * 24 * 60 * 60 * 1000);
 
                 matchesSnap.forEach(docSnap => {
                     const game = docSnap.data();
                     const players = game.players || [];
+                    const dateStr = game.date || docSnap.id.substring(0, 10);
+                    const matchTime = parseDateToTimestamp(dateStr);
 
-                    // Verify Month & Year
-                    const dateStr = game.date || docSnap.id;
                     let yr = "", mo = "";
                     if (dateStr.includes('-')) {
                         const parts = dateStr.split('-');
@@ -174,9 +295,18 @@
                         else if (parts[2]?.length === 4) { yr = parts[2]; mo = parts[1]; }
                     }
 
-                    if (yr !== yearSelect.value || mo !== monthSelect.value) return;
+                    // Timeframe Filtering Logic
+                    if (activeTimeframe === 'month') {
+                        if (yr !== yearSelect.value || mo !== monthSelect.value) return;
+                    } else if (activeTimeframe === 'year') {
+                        if (yr !== yearSelect.value) return;
+                    } else if (activeTimeframe === 'lastyear') {
+                        const targetYear = String(Number(new Date().getFullYear()) - 1);
+                        if (yr !== targetYear) return;
+                    } else if (activeTimeframe === '28days') {
+                        if (matchTime < twentyEightDaysAgo || matchTime > currentTimestamp) return;
+                    }
 
-                    // Evaluate Ranked status (>2 registered members)
                     const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
                     const isRanked = memberCount > 2;
 
@@ -186,7 +316,6 @@
 
                     const winner = players.find(p => p.isWinner) || players[0] || {};
                     const winnerEarnings = Number(winner.earnings || winner.cash || 0);
-
                     cashSum += winnerEarnings;
 
                     if (winner.name) {
@@ -195,16 +324,24 @@
 
                     players.forEach(p => {
                         const name = p.name || 'Member';
+                        const lowerName = name.toLowerCase();
                         const c = Number(p.cities || 0);
                         const s = Number(p.stations || 0);
+                        const pEarnings = Number(p.cash ?? p.earnings ?? 0);
 
                         citiesSum += c;
                         stationsSum += s;
-
                         playerProperties[name] = (playerProperties[name] || 0) + c + s;
+
+                        if (!playerStats[lowerName]) {
+                            playerStats[lowerName] = { realName: name, played: 0, wins: 0, cash: 0 };
+                        }
+                        playerStats[lowerName].played++;
+                        playerStats[lowerName].cash += pEarnings;
+                        if (p.isWinner) playerStats[lowerName].wins++;
                     });
 
-                    monthlyMatches.push({
+                    matchingMatches.push({
                         id: docSnap.id,
                         date: dateStr,
                         location: game.location || 'N/A',
@@ -214,7 +351,7 @@
                     });
                 });
 
-                // Update metric cards
+                // Update Overview Metrics
                 totalGames.textContent = allGamesCount;
                 if (rankedBreakdownSubtitle) {
                     rankedBreakdownSubtitle.textContent = `${rankedGamesCount} Ranked / ${practiceGamesCount} Practice`;
@@ -225,7 +362,26 @@
                 totalCities.textContent = citiesSum;
                 totalStations.textContent = stationsSum;
 
-                // Find top winner
+                // Range Text
+                if (activeTimeframe === 'month') {
+                    dateRangeIndicator.textContent = `Period: ${monthSelect.options[monthSelect.selectedIndex].text} ${yearSelect.value}`;
+                    timeframeSubtitle.textContent = `Aggregated statistics for ${monthSelect.options[monthSelect.selectedIndex].text} ${yearSelect.value}.`;
+                } else if (activeTimeframe === 'year') {
+                    dateRangeIndicator.textContent = `Period: Full Year ${yearSelect.value}`;
+                    timeframeSubtitle.textContent = `Aggregated statistics for the year ${yearSelect.value}.`;
+                } else if (activeTimeframe === '28days') {
+                    dateRangeIndicator.textContent = `Period: Last 28 Days (Rolling)`;
+                    timeframeSubtitle.textContent = `Performance overview covering matches played in the past 28 days.`;
+                } else if (activeTimeframe === 'lastyear') {
+                    const prevYr = String(Number(new Date().getFullYear()) - 1);
+                    dateRangeIndicator.textContent = `Period: Previous Year (${prevYr})`;
+                    timeframeSubtitle.textContent = `Complete summary for the calendar year ${prevYr}.`;
+                } else {
+                    dateRangeIndicator.textContent = `Period: All-Time Career History`;
+                    timeframeSubtitle.textContent = `Cumulative career overview across all recorded Monopoly game logs.`;
+                }
+
+                // Top Champion
                 let champName = "None";
                 let maxWins = 0;
                 for (const [pName, wins] of Object.entries(playerWins)) {
@@ -237,7 +393,7 @@
                 topPlayer.textContent = champName;
                 topWins.textContent = `${maxWins} Wins`;
 
-                // Find top property owner
+                // Top Property Owner
                 let propOwner = "N/A";
                 let maxProps = 0;
                 for (const [pName, count] of Object.entries(playerProperties)) {
@@ -248,13 +404,26 @@
                 }
                 topPropertyOwner.textContent = propOwner;
 
-                // Render table rows
-                if (monthlyMatches.length === 0) {
-                    monthlyTableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-sans">No game records found for ${monthSelect.options[monthSelect.selectedIndex].text} ${yearSelect.value}.</td></tr>`;
+                // Match User Auth to Stats
+                if (currentUserEmailOrName && playerStats[currentUserEmailOrName]) {
+                    const uStat = playerStats[currentUserEmailOrName];
+                    userPersonalCard.classList.remove('hidden');
+                    linkedPlayerName.textContent = uStat.realName;
+                    userStatMatches.textContent = uStat.played;
+                    userStatWins.textContent = uStat.wins;
+                    userStatWinRate.textContent = uStat.played > 0 ? `${((uStat.wins / uStat.played) * 100).toFixed(1)}%` : "0%";
+                    userStatCash.textContent = `$${uStat.cash.toLocaleString()}`;
+                } else {
+                    userPersonalCard.classList.add('hidden');
+                }
+
+                // Render Table
+                if (matchingMatches.length === 0) {
+                    overviewTableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-slate-400 font-sans">No game records found for this timeframe.</td></tr>`;
                     return;
                 }
 
-                monthlyTableBody.innerHTML = monthlyMatches.map(m => `
+                overviewTableBody.innerHTML = matchingMatches.map(m => `
                     <tr class="hover:bg-slate-800/40">
                         <td class="py-3 px-3 font-bold text-amber-400">
                             <a href="view.html?game=${encodeURIComponent(m.id)}" class="hover:underline flex items-center gap-1">
@@ -275,14 +444,14 @@
                 `).join('');
 
             } catch (err) {
-                console.error("Monthly Overview Error:", err);
-                monthlyTableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-red-400 font-sans">Failed to load monthly overview statistics.</td></tr>`;
+                console.error("Overview Load Error:", err);
+                overviewTableBody.innerHTML = `<tr><td colspan="6" class="py-8 text-center text-red-400 font-sans">Failed to load performance overview data.</td></tr>`;
             }
         }
 
-        monthSelect.addEventListener('change', loadMonthlyOverview);
-        yearSelect.addEventListener('change', loadMonthlyOverview);
-        loadMonthlyOverview();
+        monthSelect.addEventListener('change', loadOverviewData);
+        yearSelect.addEventListener('change', loadOverviewData);
+        fetchMembersAndOverview();
     </script>
 </body>
 </html>
