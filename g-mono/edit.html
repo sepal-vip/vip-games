@@ -5,136 +5,133 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Match</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
-<body class="bg-slate-950 p-4">
-    <div class="max-w-2xl mx-auto bg-slate-900 p-6 rounded-2xl">
+<body class="bg-slate-950 text-slate-100 p-4 min-h-screen">
+    <div class="max-w-2xl mx-auto bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl space-y-6">
+        <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+            <h1 class="text-xl font-bold text-white flex items-center gap-2">
+                <span class="material-icons text-amber-500">edit</span> Edit Match Record
+            </h1>
+            <a href="history.html" class="text-xs text-slate-400 hover:text-white flex items-center gap-1">
+                <span class="material-icons text-sm">arrow_back</span> Back to History
+            </a>
+        </div>
+
         <form id="editMatchForm" class="space-y-4">
-            <input type="date" id="matchDate" class="w-full bg-slate-950 border p-2 rounded">
-            <input type="text" id="matchLocation" class="w-full bg-slate-950 border p-2 rounded">
-            <div id="playersRowsContainer"></div>
-            <button type="submit" class="w-full bg-amber-500 py-2 rounded">Update</button>
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Match Date</label>
+                <input type="date" id="matchDate" class="w-full bg-slate-950 border border-slate-800 p-2 rounded-xl text-sm focus:outline-none focus:border-amber-500 text-white">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Location</label>
+                <input type="text" id="matchLocation" placeholder="e.g. 302 sepal solitaire" class="w-full bg-slate-950 border border-slate-800 p-2 rounded-xl text-sm focus:outline-none focus:border-amber-500 text-white">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Players & Net Cash Breakdown</label>
+                <div id="playersRowsContainer" class="space-y-3"></div>
+            </div>
+
+            <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl transition shadow">Update Match</button>
         </form>
     </div>
-        <script type="module">
-        import { db, collection, getDocs } from "../web-info/firebase.js";
 
-        const searchInput = document.getElementById('searchInput');
-        const typeFilter = document.getElementById('typeFilter');
-        const historyTableBody = document.getElementById('historyTableBody');
+    <script type="module">
+        import { db, doc, getDoc, updateDoc } from "../web-info/firebase.js";
 
-        let allMatches = [];
+        const urlParams = new URLSearchParams(window.location.search);
+        const gameId = urlParams.get('game');
 
-        async function fetchMatchHistory() {
-            try {
-                const matchesRef = collection(db, "games", "Monopoly", "matches");
-                const snapshot = await getDocs(matchesRef);
+        const matchDateInput = document.getElementById('matchDate');
+        const matchLocationInput = document.getElementById('matchLocation');
+        const playersRowsContainer = document.getElementById('playersRowsContainer');
+        const editMatchForm = document.getElementById('editMatchForm');
 
-                allMatches = [];
-                snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const players = data.players || [];
-                    const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
-                    const winnerObj = players.find(p => p.isWinner) || players[0] || {};
-                    const gameDate = data.date || docSnap.id.substring(0, 10);
-
-                    allMatches.push({
-                        id: docSnap.id,
-                        date: gameDate,
-                        parsedDate: parseDateForSorting(gameDate),
-                        location: data.location || 'N/A',
-                        playersCount: players.length,
-                        memberCount: memberCount,
-                        isRanked: memberCount >= 2, // Updated to >= 2 members rule
-                        winner: winnerObj.name || 'N/A',
-                        players: players
-                    });
-                });
-
-                // Sort descending by playing date (newest first)
-                allMatches.sort((a, b) => b.parsedDate - a.parsedDate);
-                renderHistory();
-            } catch (err) {
-                console.error("Fetch History Error:", err);
-                historyTableBody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-red-400">Unable to load match logs from Firestore.</td></tr>`;
-            }
-        }
-
-        // Helper function to convert various date string formats (DD-MM-YYYY, YYYY-MM-DD, etc.) into a timestamp for sorting
-        function parseDateForSorting(dateStr) {
-            if (!dateStr) return 0;
-            const parts = dateStr.split(/[-/]/);
-            if (parts.length === 3) {
-                // If format starts with YYYY (e.g. YYYY-MM-DD)
-                if (parts[0].length === 4) {
-                    return new Date(parts[0], parts[1] - 1, parts[2]).getTime();
-                }
-                // Default DD-MM-YYYY format
-                return new Date(parts[2], parts[1] - 1, parts[0]).getTime();
-            }
-            return new Date(dateStr).getTime() || 0;
-        }
-
-        function renderHistory() {
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            const filterVal = typeFilter.value;
-
-            const filtered = allMatches.filter(m => {
-                const matchesSearch = m.id.toLowerCase().includes(searchTerm) ||
-                                     m.location.toLowerCase().includes(searchTerm) ||
-                                     m.winner.toLowerCase().includes(searchTerm) ||
-                                     m.players.some(p => p.name?.toLowerCase().includes(searchTerm));
-
-                if (!matchesSearch) return false;
-
-                if (filterVal === 'ranked') return m.isRanked;
-                if (filterVal === 'unranked') return !m.isRanked;
-                return true;
-            });
-
-            if (filtered.length === 0) {
-                historyTableBody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400">No matching game records found.</td></tr>`;
+        async function loadMatchData() {
+            if (!gameId) {
+                alert('No game ID specified in URL.');
+                window.location.href = 'history.html';
                 return;
             }
 
-            historyTableBody.innerHTML = filtered.map(m => `
-                <tr class="hover:bg-slate-800/40 transition">
-                    <td class="py-3 px-3 font-mono font-bold text-amber-400">
-                        <a href="view.html?game=${encodeURIComponent(m.id)}" class="hover:underline flex items-center gap-1">
-                            <span>${m.id}</span>
-                            <span class="material-icons text-xs">open_in_new</span>
-                        </a>
-                    </td>
-                    <td class="py-3 px-3 font-mono text-slate-300">${m.date}</td>
-                    <td class="py-3 px-3 text-slate-200">${m.location}</td>
-                    <td class="py-3 px-3 text-center font-mono text-slate-300">${m.playersCount}</td>
-                    <td class="py-3 px-3 font-semibold text-white flex items-center gap-1">
-                        <span>🥇</span>
-                        <a href="view.html?player=${encodeURIComponent(m.winner)}" class="hover:underline text-amber-300">${m.winner}</a>
-                    </td>
-                    <td class="py-3 px-3 text-center">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase ${m.isRanked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">
-                            ${m.isRanked ? 'Ranked' : 'Practice'}
-                        </span>
-                    </td>
-                    <td class="py-3 px-3 text-right">
-                        <div class="flex items-center justify-end gap-2">
-                            <a href="view.html?game=${encodeURIComponent(m.id)}" class="p-1 text-slate-400 hover:text-white rounded transition" title="Inspect Game">
-                                <span class="material-icons text-base">visibility</span>
-                            </a>
-                            <a href="edit.html?game=${encodeURIComponent(m.id)}" class="p-1 text-slate-400 hover:text-amber-400 rounded transition" title="Edit Record">
-                                <span class="material-icons text-base">edit</span>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
+            try {
+                const docRef = doc(db, "games", "Monopoly", "matches", gameId);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    alert('Match not found.');
+                    window.location.href = 'history.html';
+                    return;
+                }
+
+                const data = docSnap.data();
+                matchDateInput.value = data.date || '';
+                matchLocationInput.value = data.location || '';
+
+                const players = data.players || [];
+                renderPlayerInputs(players);
+            } catch (err) {
+                console.error("Error loading match:", err);
+                alert('Failed to load match details.');
+            }
+        }
+
+        function renderPlayerInputs(players) {
+            playersRowsContainer.innerHTML = players.map((p, index) => `
+                <div class="flex items-center gap-3 bg-slate-950/60 p-3 rounded-xl border border-slate-800 player-row" data-index="${index}">
+                    <div class="flex-1">
+                        <label class="block text-[10px] text-slate-400 font-bold uppercase">Player Name</label>
+                        <input type="text" value="${p.name || ''}" class="player-name w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white" required>
+                    </div>
+                    <div class="w-32">
+                        <label class="block text-[10px] text-slate-400 font-bold uppercase">Net Cash ($)</label>
+                        <input type="number" value="${p.cash ?? p.earnings ?? 0}" class="player-cash w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white font-mono" required>
+                    </div>
+                </div>
             `).join('');
         }
 
-        searchInput.addEventListener('input', renderHistory);
-        typeFilter.addEventListener('change', renderHistory);
+        editMatchForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            try {
+                const rows = document.querySelectorAll('.player-row');
+                const updatedPlayers = [];
 
-        fetchMatchHistory();
+                rows.forEach(row => {
+                    const name = row.querySelector('.player-name').value.trim();
+                    const cash = Number(row.querySelector('.player-cash').value);
+                    updatedPlayers.push({
+                        name,
+                        cash,
+                        earnings: cash,
+                        isMember: true
+                    });
+                });
+
+                // Auto-determine winner (highest cash)
+                updatedPlayers.sort((a, b) => b.cash - a.cash);
+                updatedPlayers.forEach((p, idx) => {
+                    p.isWinner = (idx === 0);
+                });
+
+                const docRef = doc(db, "games", "Monopoly", "matches", gameId);
+                await updateDoc(docRef, {
+                    date: matchDateInput.value,
+                    location: matchLocationInput.value,
+                    players: updatedPlayers
+                });
+
+                alert('Match updated successfully!');
+                window.location.href = `view.html?game=${encodeURIComponent(gameId)}`;
+            } catch (err) {
+                console.error("Error updating match:", err);
+                alert('Failed to update match record.');
+            }
+        });
+
+        loadMatchData();
     </script>
-
 </body>
 </html>
