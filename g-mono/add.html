@@ -10,7 +10,6 @@
     <style> body { font-family: 'Google Sans', sans-serif; } </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
-
     <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
@@ -21,19 +20,15 @@
             </span>
         </div>
     </nav>
-
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
         <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
-            
             <div class="border-b border-slate-700/60 pb-4">
                 <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                    🎲 Log New Match Session
+                    Log New Match Session
                 </h1>
                 <p class="text-xs text-slate-400 mt-1">Record game session date, location, player earnings, and August 2026+ property collections.</p>
             </div>
-
             <form id="matchForm" class="space-y-6">
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Match Date</label>
@@ -44,7 +39,6 @@
                         <input type="text" id="location" required placeholder="e.g. Living Room, Club House" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                     </div>
                 </div>
-
                 <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl flex items-center justify-between gap-4">
                     <div>
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Generated Game Path ID</span>
@@ -52,7 +46,6 @@
                     </div>
                     <span class="material-icons text-slate-500">fingerprint</span>
                 </div>
-
                 <div id="validityAlert" class="p-4 rounded-xl border bg-amber-950/60 border-amber-800/60 text-amber-300 text-xs flex items-start gap-3">
                     <span class="material-icons text-base text-amber-400 shrink-0 mt-0.5">warning</span>
                     <div>
@@ -60,7 +53,6 @@
                         <p class="text-[11px] text-amber-200/80 mt-0.5">Matches must include more than 2 registered members (&gt;2 members) to count toward official monthly leaderboards. Guest player records and 2-player practice games will be archived in game logs only.</p>
                     </div>
                 </div>
-
                 <div class="space-y-4 pt-2 border-t border-slate-700/50">
                     <div class="flex justify-between items-center">
                         <h2 class="text-sm font-bold text-white uppercase tracking-wider">Participating Player Roster</h2>
@@ -68,34 +60,26 @@
                             <span class="material-icons text-sm">add</span> Add Player
                         </button>
                     </div>
-
                     <div id="playerRowsContainer" class="space-y-3">
-                        <!-- Dynamic Player Entry Cards Injected Here -->
+                        <!-- Dynamic Player Entry Cards -->
                     </div>
                 </div>
-
                 <div id="formStatus" class="hidden text-xs p-3 rounded-xl border"></div>
-
                 <button type="submit" id="submitBtn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
                     <span class="material-icons text-base">save</span> Save Match Record
                 </button>
             </form>
-
         </div>
     </main>
-
     <script type="module">
         import { db, collection, doc, getDocs, setDoc } from "../web-info/firebase.js";
-
         let registeredMembersList = [];
-
         const matchDate = document.getElementById('matchDate');
         const locationInput = document.getElementById('location');
         const gameIdPreview = document.getElementById('gameIdPreview');
         const playerRowsContainer = document.getElementById('playerRowsContainer');
         const formStatus = document.getElementById('formStatus');
         const submitBtn = document.getElementById('submitBtn');
-
         const today = new Date();
         matchDate.value = today.toISOString().split('T')[0];
 
@@ -112,27 +96,22 @@
             } catch(e) {
                 console.error("Error loading member roster from Firestore:", e);
             }
-
             updateGameIdPreview();
-            createPlayerRow(true);  
-            createPlayerRow(false); 
-            createPlayerRow(false); 
+            createPlayerRow();
+            createPlayerRow();
+            createPlayerRow();
         }
 
         async function updateGameIdPreview() {
             if (!matchDate.value) return;
-            
-            const parts = matchDate.value.split('-'); 
-            const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`; 
-
+            const parts = matchDate.value.split('-');
+            const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
             try {
                 const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
                 let countSameDate = 0;
-
                 matchesSnap.forEach(d => {
                     if (d.id.startsWith(formattedDate)) countSameDate++;
                 });
-
                 const indexStr = String(countSameDate + 1).padStart(2, '0');
                 const calculatedId = `${formattedDate}-${indexStr}`;
                 gameIdPreview.textContent = `games/Monopoly/matches/${calculatedId}`;
@@ -142,7 +121,6 @@
                 gameIdPreview.textContent = `games/Monopoly/matches/${fallbackId}`;
                 gameIdPreview.dataset.id = fallbackId;
             }
-
             togglePropertyFields();
         }
 
@@ -160,10 +138,9 @@
             });
         }
 
-        function createPlayerRow(isFirst = false, initialEarnings = 0) {
+        function createPlayerRow(initialEarnings = 0) {
             const card = document.createElement('div');
             card.className = "player-card bg-slate-900/80 border border-slate-700/60 rounded-xl p-4 space-y-3 relative";
-
             card.innerHTML = `
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div class="flex-1 w-full space-y-1">
@@ -175,26 +152,19 @@
                         </select>
                         <input type="text" class="custom-guest-name hidden bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-300 w-full mt-1" placeholder="Enter Guest Name (Excluded from Leaderboard)">
                     </div>
-
                     <div class="w-full sm:w-44 space-y-1">
                         <div class="flex justify-between items-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Earnings Net ($)</label>
-                            <button type="button" class="toggle-neg-btn text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-1.5 py-0.5 rounded border border-slate-700 font-mono transition" title="Toggle Positive/Negative">± Neg</button>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Net Earnings</label>
+                            <button type="button" class="toggle-neg-btn text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-1.5 py-0.5 rounded border border-slate-700 font-mono transition" title="Toggle Positive/Negative">Neg</button>
                         </div>
                         <input type="text" inputmode="decimal" class="player-earnings bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-emerald-400 font-mono font-bold w-full" value="${initialEarnings}" placeholder="0" required>
                     </div>
-
-                    <div class="flex items-center gap-2 pt-4 sm:pt-3">
-                        <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                            <input type="radio" name="winnerRadio" class="winner-radio accent-amber-500" ${isFirst ? 'checked' : ''}>
-                            <span class="text-xs text-amber-400 font-bold">Winner</span>
-                        </label>
-                        <button type="button" class="remove-row-btn p-1 text-slate-500 hover:text-red-400 rounded transition" title="Remove Player">
+                    <div class="flex items-center pt-4 sm:pt-3">
+                        <button type="button" class="remove-row-btn p-2 text-slate-500 hover:text-red-400 hover:bg-slate-800 rounded-lg transition" title="Remove Player">
                             <span class="material-icons text-base">delete</span>
                         </button>
                     </div>
                 </div>
-
                 <div class="property-box ${isAugust2026OrLater(matchDate.value) ? '' : 'hidden'} pt-3 border-t border-slate-800 space-y-2">
                     <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">August 2026+ Property Collection (Max 26 Total)</span>
                     <div class="grid grid-cols-2 gap-3">
@@ -209,7 +179,6 @@
                     </div>
                 </div>
             `;
-
             const select = card.querySelector('.member-select');
             const customGuestName = card.querySelector('.custom-guest-name');
             const removeBtn = card.querySelector('.remove-row-btn');
@@ -226,7 +195,19 @@
                 }
             });
 
-            // Toggle positive/negative button functionality for mobile virtual keyboards
+            earningsInput.addEventListener('input', () => {
+                const numericVal = parseFloat(earningsInput.value);
+                if (!isNaN(numericVal)) {
+                    if (numericVal < 0) {
+                        earningsInput.classList.remove('text-emerald-400');
+                        earningsInput.classList.add('text-rose-400');
+                    } else {
+                        earningsInput.classList.remove('text-rose-400');
+                        earningsInput.classList.add('text-emerald-400');
+                    }
+                }
+            });
+
             toggleNegBtn.addEventListener('click', () => {
                 let val = earningsInput.value.trim();
                 if (val.startsWith('-')) {
@@ -234,7 +215,7 @@
                     earningsInput.classList.remove('text-rose-400');
                     earningsInput.classList.add('text-emerald-400');
                 } else {
-                    earningsInput.value = '-' + val;
+                    earningsInput.value = '-' + (val || '0');
                     earningsInput.classList.remove('text-emerald-400');
                     earningsInput.classList.add('text-rose-400');
                 }
@@ -252,11 +233,10 @@
         }
 
         matchDate.addEventListener('change', updateGameIdPreview);
-        document.getElementById('addPlayerRowBtn').addEventListener('click', () => createPlayerRow(false));
+        document.getElementById('addPlayerRowBtn').addEventListener('click', () => createPlayerRow(0));
 
         document.getElementById('matchForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
             const customGameId = gameIdPreview.dataset.id;
             if (!customGameId) {
                 alert("Please select a valid date.");
@@ -264,34 +244,41 @@
             }
 
             const playerCards = document.querySelectorAll('.player-card');
-            const playersData = [];
+            const rawPlayers = [];
+            let maxEarnings = -Infinity;
 
             playerCards.forEach(card => {
                 const selectVal = card.querySelector('.member-select').value;
                 const customGuestVal = card.querySelector('.custom-guest-name').value;
                 const earningsVal = Number(card.querySelector('.player-earnings').value || 0);
-                const isWinnerVal = card.querySelector('.winner-radio').checked;
                 const citiesVal = Number(card.querySelector('.cities-input').value || 0);
                 const stationsVal = Number(card.querySelector('.stations-input').value || 0);
-
                 const name = selectVal === 'GUEST_CUSTOM' ? (customGuestVal || 'Guest') : selectVal;
                 const isGuest = selectVal === 'GUEST_CUSTOM';
 
-                playersData.push({
+                if (earningsVal > maxEarnings) {
+                    maxEarnings = earningsVal;
+                }
+
+                rawPlayers.push({
                     name: name,
                     isGuest: isGuest,
                     isMember: !isGuest,
                     cash: earningsVal,
                     earnings: earningsVal,
-                    isWinner: isWinnerVal,
                     cities: citiesVal,
                     stations: stationsVal
                 });
             });
 
+            // Automatically set winner based on highest net earnings
+            const playersData = rawPlayers.map(p => ({
+                ...p,
+                isWinner: (p.earnings === maxEarnings)
+            }));
+
             submitBtn.disabled = true;
             submitBtn.textContent = "Saving Match Record...";
-
             try {
                 const matchData = {
                     gameId: customGameId,
@@ -300,13 +287,10 @@
                     players: playersData,
                     createdAt: new Date().toISOString()
                 };
-
                 const docRef = doc(db, "games", "Monopoly", "matches", customGameId);
                 await setDoc(docRef, matchData);
-
                 showStatus(`Match record ${customGameId} successfully saved! Redirecting...`, "success");
                 setTimeout(() => window.location.href = `view.html?game=${encodeURIComponent(customGameId)}`, 1200);
-
             } catch (err) {
                 showStatus(err.message || "Failed to save match record.", "error");
                 submitBtn.disabled = false;
@@ -323,7 +307,6 @@
                 formStatus.className = "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800";
             }
         }
-
         initPage();
     </script>
 </body>

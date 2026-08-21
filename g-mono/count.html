@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VIP Gamers - Monopoly Score Calculator</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
@@ -13,198 +13,196 @@
     input::-webkit-outer-spin-button,
     input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; appearance: textfield; }
-    .mono-curr { font-family: sans-serif; font-weight: 800; }
+    .custom-scroll::-webkit-scrollbar { width: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 flex flex-col items-center">
-
+<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 flex flex-col items-center selection:bg-amber-500 selection:text-slate-950">
   <div class="max-w-2xl w-full space-y-5">
     
-    <!-- Top Navigation Bar -->
+    <!-- Top Bar -->
     <div class="flex items-center justify-between">
-      <a href="/vip-games/" class="p-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition flex items-center">
+      <a href="../index.html" class="p-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition flex items-center">
         <span class="material-icons">arrow_back</span>
       </a>
       <div class="text-center">
-        <h1 class="text-lg font-black text-white">Monopoly Score Audit</h1>
-        <p class="text-[11px] text-slate-400">Indian Edition Official Property Calculator</p>
+        <h1 class="text-lg font-black tracking-tight text-white flex items-center justify-center gap-1.5">
+          <span class="material-icons text-amber-500 text-base">calculate</span> Score Calculator
+        </h1>
+        <p class="text-[11px] text-slate-400">Indian Edition Audit Suite</p>
       </div>
-      <a href="/vip-games/g-mono.html" class="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 transition flex items-center gap-1 text-xs font-bold">
-        <span class="material-icons text-sm">calculate</span> G-Mono
+      <a href="g-mono.html" class="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 transition flex items-center gap-1 text-xs font-bold">
+        <span class="material-icons text-sm">casino</span> Hub
       </a>
     </div>
 
-    <!-- Final Score Dashboard Card -->
-    <div id="finalScoreCard" class="bg-gradient-to-b from-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-5 shadow-2xl space-y-4">
-      <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
-        <div>
-          <span class="text-[10px] font-extrabold text-amber-400 tracking-wider uppercase">Net Worth Total</span>
-          <h2 id="grandTotalDisplay" class="text-3xl font-black text-white tracking-tight">₥0</h2>
+    <!-- Capture Wrapper Area (Adds Clean Margin Around the Card for Snapshots) -->
+    <div id="shareableSnapshotContainer" class="p-3 sm:p-4 bg-slate-950 rounded-[2.5rem]">
+      <div id="finalScoreCard" class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+              <span class="text-[10px] font-extrabold text-amber-400 tracking-wider uppercase">Monopoly Total Net Worth</span>
+            </div>
+            <h2 id="grandTotalDisplay" class="text-3xl sm:text-4xl font-black text-white tracking-tight mt-0.5">0</h2>
+          </div>
+          <button id="resetAllBtn" type="button" class="p-2 px-3.5 bg-slate-800/80 hover:bg-rose-950/60 hover:text-rose-300 hover:border-rose-800 border border-slate-700 text-slate-300 rounded-2xl text-xs font-bold transition flex items-center gap-1.5">
+            <span class="material-icons text-sm">restart_alt</span> Reset
+          </button>
         </div>
-        <button id="resetAllBtn" type="button" class="p-2 px-3 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1">
-          <span class="material-icons text-xs">refresh</span> Reset
-        </button>
-      </div>
 
-      <!-- Quick Metrics Breakdown -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center">
-        <div class="bg-slate-950/80 p-2.5 rounded-2xl border border-slate-800/60">
-          <p class="text-[10px] font-bold text-slate-400">Properties</p>
-          <p id="statPropTotal" class="text-sm font-black text-emerald-400">₥0</p>
-          <span id="statPropCount" class="text-[10px] text-slate-500">0 Cities</span>
-        </div>
-        <div class="bg-slate-950/80 p-2.5 rounded-2xl border border-slate-800/60">
-          <p class="text-[10px] font-bold text-slate-400">Stations & Utils</p>
-          <p id="statSpecialTotal" class="text-sm font-black text-sky-400">₥0</p>
-          <span id="statSpecialCount" class="text-[10px] text-slate-500">0 Items</span>
-        </div>
-        <div class="bg-slate-950/80 p-2.5 rounded-2xl border border-slate-800/60">
-          <p class="text-[10px] font-bold text-slate-400">Cash in Hand</p>
-          <p id="statCashTotal" class="text-sm font-black text-amber-400">₥0</p>
-          <span class="text-[10px] text-slate-500">Liquid Funds</span>
-        </div>
-        <div class="bg-slate-950/80 p-2.5 rounded-2xl border border-slate-800/60">
-          <p class="text-[10px] font-bold text-slate-400">Net Loans/Debt</p>
-          <p id="statLoanNet" class="text-sm font-black text-slate-200">₥0</p>
-          <span class="text-[10px] text-slate-500">Balance</span>
+        <!-- Metric Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Properties</p>
+            <p id="statPropTotal" class="text-base font-black text-emerald-400 font-mono mt-0.5">0</p>
+            <span id="statPropCount" class="text-[10px] text-slate-500 font-medium">0 Cities</span>
+          </div>
+          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stations & Utils</p>
+            <p id="statSpecialTotal" class="text-base font-black text-sky-400 font-mono mt-0.5">0</p>
+            <span id="statSpecialCount" class="text-[10px] text-slate-500 font-medium">0 Items</span>
+          </div>
+          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cash in Hand</p>
+            <p id="statCashTotal" class="text-base font-black text-amber-400 font-mono mt-0.5">0</p>
+            <span class="text-[10px] text-slate-500 font-medium">Liquid</span>
+          </div>
+          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
+            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Net Loans/Debt</p>
+            <p id="statLoanNet" class="text-base font-black text-slate-200 font-mono mt-0.5">0</p>
+            <span class="text-[10px] text-slate-500 font-medium">Balance</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Section 1: Indian City Color Sets -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
+    <!-- Section 1: Color Sets & Properties -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="text-sm font-black text-white flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 1. Select Color Sets & Buildings
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 1. City Color Sets & Houses
         </h3>
-        <span class="text-[10px] text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">Custom Rule: Any Hotel Allowed</span>
+        <span class="text-[9px] text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">Custom Motel/Hotel Allowed</span>
       </div>
-
-      <!-- Color Set Buttons -->
       <div id="colorSetsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
-
-      <!-- Properties Drawer -->
+      
+      <!-- Property Drawer -->
       <div id="propsDrawer" class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
         <div class="flex items-center justify-between pb-2 border-b border-slate-800">
           <span id="drawerTitle" class="text-xs font-black text-white"></span>
-          <span id="drawerHouseCost" class="text-[10px] text-slate-400 font-bold"></span>
+          <span id="drawerHouseCost" class="text-[10px] text-slate-400 font-mono font-bold"></span>
         </div>
         <div id="drawerProperties" class="space-y-3"></div>
       </div>
     </div>
 
-    <!-- Section 2: Utilities (Mint) & Stations (Black) -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
-      <h3 class="text-sm font-black text-white flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> 2. Utilities (Mint) & Stations (Black)
+    <!-- Section 2: Utilities & Stations -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
+      <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> 2. Utilities & Stations
       </h3>
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <!-- Utilities -->
         <div class="space-y-2">
-          <span class="text-[11px] font-bold text-emerald-400 uppercase tracking-wider">Utilities (₥150 each)</span>
+          <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Utilities (150 each)</span>
           <div id="utilitiesContainer" class="space-y-2"></div>
         </div>
-        <!-- Stations -->
         <div class="space-y-2">
-          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Stations (₥200 each)</span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stations (200 each)</span>
           <div id="stationsContainer" class="space-y-2"></div>
         </div>
       </div>
     </div>
 
-    <!-- Section 3: Selected Summary Checklist -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
-      <h3 class="text-sm font-black text-white flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 3. Owned Assets Summary
+    <!-- Section 3: Owned Assets -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-3">
+      <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
+        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 3. Owned Assets Breakdown
       </h3>
-      <div id="ownedItemsList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs">
+      <div id="ownedItemsList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs custom-scroll">
         <p class="text-slate-500 text-center py-4">No properties, stations, or utilities selected yet.</p>
       </div>
     </div>
 
-    <!-- Section 4: Cash Breakdown & Denominations -->
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
+    <!-- Section 4: Cash in Hand -->
+    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="text-sm font-black text-white flex items-center gap-2">
+        <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
           <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> 4. Cash in Hand
         </h3>
         <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-          <button id="cashModeDirect" type="button" class="px-3 py-1 rounded-lg font-bold bg-amber-500 text-slate-950">Direct Total</button>
+          <button id="cashModeDirect" type="button" class="px-3 py-1 rounded-lg font-bold bg-amber-500 text-slate-950">Direct Value</button>
           <button id="cashModeCount" type="button" class="px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white">Count Notes</button>
         </div>
       </div>
-
       <div id="cashDirectSection">
-        <input type="number" id="directCashInput" placeholder="Enter Total Cash (₥)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+        <input type="number" id="directCashInput" placeholder="Enter Total Cash Value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
       </div>
-
       <div id="cashCountSection" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">₥1</span>
+          <span class="text-xs font-bold text-slate-400">1</span>
           <input type="number" data-note="1" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">₥5</span>
+          <span class="text-xs font-bold text-slate-400">5</span>
           <input type="number" data-note="5" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">₥10</span>
+          <span class="text-xs font-bold text-slate-400">10</span>
           <input type="number" data-note="10" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">₥20</span>
+          <span class="text-xs font-bold text-slate-400">20</span>
           <input type="number" data-note="20" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">₥50</span>
+          <span class="text-xs font-bold text-slate-400">50</span>
           <input type="number" data-note="50" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">₥100</span>
+          <span class="text-xs font-bold text-slate-400">100</span>
           <input type="number" data-note="100" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between sm:col-span-2">
-          <span class="text-xs font-bold text-slate-400">₥500</span>
+          <span class="text-xs font-bold text-slate-400">500</span>
           <input type="number" data-note="500" class="cash-note-input w-16 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
       </div>
     </div>
 
-    <!-- Section 5: Debts & Loans Owed -->
+    <!-- Section 5: Debts & Loans -->
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <!-- Debts Owed (-) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-black text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
             <span class="material-icons text-sm">remove_circle</span> Debts Owed (-)
           </h3>
-          <span id="debtTotalLabel" class="text-xs font-bold text-rose-400">₥0</span>
+          <span id="debtTotalLabel" class="text-xs font-mono font-bold text-rose-400">0</span>
         </div>
         <div id="debtInputsContainer" class="space-y-2">
-          <input type="number" placeholder="Debt 1 (₥)" class="debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">
+          <input type="number" placeholder="Debt 1" class="debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">
         </div>
       </div>
 
-      <!-- Money Loaned Out (+) -->
-      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-3">
+      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
             <span class="material-icons text-sm">add_circle</span> Loaned Out (+)
           </h3>
-          <span id="loanTotalLabel" class="text-xs font-bold text-emerald-400">₥0</span>
+          <span id="loanTotalLabel" class="text-xs font-mono font-bold text-emerald-400">0</span>
         </div>
         <div id="loanInputsContainer" class="space-y-2">
-          <input type="number" placeholder="Loaned 1 (₥)" class="loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">
+          <input type="number" placeholder="Loaned 1" class="loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">
         </div>
       </div>
     </div>
 
-    <!-- Actions: Copy & Share -->
+    <!-- Actions -->
     <div class="space-y-2 pt-2">
-      <button id="shareImageBtn" type="button" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-2xl transition-all shadow-lg hover:shadow-amber-500/20 flex items-center justify-center gap-2">
-        <span class="material-icons">share</span> Share Score Snapshot (WhatsApp/Native)
+      <button id="openShareModalBtn" type="button" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-2xl transition-all shadow-lg hover:shadow-amber-500/20 flex items-center justify-center gap-2 text-sm">
+        <span class="material-icons text-base">share</span> Share Score Record
       </button>
-
       <div class="grid grid-cols-2 gap-2">
         <button id="copyPlainBtn" type="button" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5">
           <span class="material-icons text-sm">content_paste</span> Copy Plain
@@ -214,11 +212,47 @@
         </button>
       </div>
     </div>
+  </div>
 
+  <!-- Share Custom Modal -->
+  <div id="shareModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+          <span class="material-icons text-amber-400 text-base">ios_share</span> Share Monopoly Score
+        </h3>
+        <button type="button" id="closeShareModalBtn" class="text-slate-400 hover:text-white">
+          <span class="material-icons text-lg">close</span>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400">Choose your preferred sharing mode:</p>
+      <div class="space-y-2.5">
+        <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+          <div>
+            <p class="text-xs font-bold text-white">Share Link Only</p>
+            <p class="text-[10px] text-slate-400">Generates instant calculator share link</p>
+          </div>
+          <span class="material-icons text-amber-400 text-sm">link</span>
+        </button>
+        <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+          <div>
+            <p class="text-xs font-bold text-white">Share Score Snapshot Only</p>
+            <p class="text-[10px] text-slate-400">Card image with outer padding margin</p>
+          </div>
+          <span class="material-icons text-emerald-400 text-sm">image</span>
+        </button>
+        <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
+          <div>
+            <p class="text-xs font-bold text-amber-300">Share Image + Link Caption (WhatsApp)</p>
+            <p class="text-[10px] text-amber-200/70">Scorecard image with dynamic link caption</p>
+          </div>
+          <span class="material-icons text-amber-400 text-sm">send</span>
+        </button>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Indian Monopoly Board Data with Exact Specs
     const indianMonopolyData = [
       {
         id: "brown",
@@ -316,13 +350,11 @@
       }
     ];
 
-    // Utilities (Mint)
     const utilitiesData = [
       { name: "Electric Company", classic: "Electric Co", base: 150, owned: false },
       { name: "Water Works", classic: "Water Works", base: 150, owned: false }
     ];
 
-    // Stations (Black)
     const stationsData = [
       { name: "Chennai Central", classic: "Reading RR", base: 200, owned: false },
       { name: "Howrah", classic: "Pennsylvania RR", base: 200, owned: false },
@@ -333,7 +365,6 @@
     let activeSet = null;
     let cashMode = 'direct';
 
-    // Render Color Set Selector Grid
     const setsGrid = document.getElementById('colorSetsGrid');
     indianMonopolyData.forEach(set => {
       const btn = document.createElement('button');
@@ -350,7 +381,6 @@
       setsGrid.appendChild(btn);
     });
 
-    // Render Utilities
     const utilsContainer = document.getElementById('utilitiesContainer');
     utilitiesData.forEach((util, idx) => {
       const el = document.createElement('div');
@@ -358,7 +388,7 @@
       el.innerHTML = `
         <div>
           <p class="text-xs font-bold text-white">${util.name}</p>
-          <p class="text-[10px] text-emerald-400/80">${util.classic} • ₥${util.base}</p>
+          <p class="text-[10px] text-emerald-400/80 font-mono">${util.classic} - ${util.base}</p>
         </div>
         <input type="checkbox" id="util-${idx}" class="w-5 h-5 rounded-lg accent-emerald-500 bg-slate-900 border-slate-700 cursor-pointer">
       `;
@@ -369,7 +399,6 @@
       utilsContainer.appendChild(el);
     });
 
-    // Render Stations
     const stationsContainer = document.getElementById('stationsContainer');
     stationsData.forEach((station, idx) => {
       const el = document.createElement('div');
@@ -377,7 +406,7 @@
       el.innerHTML = `
         <div>
           <p class="text-xs font-bold text-white">${station.name}</p>
-          <p class="text-[10px] text-slate-400">${station.classic} • ₥${station.base}</p>
+          <p class="text-[10px] text-slate-400 font-mono">${station.classic} - ${station.base}</p>
         </div>
         <input type="checkbox" id="station-${idx}" class="w-5 h-5 rounded-lg accent-amber-500 bg-slate-900 border-slate-700 cursor-pointer">
       `;
@@ -393,8 +422,7 @@
       const drawer = document.getElementById('propsDrawer');
       const container = document.getElementById('drawerProperties');
       document.getElementById('drawerTitle').textContent = `${activeSet.name} Properties`;
-      document.getElementById('drawerHouseCost').textContent = `₥${activeSet.houseCost} / Building`;
-
+      document.getElementById('drawerHouseCost').textContent = `${activeSet.houseCost} / Building`;
       container.innerHTML = '';
       activeSet.properties.forEach((prop, idx) => {
         const item = document.createElement('div');
@@ -405,13 +433,11 @@
               <input type="checkbox" id="propCheck-${setId}-${idx}" ${prop.owned ? 'checked' : ''} class="w-4 h-4 rounded accent-amber-500">
               <div>
                 <span class="text-xs font-bold text-white">${prop.name}</span>
-                <span class="text-[10px] text-slate-500 block">${prop.classic} • Base ₥${prop.base}</span>
+                <span class="text-[10px] text-slate-500 block font-mono">${prop.classic} | Base ${prop.base}</span>
               </div>
             </div>
-            <span class="text-xs font-black text-amber-400">₥${getPropTotal(prop, activeSet.houseCost)}</span>
+            <span class="text-xs font-black text-amber-400 font-mono">${getPropTotal(prop, activeSet.houseCost)}</span>
           </div>
-
-          <!-- Building Selection -->
           <div class="flex flex-wrap gap-1 pt-1 ${prop.owned ? '' : 'opacity-40 pointer-events-none'}">
             <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 0 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 0)">None</button>
             <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 1 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 1)">1H</button>
@@ -422,14 +448,12 @@
             <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 5 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 5)">Hotel (5H)</button>
           </div>
         `;
-
         item.querySelector(`#propCheck-${setId}-${idx}`).addEventListener('change', (e) => {
           prop.owned = e.target.checked;
           if (!prop.owned) prop.houses = 0;
           openSetDrawer(setId);
           calculateAll();
         });
-
         container.appendChild(item);
       });
       drawer.classList.remove('hidden');
@@ -447,7 +471,6 @@
       return prop.base + (prop.houses * houseCost);
     }
 
-    // Cash Switchers
     document.getElementById('cashModeDirect').addEventListener('click', () => {
       cashMode = 'direct';
       document.getElementById('cashDirectSection').classList.remove('hidden');
@@ -469,24 +492,20 @@
     document.getElementById('directCashInput').addEventListener('input', calculateAll);
     document.querySelectorAll('.cash-note-input').forEach(inp => inp.addEventListener('input', calculateAll));
 
-    // Dynamic Loans & Debts (Infinite auto-next box)
     function setupDynamicInputs(containerId, inputClass, placeholderPrefix) {
       const container = document.getElementById(containerId);
-      
       container.addEventListener('input', (e) => {
         if (!e.target.classList.contains(inputClass)) return;
         const allInputs = container.querySelectorAll(`.${inputClass}`);
         const lastInput = allInputs[allInputs.length - 1];
-
         if (lastInput.value.trim() !== "") {
           const nextIndex = allInputs.length + 1;
           const newInput = document.createElement('input');
           newInput.type = "number";
-          newInput.placeholder = `${placeholderPrefix} ${nextIndex} (₥)`;
+          newInput.placeholder = `${placeholderPrefix} ${nextIndex}`;
           newInput.className = lastInput.className;
           container.appendChild(newInput);
         }
-        
         for (let i = allInputs.length - 2; i >= 0; i--) {
           if (allInputs[i].value.trim() === "" && allInputs[i + 1].value.trim() === "") {
             allInputs[i + 1].remove();
@@ -495,17 +514,14 @@
         calculateAll();
       });
     }
-
     setupDynamicInputs('debtInputsContainer', 'debt-box', 'Debt');
     setupDynamicInputs('loanInputsContainer', 'loan-box', 'Loaned');
 
-    // Grand Calculation Engine
     function calculateAll() {
       let propTotal = 0;
       let propCount = 0;
       let ownedItems = [];
 
-      // Color Sets
       indianMonopolyData.forEach(set => {
         set.properties.forEach(prop => {
           if (prop.owned) {
@@ -513,30 +529,28 @@
             propTotal += val;
             propCount++;
             let struct = prop.houses === 5 ? 'Hotel' : prop.houses === 2.5 ? 'Motel' : prop.houses > 0 ? `${prop.houses} Houses` : 'No Buildings';
-            ownedItems.push({ name: `${prop.name} (${set.name})`, detail: `${struct} • ₥${val}` });
+            ownedItems.push({ name: `${prop.name} (${set.name})`, detail: `${struct} - ${val}` });
           }
         });
       });
 
-      // Utilities & Stations
       let specialTotal = 0;
       let specialCount = 0;
       utilitiesData.forEach(u => {
         if (u.owned) {
           specialTotal += u.base;
           specialCount++;
-          ownedItems.push({ name: `${u.name} (Utility)`, detail: `₥${u.base}` });
+          ownedItems.push({ name: `${u.name} (Utility)`, detail: `${u.base}` });
         }
       });
       stationsData.forEach(s => {
         if (s.owned) {
           specialTotal += s.base;
           specialCount++;
-          ownedItems.push({ name: `${s.name} (Station)`, detail: `₥${s.base}` });
+          ownedItems.push({ name: `${s.name} (Station)`, detail: `${s.base}` });
         }
       });
 
-      // Liquid Cash
       let cashTotal = 0;
       if (cashMode === 'direct') {
         cashTotal = parseFloat(document.getElementById('directCashInput').value) || 0;
@@ -548,12 +562,10 @@
         });
       }
 
-      // Loans & Debts
       let debtTotal = 0;
       document.querySelectorAll('.debt-box').forEach(box => {
         debtTotal += parseFloat(box.value) || 0;
       });
-
       let loanTotal = 0;
       document.querySelectorAll('.loan-box').forEach(box => {
         loanTotal += parseFloat(box.value) || 0;
@@ -561,18 +573,16 @@
 
       const grandTotal = propTotal + specialTotal + cashTotal + loanTotal - debtTotal;
 
-      // Update UI Metrics
-      document.getElementById('grandTotalDisplay').textContent = `₥${grandTotal.toLocaleString()}`;
-      document.getElementById('statPropTotal').textContent = `₥${propTotal.toLocaleString()}`;
+      document.getElementById('grandTotalDisplay').textContent = `${grandTotal.toLocaleString()}`;
+      document.getElementById('statPropTotal').textContent = `${propTotal.toLocaleString()}`;
       document.getElementById('statPropCount').textContent = `${propCount} Cities`;
-      document.getElementById('statSpecialTotal').textContent = `₥${specialTotal.toLocaleString()}`;
+      document.getElementById('statSpecialTotal').textContent = `${specialTotal.toLocaleString()}`;
       document.getElementById('statSpecialCount').textContent = `${specialCount} Items`;
-      document.getElementById('statCashTotal').textContent = `₥${cashTotal.toLocaleString()}`;
-      document.getElementById('statLoanNet').textContent = `₥${(loanTotal - debtTotal).toLocaleString()}`;
-      document.getElementById('debtTotalLabel').textContent = `-₥${debtTotal.toLocaleString()}`;
-      document.getElementById('loanTotalLabel').textContent = `+₥${loanTotal.toLocaleString()}`;
+      document.getElementById('statCashTotal').textContent = `${cashTotal.toLocaleString()}`;
+      document.getElementById('statLoanNet').textContent = `${(loanTotal - debtTotal).toLocaleString()}`;
+      document.getElementById('debtTotalLabel').textContent = `-${debtTotal.toLocaleString()}`;
+      document.getElementById('loanTotalLabel').textContent = `+${loanTotal.toLocaleString()}`;
 
-      // Update Summary Checklist
       const ownedList = document.getElementById('ownedItemsList');
       if (ownedItems.length === 0) {
         ownedList.innerHTML = `<p class="text-slate-500 text-center py-4">No properties, stations, or utilities selected yet.</p>`;
@@ -580,15 +590,13 @@
         ownedList.innerHTML = ownedItems.map(item => `
           <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">
             <span class="font-bold text-white">${item.name}</span>
-            <span class="text-amber-400 font-semibold">${item.detail}</span>
+            <span class="text-amber-400 font-mono font-semibold">${item.detail}</span>
           </div>
         `).join('');
       }
-
       return { grandTotal, propTotal, propCount, specialTotal, specialCount, cashTotal, debtTotal, loanTotal };
     }
 
-    // Reset Functionality
     document.getElementById('resetAllBtn').addEventListener('click', () => {
       indianMonopolyData.forEach(set => set.properties.forEach(p => { p.owned = false; p.houses = 0; }));
       utilitiesData.forEach(u => u.owned = false);
@@ -596,65 +604,113 @@
       document.querySelectorAll('#utilitiesContainer input, #stationsContainer input').forEach(i => i.checked = false);
       document.getElementById('directCashInput').value = 0;
       document.querySelectorAll('.cash-note-input').forEach(i => i.value = 0);
-      document.getElementById('debtInputsContainer').innerHTML = `<input type="number" placeholder="Debt 1 (₥)" class="debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">`;
-      document.getElementById('loanInputsContainer').innerHTML = `<input type="number" placeholder="Loaned 1 (₥)" class="loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">`;
+      document.getElementById('debtInputsContainer').innerHTML = `<input type="number" placeholder="Debt 1" class="debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">`;
+      document.getElementById('loanInputsContainer').innerHTML = `<input type="number" placeholder="Loaned 1" class="loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">`;
       setupDynamicInputs('debtInputsContainer', 'debt-box', 'Debt');
       setupDynamicInputs('loanInputsContainer', 'loan-box', 'Loaned');
       if (activeSet) openSetDrawer(activeSet.id);
       calculateAll();
     });
 
-    // Copy Plain Text
+    function getFormattedShareLink(data) {
+      const baseUrl = `https://sepal-vip.github.io/vip-games/g-mono/count.html`;
+      const params = new URLSearchParams({
+        score: data.grandTotal,
+        cities: data.propCount,
+        special: data.specialCount,
+        cash: data.cashTotal,
+        netLoan: data.loanTotal - data.debtTotal
+      });
+      return `${baseUrl}?${params.toString()}`;
+    }
+
+    // Modal Control
+    const shareModal = document.getElementById('shareModal');
+    document.getElementById('openShareModalBtn').addEventListener('click', () => shareModal.classList.remove('hidden'));
+    document.getElementById('closeShareModalBtn').addEventListener('click', () => shareModal.classList.add('hidden'));
+
+    // Share Link Only
+    document.getElementById('shareLinkOnlyBtn').addEventListener('click', async () => {
+      const data = calculateAll();
+      const shareUrl = getFormattedShareLink(data);
+      if (navigator.share) {
+        await navigator.share({ title: 'Monopoly Score Calculator', url: shareUrl });
+      } else {
+        navigator.clipboard.writeText(shareUrl);
+        alert('Score Link Copied: ' + shareUrl);
+      }
+      shareModal.classList.add('hidden');
+    });
+
+    // Capture Helper with Margin
+    async function captureSnapshotBlob() {
+      const captureTarget = document.getElementById('shareableSnapshotContainer');
+      const canvas = await html2canvas(captureTarget, {
+        backgroundColor: '#020617',
+        scale: 2,
+        useCORS: true
+      });
+      return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    }
+
+    // Share Image Only
+    document.getElementById('shareImageOnlyBtn').addEventListener('click', async () => {
+      try {
+        const blob = await captureSnapshotBlob();
+        const file = new File([blob], 'monopoly-scorecard.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'VIP Gamers Monopoly Score' });
+        } else {
+          const downloadUrl = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = downloadUrl;
+          a.download = 'monopoly-scorecard.png';
+          a.click();
+        }
+      } catch (err) {
+        console.error(err);
+      }
+      shareModal.classList.add('hidden');
+    });
+
+    // Share Both (WhatsApp link in caption + Image)
+    document.getElementById('shareBothBtn').addEventListener('click', async () => {
+      const data = calculateAll();
+      const shareUrl = getFormattedShareLink(data);
+      const captionText = `Monopoly Final Score: ${data.grandTotal.toLocaleString()} (${data.propCount} Cities, ${data.specialCount} Stations/Utilities).\nCheck details: ${shareUrl}`;
+
+      try {
+        const blob = await captureSnapshotBlob();
+        const file = new File([blob], 'monopoly-scorecard.png', { type: 'image/png' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: 'VIP Gamers Monopoly Score',
+            text: captionText
+          });
+        } else {
+          const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
+          window.open(waUrl, '_blank');
+        }
+      } catch (err) {
+        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
+        window.open(waUrl, '_blank');
+      }
+      shareModal.classList.add('hidden');
+    });
+
     document.getElementById('copyPlainBtn').addEventListener('click', () => {
       const data = calculateAll();
-      const text = `Monopoly Score: ₥${data.grandTotal} | Cities: ${data.propCount} | Stations/Utils: ${data.specialCount} | Cash: ₥${data.cashTotal} | Net Loans: ₥${data.loanTotal - data.debtTotal}`;
+      const text = `Monopoly Score: ${data.grandTotal} | Cities: ${data.propCount} | Stations/Utils: ${data.specialCount} | Cash: ${data.cashTotal} | Net Loans: ${data.loanTotal - data.debtTotal}`;
       navigator.clipboard.writeText(text);
       alert('Plain text copied!');
     });
 
-    // Copy Formatted Text
     document.getElementById('copyFormatBtn').addEventListener('click', () => {
       const data = calculateAll();
-      const formatted = `🏆 *VIP GAMERS - MONOPOLY AUDIT*\n━━━━━━━━━━━━━━━━━━━━\n💰 *Total Net Worth:* ₥${data.grandTotal.toLocaleString()}\n🏠 *City Properties:* ₥${data.propTotal.toLocaleString()} (${data.propCount} Cities)\n🚂 *Stations & Utilities:* ₥${data.specialTotal.toLocaleString()} (${data.specialCount} Items)\n💵 *Liquid Cash:* ₥${data.cashTotal.toLocaleString()}\n🤝 *Loaned Out:* ₥${data.loanTotal.toLocaleString()}\n🔻 *Debts Owed:* ₥${data.debtTotal.toLocaleString()}\n━━━━━━━━━━━━━━━━━━━━\nCalculated offline via VIP Gamers Hub`;
+      const formatted = `*VIP GAMERS - MONOPOLY AUDIT*\n*Total Net Worth:* ${data.grandTotal.toLocaleString()}\n*City Properties:* ${data.propTotal.toLocaleString()} (${data.propCount} Cities)\n*Stations & Utilities:* ${data.specialTotal.toLocaleString()} (${data.specialCount} Items)\n*Liquid Cash:* ${data.cashTotal.toLocaleString()}\n*Loaned Out:* ${data.loanTotal.toLocaleString()}\n*Debts Owed:* ${data.debtTotal.toLocaleString()}\n\nCalculated offline via VIP Gamers Hub`;
       navigator.clipboard.writeText(formatted);
       alert('Formatted scorecard copied!');
-    });
-
-    // Image Snapshot & WhatsApp Share
-    document.getElementById('shareImageBtn').addEventListener('click', async () => {
-      const data = calculateAll();
-      const card = document.getElementById('finalScoreCard');
-      const shareText = `🎮 Monopoly Final Score: ₥${data.grandTotal.toLocaleString()} (${data.propCount} Cities & ${data.specialCount} Stations/Utilities)!`;
-
-      try {
-        const canvas = await html2canvas(card, {
-          backgroundColor: '#020617',
-          scale: 2,
-          windowWidth: card.scrollWidth + 30
-        });
-
-        canvas.toBlob(async (blob) => {
-          const file = new File([blob], 'monopoly-score.png', { type: 'image/png' });
-
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-              title: 'VIP Gamers Monopoly Score',
-              text: shareText
-            });
-          } else if (navigator.share) {
-            await navigator.share({
-              title: 'VIP Gamers Monopoly Score',
-              text: shareText
-            });
-          } else {
-            const wa = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-            window.open(wa, '_blank');
-          }
-        }, 'image/png');
-      } catch (err) {
-        console.error('Share error:', err);
-      }
     });
 
     calculateAll();

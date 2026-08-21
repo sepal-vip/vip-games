@@ -5,54 +5,106 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monopoly Suite - Record Inspector</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style> body { font-family: 'Google Sans', sans-serif; } </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
-
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
     <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
                 <span class="material-icons text-base">arrow_back</span> Monopoly Hub
             </a>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-3">
+                <button id="openShareModalBtn" class="hidden px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1 shadow">
+                    <span class="material-icons text-sm">share</span> Share Record
+                </button>
                 <a href="history.html" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1">
                     <span class="material-icons text-sm">history</span> Match History
                 </a>
             </div>
         </div>
     </nav>
-
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-        <div id="inspectorCard" class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
-            <div id="loadingState" class="py-12 text-center text-slate-400 space-y-3">
-                <span class="material-icons text-4xl animate-spin text-amber-500">sync</span>
-                <p class="text-sm font-mono">Fetching record details from Firestore...</p>
-            </div>
-            
-            <div id="inspectorContent" class="hidden space-y-6">
-                <!-- Dynamic Content Injected Here -->
+        <!-- Wrapper container to provide margins when capturing images -->
+        <div id="shareableSnapshotContainer" class="p-2 sm:p-4 bg-slate-900 rounded-[2rem]">
+            <div id="inspectorCard" class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
+                <div id="loadingState" class="py-12 text-center text-slate-400 space-y-3">
+                    <span class="material-icons text-4xl animate-spin text-amber-500">sync</span>
+                    <p class="text-sm font-mono">Fetching record details from Firestore...</p>
+                </div>
+                
+                <div id="inspectorContent" class="hidden space-y-6">
+                    <!-- Dynamic Content Injected Here -->
+                </div>
             </div>
         </div>
     </main>
 
-        <script type="module">
-        import { db, doc, getDoc, collection, getDocs } from "../web-info/firebase.js";
+    <!-- Share Modal -->
+    <div id="shareModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                    <span class="material-icons text-amber-400 text-base">ios_share</span> Share Match / Profile Record
+                </h3>
+                <button type="button" id="closeShareModalBtn" class="text-slate-400 hover:text-white">
+                    <span class="material-icons text-lg">close</span>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400">Choose your preferred sharing option:</p>
+            <div class="space-y-2.5">
+                <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                    <div>
+                        <p class="text-xs font-bold text-white">Share Link Only</p>
+                        <p class="text-[10px] text-slate-400">Direct link to view this record online</p>
+                    </div>
+                    <span class="material-icons text-amber-400 text-sm">link</span>
+                </button>
+                <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                    <div>
+                        <p class="text-xs font-bold text-white">Share Snapshot Image</p>
+                        <p class="text-[10px] text-slate-400">Card scorecard with outer margins</p>
+                    </div>
+                    <span class="material-icons text-emerald-400 text-sm">image</span>
+                </button>
+                <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
+                    <div>
+                        <p class="text-xs font-bold text-amber-300">Share Image + Link Caption (WhatsApp)</p>
+                        <p class="text-[10px] text-amber-200/70">Card image with record link in message</p>
+                    </div>
+                    <span class="material-icons text-amber-400 text-sm">send</span>
+                </button>
+            </div>
+        </div>
+    </div>
 
+    <script type="module">
+        import { db, doc, getDoc, collection, getDocs } from "../web-info/firebase.js";
         const urlParams = new URLSearchParams(window.location.search);
         const gameId = urlParams.get('game');
         const playerName = urlParams.get('player');
-
         const loadingState = document.getElementById('loadingState');
         const inspectorContent = document.getElementById('inspectorContent');
+        const openShareModalBtn = document.getElementById('openShareModalBtn');
+        const shareModal = document.getElementById('shareModal');
+        const closeShareModalBtn = document.getElementById('closeShareModalBtn');
+
+        let currentShareDetails = {
+            title: "VIP Gamers Monopoly Record",
+            caption: "",
+            url: ""
+        };
 
         async function initInspector() {
             try {
                 if (gameId) {
                     await renderGameView(gameId);
+                    setupGameShare(gameId);
                 } else if (playerName) {
                     await renderPlayerView(playerName);
+                    setupPlayerShare(playerName);
                 } else {
                     renderEmptyView();
                 }
@@ -68,11 +120,9 @@
         }
 
         async function renderGameView(id) {
-            // Sanitize query parameter formats (e.g., replace underscores if needed)
             const cleanId = id.trim().replace('_', '-');
             const docRef = doc(db, "games", "Monopoly", "matches", cleanId);
             const docSnap = await getDoc(docRef);
-
             loadingState.classList.add('hidden');
             inspectorContent.classList.remove('hidden');
 
@@ -91,17 +141,14 @@
             const game = docSnap.data();
             const players = game.players || [];
             
-            // Sort players automatically by net cash (earnings/cash) in descending order (highest to lowest)
             const sortedPlayers = [...players].sort((a, b) => {
-                const cashA = Number(a.earnings || a.cash || 0);
-                const cashB = Number(b.earnings || b.cash || 0);
+                const cashA = Number(a.earnings ?? a.cash ?? 0);
+                const cashB = Number(b.earnings ?? b.cash ?? 0);
                 return cashB - cashA;
             });
 
             const registeredCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
-            const isRanked = registeredCount >= 2;
-
-            // Date analysis for property tracking (August 2026+)
+            const isRanked = registeredCount > 2;
             const dateStr = game.date || cleanId.substring(0, 10);
             const isAug2026 = checkIfAug2026(dateStr);
 
@@ -111,19 +158,18 @@
                         <div class="flex items-center gap-2">
                             <h1 class="text-2xl font-extrabold text-white">Match Log: ${cleanId}</h1>
                             <span class="px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full ${isRanked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">
-                                ${isRanked ? '🏆 Ranked Match' : '⚠️ Practice / Unranked'}
+                                ${isRanked ? 'Ranked Match' : 'Practice / Unranked'}
                             </span>
                         </div>
                         <p class="text-xs text-slate-400 mt-1 flex items-center gap-3">
-                            <span>📅 Date: <strong class="text-slate-200">${dateStr}</strong></span>
-                            <span>📍 Location: <strong class="text-slate-200">${game.location || 'N/A'}</strong></span>
+                            <span>Date: <strong class="text-slate-200">${dateStr}</strong></span>
+                            <span>Location: <strong class="text-slate-200">${game.location || 'N/A'}</strong></span>
                         </p>
                     </div>
                     <a href="edit.html?game=${encodeURIComponent(cleanId)}" class="px-3.5 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-bold text-white rounded-xl transition flex items-center gap-1">
                         <span class="material-icons text-sm">edit</span> Edit Record
                     </a>
                 </div>
-
                 <div class="space-y-4">
                     <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Player Standings & Breakdown</h2>
                     <div class="overflow-x-auto">
@@ -133,7 +179,7 @@
                                     <th class="py-2.5 px-3">Rank</th>
                                     <th class="py-2.5 px-3">Player</th>
                                     <th class="py-2.5 px-3 text-center">Member Type</th>
-                                    <th class="py-2.5 px-3 text-right">Net Cash ($)</th>
+                                    <th class="py-2.5 px-3 text-right">Net Earnings</th>
                                     ${isAug2026 ? `<th class="py-2.5 px-3 text-center">Cities (Max 20)</th><th class="py-2.5 px-3 text-center">Stations/Util (Max 6)</th><th class="py-2.5 px-3 text-center">Total Props</th>` : ''}
                                 </tr>
                             </thead>
@@ -141,14 +187,15 @@
                                 ${sortedPlayers.map((p, index) => {
                                     const rank = index + 1;
                                     let rankBadge = `<span class="font-mono font-bold text-slate-400">#${rank}</span>`;
-                                    if (rank === 1) rankBadge = `<span class="text-amber-400 font-bold flex items-center gap-1">🥇 1st</span>`;
-                                    else if (rank === 2) rankBadge = `<span class="text-slate-300 font-bold flex items-center gap-1">🥈 2nd</span>`;
-                                    else if (rank === 3) rankBadge = `<span class="text-amber-600 font-bold flex items-center gap-1">🥉 3rd</span>`;
+                                    if (rank === 1) rankBadge = `<span class="text-amber-400 font-bold flex items-center gap-1">1st</span>`;
+                                    else if (rank === 2) rankBadge = `<span class="text-slate-300 font-bold flex items-center gap-1">2nd</span>`;
+                                    else if (rank === 3) rankBadge = `<span class="text-amber-600 font-bold flex items-center gap-1">3rd</span>`;
 
                                     const cities = p.cities || 0;
                                     const stations = p.stations || 0;
                                     const totalProps = (Number(cities) + Number(stations));
                                     const isMember = p.isMember !== false && !p.isGuest;
+                                    const netVal = Number(p.earnings ?? p.cash ?? 0);
 
                                     return `
                                         <tr class="hover:bg-slate-800/40">
@@ -163,8 +210,8 @@
                                                     ${isMember ? 'Member' : 'Guest'}
                                                 </span>
                                             </td>
-                                            <td class="py-3 px-3 text-right font-mono font-bold ${Number(p.earnings || p.cash || 0) >= 0 ? 'text-emerald-400' : 'text-red-400'}">
-                                                $${Number(p.earnings || p.cash || 0).toLocaleString()}
+                                            <td class="py-3 px-3 text-right font-mono font-bold ${netVal >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                                                ${netVal.toLocaleString()}
                                             </td>
                                             ${isAug2026 ? `
                                                 <td class="py-3 px-3 text-center font-mono text-slate-300">${cities}</td>
@@ -178,20 +225,19 @@
                         </table>
                     </div>
                 </div>
-
                 ${!isRanked ? `
                     <div class="p-3 bg-amber-950/60 border border-amber-800/60 rounded-xl text-xs text-amber-300 flex items-center gap-2">
                         <span class="material-icons text-base text-amber-400">info</span>
-                        <span>This game was excluded from official monthly summaries because it did not meet the minimum requirement of 2 registered members.</span>
+                        <span>This match was archived as unranked because it did not meet the requirement of >2 registered members.</span>
                     </div>
                 ` : ''}
             `;
+            openShareModalBtn.classList.remove('hidden');
         }
 
         async function renderPlayerView(name) {
             const matchesRef = collection(db, "games", "Monopoly", "matches");
             const snapshot = await getDocs(matchesRef);
-
             let playedMatches = [];
             let totalWins = 0;
             let totalEarnings = 0;
@@ -202,16 +248,13 @@
                 const game = docSnap.data();
                 const players = game.players || [];
                 const pData = players.find(p => p.name?.toLowerCase() === name.toLowerCase());
-
                 if (pData) {
                     const isWinner = pData.isWinner || false;
-                    const cash = Number(pData.earnings || pData.cash || 0);
-
+                    const cash = Number(pData.earnings ?? pData.cash ?? 0);
                     if (isWinner) totalWins++;
                     totalEarnings += cash;
                     totalCities += Number(pData.cities || 0);
                     totalStations += Number(pData.stations || 0);
-
                     playedMatches.push({
                         id: docSnap.id,
                         date: game.date || docSnap.id.substring(0, 10),
@@ -243,7 +286,6 @@
                         <p class="text-xs text-slate-400 mt-1">Player Profile & Historical Career Record</p>
                     </div>
                 </div>
-
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-xl text-center">
                         <span class="text-[10px] text-slate-400 font-bold uppercase">Matches</span>
@@ -258,13 +300,12 @@
                         <p class="text-xl font-bold text-amber-400 font-mono mt-0.5">${winRate}%</p>
                     </div>
                     <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-xl text-center">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Net Cash</span>
-                        <p class="text-xl font-bold font-mono mt-0.5 ${totalEarnings >= 0 ? 'text-emerald-400' : 'text-red-400'}">
-                            $${totalEarnings.toLocaleString()}
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Net Score</span>
+                        <p class="text-xl font-bold font-mono mt-0.5 ${totalEarnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                            ${totalEarnings.toLocaleString()}
                         </p>
                     </div>
                 </div>
-
                 <div class="space-y-3 pt-2">
                     <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Recorded Matches</h2>
                     ${matchCount === 0 ? `
@@ -278,7 +319,7 @@
                                         <th class="py-2.5 px-3">Date</th>
                                         <th class="py-2.5 px-3">Location</th>
                                         <th class="py-2.5 px-3 text-center">Result</th>
-                                        <th class="py-2.5 px-3 text-right">Cash ($)</th>
+                                        <th class="py-2.5 px-3 text-right">Earnings</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-700/50 text-xs">
@@ -290,13 +331,13 @@
                                                     <span class="material-icons text-xs">open_in_new</span>
                                                 </a>
                                             </td>
-                                           <td class="py-3 px-3 text-slate-300 font-mono">${m.date}</td>
+                                            <td class="py-3 px-3 text-slate-300 font-mono">${m.date}</td>
                                             <td class="py-3 px-3 text-slate-300">${m.location}</td>
                                             <td class="py-3 px-3 text-center font-bold ${m.isWinner ? 'text-emerald-400' : 'text-slate-500'}">
-                                                ${m.isWinner ? '🥇 Winner' : 'Participant'}
+                                                ${m.isWinner ? 'Winner' : 'Participant'}
                                             </td>
-                                            <td class="py-3 px-3 text-right font-mono font-bold ${m.earnings >= 0 ? 'text-emerald-400' : 'text-red-400'}">
-                                                $${m.earnings.toLocaleString()}
+                                            <td class="py-3 px-3 text-right font-mono font-bold ${m.earnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                                                ${m.earnings.toLocaleString()}
                                             </td>
                                         </tr>
                                     `).join('')}
@@ -306,6 +347,7 @@
                     `}
                 </div>
             `;
+            openShareModalBtn.classList.remove('hidden');
         }
 
         function renderEmptyView() {
@@ -315,7 +357,7 @@
                 <div class="text-center py-8 space-y-3">
                     <span class="material-icons text-amber-500 text-5xl">help_outline</span>
                     <h2 class="text-xl font-bold text-white">Missing Query Parameters</h2>
-                    <p class="text-xs text-slate-400">Please provide a valid URL parameter (e.g., <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-400">?game=01-08-2026-01</code> or <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-400">?player=Alice</code>).</p>
+                    <p class="text-xs text-slate-400">Please provide a valid URL parameter (e.g., <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-400">?game=01-08-2026-01</code> or <code class="bg-slate-900 px-1.5 py-0.5 rounded text-amber-400">?player=Mitansh</code>).</p>
                     <a href="history.html" class="inline-block px-4 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-bold text-white rounded-xl transition">Return to History</a>
                 </div>
             `;
@@ -330,8 +372,87 @@
             return yr > 2026 || (yr === 2026 && mo >= 8);
         }
 
+        function setupGameShare(id) {
+            currentShareDetails.url = `https://sepal-vip.github.io/vip-games/g-mono/view.html?game=${encodeURIComponent(id)}`;
+            currentShareDetails.title = `Monopoly Match Record: ${id}`;
+            currentShareDetails.caption = `Check out the official Monopoly Match Session (${id}) on VIP Gamers Hub: ${currentShareDetails.url}`;
+        }
+
+        function setupPlayerShare(name) {
+            currentShareDetails.url = `https://sepal-vip.github.io/vip-games/g-mono/view.html?player=${encodeURIComponent(name)}`;
+            currentShareDetails.title = `Monopoly Player Profile: ${name}`;
+            currentShareDetails.caption = `Check out ${name}'s career record on VIP Gamers Hub: ${currentShareDetails.url}`;
+        }
+
+        // Modal Controls
+        openShareModalBtn.addEventListener('click', () => shareModal.classList.remove('hidden'));
+        closeShareModalBtn.addEventListener('click', () => shareModal.classList.add('hidden'));
+
+        // Share Link Only
+        document.getElementById('shareLinkOnlyBtn').addEventListener('click', async () => {
+            if (navigator.share) {
+                await navigator.share({ title: currentShareDetails.title, url: currentShareDetails.url });
+            } else {
+                navigator.clipboard.writeText(currentShareDetails.url);
+                alert('Record Link Copied: ' + currentShareDetails.url);
+            }
+            shareModal.classList.add('hidden');
+        });
+
+        // Capture Helper with Margin
+        async function captureSnapshotBlob() {
+            const captureTarget = document.getElementById('shareableSnapshotContainer');
+            const canvas = await html2canvas(captureTarget, {
+                backgroundColor: '#0f172a',
+                scale: 2,
+                useCORS: true
+            });
+            return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        }
+
+        // Share Image Only
+        document.getElementById('shareImageOnlyBtn').addEventListener('click', async () => {
+            try {
+                const blob = await captureSnapshotBlob();
+                const file = new File([blob], 'monopoly-record.png', { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: currentShareDetails.title });
+                } else {
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = 'monopoly-record.png';
+                    a.click();
+                }
+            } catch (err) {
+                console.error(err);
+            }
+            shareModal.classList.add('hidden');
+        });
+
+        // Share Both (WhatsApp link in caption + Image)
+        document.getElementById('shareBothBtn').addEventListener('click', async () => {
+            try {
+                const blob = await captureSnapshotBlob();
+                const file = new File([blob], 'monopoly-record.png', { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: currentShareDetails.title,
+                        text: currentShareDetails.caption
+                    });
+                } else {
+                    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(currentShareDetails.caption)}`;
+                    window.open(waUrl, '_blank');
+                }
+            } catch (err) {
+                const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(currentShareDetails.caption)}`;
+                window.open(waUrl, '_blank');
+            }
+            shareModal.classList.add('hidden');
+        });
+
         initInspector();
     </script>
-
 </body>
 </html>
