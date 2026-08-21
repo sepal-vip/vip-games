@@ -36,7 +36,7 @@
       </a>
     </div>
 
-    <!-- Capture Wrapper Area (Adds Clean Margin Around the Card for Snapshots) -->
+    <!-- Fixed-Ratio Snapshot Capture Wrapper Area -->
     <div id="shareableSnapshotContainer" class="p-3 sm:p-4 bg-slate-950 rounded-[2.5rem]">
       <div id="finalScoreCard" class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
         <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
@@ -88,7 +88,6 @@
       </div>
       <div id="colorSetsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
       
-      <!-- Property Drawer -->
       <div id="propsDrawer" class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
         <div class="flex items-center justify-between pb-2 border-b border-slate-800">
           <span id="drawerTitle" class="text-xs font-black text-white"></span>
@@ -141,31 +140,31 @@
       </div>
       <div id="cashCountSection" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">1</span>
+          <span class="text-xs font-bold text-slate-400 font-mono">1</span>
           <input type="number" data-note="1" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">5</span>
+          <span class="text-xs font-bold text-slate-400 font-mono">5</span>
           <input type="number" data-note="5" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">10</span>
+          <span class="text-xs font-bold text-slate-400 font-mono">10</span>
           <input type="number" data-note="10" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">20</span>
+          <span class="text-xs font-bold text-slate-400 font-mono">20</span>
           <input type="number" data-note="20" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">50</span>
+          <span class="text-xs font-bold text-slate-400 font-mono">50</span>
           <input type="number" data-note="50" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400">100</span>
+          <span class="text-xs font-bold text-slate-400 font-mono">100</span>
           <input type="number" data-note="100" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
         <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between sm:col-span-2">
-          <span class="text-xs font-bold text-slate-400">500</span>
+          <span class="text-xs font-bold text-slate-400 font-mono">500</span>
           <input type="number" data-note="500" class="cash-note-input w-16 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
         </div>
       </div>
@@ -230,21 +229,21 @@
         <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
           <div>
             <p class="text-xs font-bold text-white">Share Link Only</p>
-            <p class="text-[10px] text-slate-400">Generates instant calculator share link</p>
+            <p class="text-[10px] text-slate-400">Generates URL state query that restores counts</p>
           </div>
           <span class="material-icons text-amber-400 text-sm">link</span>
         </button>
         <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
           <div>
-            <p class="text-xs font-bold text-white">Share Score Snapshot Only</p>
-            <p class="text-[10px] text-slate-400">Card image with outer padding margin</p>
+            <p class="text-xs font-bold text-white">Share Snapshot Image</p>
+            <p class="text-[10px] text-slate-400">Fixed-ratio scorecard image</p>
           </div>
           <span class="material-icons text-emerald-400 text-sm">image</span>
         </button>
         <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
           <div>
             <p class="text-xs font-bold text-amber-300">Share Image + Link Caption (WhatsApp)</p>
-            <p class="text-[10px] text-amber-200/70">Scorecard image with dynamic link caption</p>
+            <p class="text-[10px] text-amber-200/70">Card snapshot with active link in caption</p>
           </div>
           <span class="material-icons text-amber-400 text-sm">send</span>
         </button>
@@ -361,6 +360,14 @@
       { name: "New Delhi", classic: "B&O RR", base: 200, owned: false },
       { name: "Chhatrapati Shivaji Maharaj Terminus", classic: "Short Line RR", base: 200, owned: false }
     ];
+
+    // Flat list of 22 color properties
+    const flatProperties = [];
+    indianMonopolyData.forEach((set, sIdx) => {
+      set.properties.forEach((prop, pIdx) => {
+        flatProperties.push({ ...prop, setId: set.id, setIndex: sIdx, propIndex: pIdx });
+      });
+    });
 
     let activeSet = null;
     let cashMode = 'direct';
@@ -597,6 +604,163 @@
       return { grandTotal, propTotal, propCount, specialTotal, specialCount, cashTotal, debtTotal, loanTotal };
     }
 
+    // Dynamic Parameter URL Generator
+    function getDynamicShareLink() {
+      const baseUrl = `https://sepal-vip.github.io/vip-games/g-mono/count.html`;
+      const params = new URLSearchParams();
+
+      // 1. Props: propIndex,level,propIndex,level
+      const propPairs = [];
+      let currentFlatIdx = 0;
+      indianMonopolyData.forEach(set => {
+        set.properties.forEach(prop => {
+          if (prop.owned) {
+            propPairs.push(currentFlatIdx, prop.houses);
+          }
+          currentFlatIdx++;
+        });
+      });
+      if (propPairs.length > 0) {
+        params.set('props', propPairs.join(','));
+      }
+
+      // 2. Utilities & Stations: specials=u0,u1,s0,s1
+      const specials = [];
+      utilitiesData.forEach((u, idx) => { if (u.owned) specials.push(`u${idx}`); });
+      stationsData.forEach((s, idx) => { if (s.owned) specials.push(`s${idx}`); });
+      if (specials.length > 0) {
+        params.set('specials', specials.join(','));
+      }
+
+      // 3. Cash Mode
+      if (cashMode === 'count') {
+        const cashCounts = [];
+        document.querySelectorAll('.cash-note-input').forEach(inp => {
+          const count = parseFloat(inp.value) || 0;
+          if (count > 0) {
+            cashCounts.push(`${inp.dataset.note}:${count}`);
+          }
+        });
+        if (cashCounts.length > 0) {
+          params.set('cash_counted', cashCounts.join(','));
+        }
+      } else {
+        const directVal = parseFloat(document.getElementById('directCashInput').value) || 0;
+        if (directVal > 0) {
+          params.set('cash_total', directVal);
+        }
+      }
+
+      // 4. Loans & Debts (total out - in / debt - loaned)
+      const debtsArr = [];
+      document.querySelectorAll('.debt-box').forEach(b => {
+        const v = parseFloat(b.value) || 0;
+        if (v > 0) debtsArr.push(v);
+      });
+      const loansArr = [];
+      document.querySelectorAll('.loan-box').forEach(b => {
+        const v = parseFloat(b.value) || 0;
+        if (v > 0) loansArr.push(v);
+      });
+
+      const totalDebt = debtsArr.reduce((a, b) => a + b, 0);
+      const totalLoan = loansArr.reduce((a, b) => a + b, 0);
+      const netLoanDiff = totalDebt - totalLoan;
+
+      if (debtsArr.length > 0) params.set('debts', debtsArr.join(','));
+      if (loansArr.length > 0) params.set('loans', loansArr.join(','));
+      if (totalDebt > 0 || totalLoan > 0) params.set('loan', netLoanDiff);
+
+      const qs = params.toString();
+      return qs ? `${baseUrl}?${qs}` : baseUrl;
+    }
+
+    // Load from URL query parameters
+    function loadStateFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      if (!params.toString()) return;
+
+      // 1. Restore Props
+      if (params.has('props')) {
+        const propTokens = params.get('props').split(',').map(Number);
+        for (let i = 0; i < propTokens.length; i += 2) {
+          const fIdx = propTokens[i];
+          const level = propTokens[i + 1] !== undefined ? propTokens[i + 1] : 0;
+          if (flatProperties[fIdx]) {
+            const setObj = indianMonopolyData[flatProperties[fIdx].setIndex];
+            const propObj = setObj.properties[flatProperties[fIdx].propIndex];
+            propObj.owned = true;
+            propObj.houses = level;
+          }
+        }
+      }
+
+      // 2. Restore Specials
+      if (params.has('specials')) {
+        const specialTokens = params.get('specials').split(',');
+        specialTokens.forEach(token => {
+          if (token.startsWith('u')) {
+            const uIdx = Number(token.substring(1));
+            if (utilitiesData[uIdx]) {
+              utilitiesData[uIdx].owned = true;
+              const inp = document.getElementById(`util-${uIdx}`);
+              if (inp) inp.checked = true;
+            }
+          } else if (token.startsWith('s')) {
+            const sIdx = Number(token.substring(1));
+            if (stationsData[sIdx]) {
+              stationsData[sIdx].owned = true;
+              const inp = document.getElementById(`station-${sIdx}`);
+              if (inp) inp.checked = true;
+            }
+          }
+        });
+      }
+
+      // 3. Restore Cash
+      if (params.has('cash_counted')) {
+        document.getElementById('cashModeCount').click();
+        const counts = params.get('cash_counted').split(',');
+        counts.forEach(pair => {
+          const [note, count] = pair.split(':');
+          const inp = document.querySelector(`.cash-note-input[data-note="${note}"]`);
+          if (inp) inp.value = count;
+        });
+      } else if (params.has('cash_total')) {
+        document.getElementById('cashModeDirect').click();
+        document.getElementById('directCashInput').value = params.get('cash_total');
+      }
+
+      // 4. Restore Debts & Loans
+      if (params.has('debts')) {
+        const debts = params.get('debts').split(',');
+        const container = document.getElementById('debtInputsContainer');
+        container.innerHTML = '';
+        debts.forEach((d, idx) => {
+          const inp = document.createElement('input');
+          inp.type = "number";
+          inp.placeholder = `Debt ${idx + 1}`;
+          inp.className = "debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none";
+          inp.value = d;
+          container.appendChild(inp);
+        });
+      }
+
+      if (params.has('loans')) {
+        const loans = params.get('loans').split(',');
+        const container = document.getElementById('loanInputsContainer');
+        container.innerHTML = '';
+        loans.forEach((l, idx) => {
+          const inp = document.createElement('input');
+          inp.type = "number";
+          inp.placeholder = `Loaned ${idx + 1}`;
+          inp.className = "loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none";
+          inp.value = l;
+          container.appendChild(inp);
+        });
+      }
+    }
+
     document.getElementById('resetAllBtn').addEventListener('click', () => {
       indianMonopolyData.forEach(set => set.properties.forEach(p => { p.owned = false; p.houses = 0; }));
       utilitiesData.forEach(u => u.owned = false);
@@ -606,23 +770,10 @@
       document.querySelectorAll('.cash-note-input').forEach(i => i.value = 0);
       document.getElementById('debtInputsContainer').innerHTML = `<input type="number" placeholder="Debt 1" class="debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">`;
       document.getElementById('loanInputsContainer').innerHTML = `<input type="number" placeholder="Loaned 1" class="loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">`;
-      setupDynamicInputs('debtInputsContainer', 'debt-box', 'Debt');
-      setupDynamicInputs('loanInputsContainer', 'loan-box', 'Loaned');
       if (activeSet) openSetDrawer(activeSet.id);
+      window.history.replaceState({}, '', window.location.pathname);
       calculateAll();
     });
-
-    function getFormattedShareLink(data) {
-      const baseUrl = `https://sepal-vip.github.io/vip-games/g-mono/count.html`;
-      const params = new URLSearchParams({
-        score: data.grandTotal,
-        cities: data.propCount,
-        special: data.specialCount,
-        cash: data.cashTotal,
-        netLoan: data.loanTotal - data.debtTotal
-      });
-      return `${baseUrl}?${params.toString()}`;
-    }
 
     // Modal Control
     const shareModal = document.getElementById('shareModal');
@@ -631,8 +782,7 @@
 
     // Share Link Only
     document.getElementById('shareLinkOnlyBtn').addEventListener('click', async () => {
-      const data = calculateAll();
-      const shareUrl = getFormattedShareLink(data);
+      const shareUrl = getDynamicShareLink();
       if (navigator.share) {
         await navigator.share({ title: 'Monopoly Score Calculator', url: shareUrl });
       } else {
@@ -642,14 +792,22 @@
       shareModal.classList.add('hidden');
     });
 
-    // Capture Helper with Margin
+    // Fixed-Ratio Snapshot Capture Helper
     async function captureSnapshotBlob() {
-      const captureTarget = document.getElementById('shareableSnapshotContainer');
-      const canvas = await html2canvas(captureTarget, {
+      const container = document.getElementById('shareableSnapshotContainer');
+      const originalStyle = container.getAttribute('style') || '';
+      
+      container.style.width = '720px';
+      container.style.maxWidth = '720px';
+
+      const canvas = await html2canvas(container, {
         backgroundColor: '#020617',
         scale: 2,
-        useCORS: true
+        useCORS: true,
+        windowWidth: 1024
       });
+
+      container.setAttribute('style', originalStyle);
       return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     }
 
@@ -676,8 +834,8 @@
     // Share Both (WhatsApp link in caption + Image)
     document.getElementById('shareBothBtn').addEventListener('click', async () => {
       const data = calculateAll();
-      const shareUrl = getFormattedShareLink(data);
-      const captionText = `Monopoly Final Score: ${data.grandTotal.toLocaleString()} (${data.propCount} Cities, ${data.specialCount} Stations/Utilities).\nCheck details: ${shareUrl}`;
+      const shareUrl = getDynamicShareLink();
+      const captionText = `Monopoly Score Total: ${data.grandTotal.toLocaleString()} (${data.propCount} Cities, ${data.specialCount} Stations/Utilities).\nOpen Audit: ${shareUrl}`;
 
       try {
         const blob = await captureSnapshotBlob();
@@ -713,6 +871,7 @@
       alert('Formatted scorecard copied!');
     });
 
+    loadStateFromUrl();
     calculateAll();
   </script>
 </body>
