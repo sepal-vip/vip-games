@@ -27,17 +27,14 @@
         </div>
     </nav>
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-        <!-- Wrapper container to provide margins when capturing images -->
-        <div id="shareableSnapshotContainer" class="p-2 sm:p-4 bg-slate-900 rounded-[2rem]">
+        <div id="shareableSnapshotContainer" class="p-3 sm:p-5 bg-slate-900 rounded-[2rem]">
             <div id="inspectorCard" class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
                 <div id="loadingState" class="py-12 text-center text-slate-400 space-y-3">
                     <span class="material-icons text-4xl animate-spin text-amber-500">sync</span>
                     <p class="text-sm font-mono">Fetching record details from Firestore...</p>
                 </div>
                 
-                <div id="inspectorContent" class="hidden space-y-6">
-                    <!-- Dynamic Content Injected Here -->
-                </div>
+                <div id="inspectorContent" class="hidden space-y-6"></div>
             </div>
         </div>
     </main>
@@ -65,14 +62,14 @@
                 <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-white">Share Snapshot Image</p>
-                        <p class="text-[10px] text-slate-400">Card scorecard with outer margins</p>
+                        <p class="text-[10px] text-slate-400">Fixed ratio scorecard (clean without edit button)</p>
                     </div>
                     <span class="material-icons text-emerald-400 text-sm">image</span>
                 </button>
                 <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-amber-300">Share Image + Link Caption (WhatsApp)</p>
-                        <p class="text-[10px] text-amber-200/70">Card image with record link in message</p>
+                        <p class="text-[10px] text-amber-200/70">Card snapshot with link in caption</p>
                     </div>
                     <span class="material-icons text-amber-400 text-sm">send</span>
                 </button>
@@ -166,7 +163,7 @@
                             <span>Location: <strong class="text-slate-200">${game.location || 'N/A'}</strong></span>
                         </p>
                     </div>
-                    <a href="edit.html?game=${encodeURIComponent(cleanId)}" class="px-3.5 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-bold text-white rounded-xl transition flex items-center gap-1">
+                    <a id="editMatchBtn" href="edit.html?game=${encodeURIComponent(cleanId)}" class="px-3.5 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-bold text-white rounded-xl transition flex items-center gap-1">
                         <span class="material-icons text-sm">edit</span> Edit Record
                     </a>
                 </div>
@@ -241,8 +238,6 @@
             let playedMatches = [];
             let totalWins = 0;
             let totalEarnings = 0;
-            let totalCities = 0;
-            let totalStations = 0;
 
             snapshot.forEach(docSnap => {
                 const game = docSnap.data();
@@ -253,8 +248,6 @@
                     const cash = Number(pData.earnings ?? pData.cash ?? 0);
                     if (isWinner) totalWins++;
                     totalEarnings += cash;
-                    totalCities += Number(pData.cities || 0);
-                    totalStations += Number(pData.stations || 0);
                     playedMatches.push({
                         id: docSnap.id,
                         date: game.date || docSnap.id.substring(0, 10),
@@ -375,13 +368,13 @@
         function setupGameShare(id) {
             currentShareDetails.url = `https://sepal-vip.github.io/vip-games/g-mono/view.html?game=${encodeURIComponent(id)}`;
             currentShareDetails.title = `Monopoly Match Record: ${id}`;
-            currentShareDetails.caption = `Check out the official Monopoly Match Session (${id}) on VIP Gamers Hub: ${currentShareDetails.url}`;
+            currentShareDetails.caption = `Monopoly Match Session ${id} Record: ${currentShareDetails.url}`;
         }
 
         function setupPlayerShare(name) {
             currentShareDetails.url = `https://sepal-vip.github.io/vip-games/g-mono/view.html?player=${encodeURIComponent(name)}`;
             currentShareDetails.title = `Monopoly Player Profile: ${name}`;
-            currentShareDetails.caption = `Check out ${name}'s career record on VIP Gamers Hub: ${currentShareDetails.url}`;
+            currentShareDetails.caption = `${name}'s Monopoly Career Standings: ${currentShareDetails.url}`;
         }
 
         // Modal Controls
@@ -399,14 +392,29 @@
             shareModal.classList.add('hidden');
         });
 
-        // Capture Helper with Margin
+        // Fixed-ratio capture with edit button hidden
         async function captureSnapshotBlob() {
-            const captureTarget = document.getElementById('shareableSnapshotContainer');
-            const canvas = await html2canvas(captureTarget, {
+            const editBtn = document.getElementById('editMatchBtn');
+            if (editBtn) editBtn.style.display = 'none';
+
+            const container = document.getElementById('shareableSnapshotContainer');
+            const originalStyle = container.getAttribute('style') || '';
+            
+            // Set fixed capture width for constant aspect ratio across devices
+            container.style.width = '720px';
+            container.style.maxWidth = '720px';
+
+            const canvas = await html2canvas(container, {
                 backgroundColor: '#0f172a',
                 scale: 2,
-                useCORS: true
+                useCORS: true,
+                windowWidth: 1024
             });
+
+            // Restore elements
+            container.setAttribute('style', originalStyle);
+            if (editBtn) editBtn.style.display = '';
+
             return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         }
 
