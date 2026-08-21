@@ -1,330 +1,195 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Record Monopoly Match</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIP Gamers - Add Match Record</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    body { font-family: 'Google Sans', sans-serif; }
+  </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+<body class="bg-slate-950 text-slate-100 min-h-screen p-4 sm:p-6 flex flex-col items-center">
 
-    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
-                <span class="material-icons text-base">arrow_back</span> Monopoly Suite
-            </a>
-            <span class="text-xs font-bold text-purple-400 flex items-center gap-1">
-                <span class="material-icons text-sm">post_add</span> Record Match
-            </span>
+  <div class="max-w-2xl w-full space-y-6">
+    <!-- Header -->
+    <div class="flex items-center justify-between">
+      <a href="/vip-games/" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition flex items-center">
+        <span class="material-icons">arrow_back</span>
+      </a>
+      <h1 class="text-xl font-bold text-white tracking-wide">Add Match Result</h1>
+      <div class="w-10"></div>
+    </div>
+
+    <!-- Match Entry Card (Captured for Share) -->
+    <div id="matchCard" class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+            <span class="material-icons">casino</span>
+          </div>
+          <div>
+            <h2 class="text-base font-bold text-white">Monopoly Match</h2>
+            <p id="cardDate" class="text-xs text-slate-400"></p>
+          </div>
         </div>
-    </nav>
+        <span class="px-3 py-1 bg-amber-500/10 text-amber-400 text-xs font-bold rounded-full border border-amber-500/20">Active Scoreboard</span>
+      </div>
 
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
-            
-            <div class="border-b border-slate-700/60 pb-4">
-                <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                    🎲 Log New Match Session
-                </h1>
-                <p class="text-xs text-slate-400 mt-1">Record game session date, location, player earnings, and August 2026+ property collections.</p>
-            </div>
-
-            <form id="matchForm" class="space-y-6">
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Match Date</label>
-                        <input type="date" id="matchDate" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Location / Venue</label>
-                        <input type="text" id="location" required placeholder="e.g. Living Room, Club House" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
-                    </div>
-                </div>
-
-                <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-xl flex items-center justify-between gap-4">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Generated Game Path ID</span>
-                        <code id="gameIdPreview" class="text-sm font-mono text-amber-400 font-bold">Select match date...</code>
-                    </div>
-                    <span class="material-icons text-slate-500">fingerprint</span>
-                </div>
-
-                <div id="validityAlert" class="p-4 rounded-xl border bg-amber-950/60 border-amber-800/60 text-amber-300 text-xs flex items-start gap-3">
-                    <span class="material-icons text-base text-amber-400 shrink-0 mt-0.5">warning</span>
-                    <div>
-                        <p class="font-bold">More than 2 Registered Members Rule</p>
-                        <p class="text-[11px] text-amber-200/80 mt-0.5">Matches must include more than 2 registered members (&gt;2 members) to count toward official monthly leaderboards. Guest player records and 2-player practice games will be archived in game logs only.</p>
-                    </div>
-                </div>
-
-                <div class="space-y-4 pt-2 border-t border-slate-700/50">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-sm font-bold text-white uppercase tracking-wider">Participating Player Roster</h2>
-                        <button type="button" id="addPlayerRowBtn" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1">
-                            <span class="material-icons text-sm">add</span> Add Player
-                        </button>
-                    </div>
-
-                    <div id="playerRowsContainer" class="space-y-3">
-                        <!-- Dynamic Player Entry Cards Injected Here -->
-                    </div>
-                </div>
-
-                <div id="formStatus" class="hidden text-xs p-3 rounded-xl border"></div>
-
-                <button type="submit" id="submitBtn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 rounded-xl text-sm transition shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
-                    <span class="material-icons text-base">save</span> Save Match Record
-                </button>
-            </form>
-
+      <!-- Player Score List -->
+      <div id="playerList" class="space-y-3">
+        <!-- Player Row 1 -->
+        <div class="player-row bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 flex items-center gap-3 transition">
+          <div class="winner-badge hidden text-amber-400 flex items-center">
+            <span class="material-icons text-xl">emoji_events</span>
+          </div>
+          <input type="text" placeholder="Player Name" class="player-name bg-transparent border-0 font-semibold text-white placeholder-slate-500 focus:outline-none flex-1 text-sm" value="Player 1">
+          <div class="flex items-center gap-2">
+            <input type="number" placeholder="Score" class="player-score bg-slate-900 border border-slate-700 text-white text-right px-3 py-2 rounded-xl w-24 text-sm font-bold focus:border-amber-500 focus:outline-none" value="0">
+            <span class="text-xs text-slate-500 font-bold">PTS</span>
+          </div>
         </div>
-    </main>
 
-    <script type="module">
-        import { db, collection, doc, getDocs, setDoc } from "../web-info/firebase.js";
+        <!-- Player Row 2 -->
+        <div class="player-row bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 flex items-center gap-3 transition">
+          <div class="winner-badge hidden text-amber-400 flex items-center">
+            <span class="material-icons text-xl">emoji_events</span>
+          </div>
+          <input type="text" placeholder="Player Name" class="player-name bg-transparent border-0 font-semibold text-white placeholder-slate-500 focus:outline-none flex-1 text-sm" value="Player 2">
+          <div class="flex items-center gap-2">
+            <input type="number" placeholder="Score" class="player-score bg-slate-900 border border-slate-700 text-white text-right px-3 py-2 rounded-xl w-24 text-sm font-bold focus:border-amber-500 focus:outline-none" value="0">
+            <span class="text-xs text-slate-500 font-bold">PTS</span>
+          </div>
+        </div>
+      </div>
 
-        let registeredMembersList = [];
+      <button id="addPlayerBtn" type="button" class="w-full py-3 bg-slate-950/40 border border-dashed border-slate-800 hover:border-slate-600 rounded-2xl text-xs font-bold text-slate-400 hover:text-slate-200 transition flex items-center justify-center gap-2">
+        <span class="material-icons text-sm">add</span> Add Another Player
+      </button>
+    </div>
 
-        const matchDate = document.getElementById('matchDate');
-        const locationInput = document.getElementById('location');
-        const gameIdPreview = document.getElementById('gameIdPreview');
-        const playerRowsContainer = document.getElementById('playerRowsContainer');
-        const formStatus = document.getElementById('formStatus');
-        const submitBtn = document.getElementById('submitBtn');
+    <!-- Actions & Sharing -->
+    <div class="space-y-3">
+      <button id="saveMatchBtn" type="button" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-4 rounded-2xl transition-all shadow-lg hover:shadow-amber-500/20 flex items-center justify-center gap-2">
+        <span class="material-icons">save</span> Save Match Record
+      </button>
 
-        const today = new Date();
-        matchDate.value = today.toISOString().split('T')[0];
+      <div class="grid grid-cols-2 gap-3">
+        <button id="shareScoreBtn" type="button" class="p-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-bold text-slate-200 transition flex items-center justify-center gap-2">
+          <span class="material-icons text-base text-amber-500">share</span> Share Card & Link
+        </button>
+        <button id="copyLinkBtn" type="button" class="p-3.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-bold text-slate-200 transition flex items-center justify-center gap-2">
+          <span class="material-icons text-base text-slate-400">content_copy</span> Copy Link
+        </button>
+      </div>
+    </div>
+  </div>
 
-        async function initPage() {
-            try {
-                const membersSnap = await getDocs(collection(db, "players"));
-                const fetched = [];
-                membersSnap.forEach(d => {
-                    const data = d.data() || {};
-                    const name = data.name || d.id;
-                    if (name) fetched.push(name);
-                });
-                registeredMembersList = Array.from(new Set(fetched)).sort();
-            } catch(e) {
-                console.error("Error loading member roster from Firestore:", e);
-            }
+  <script>
+    document.getElementById('cardDate').textContent = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-            updateGameIdPreview();
-            createPlayerRow(true);  
-            createPlayerRow(false); 
-            createPlayerRow(false); 
+    // Dynamic Auto-Winner Selector
+    function updateWinner() {
+      const rows = document.querySelectorAll('.player-row');
+      let highestScore = -Infinity;
+      let winningRows = [];
+
+      rows.forEach(row => {
+        const score = parseFloat(row.querySelector('.player-score').value) || 0;
+        if (score > highestScore && score > 0) {
+          highestScore = score;
+          winningRows = [row];
+        } else if (score === highestScore && score > 0) {
+          winningRows.push(row);
         }
+      });
 
-        async function updateGameIdPreview() {
-            if (!matchDate.value) return;
-            
-            const parts = matchDate.value.split('-'); 
-            const formattedDate = `${parts[2]}-${parts[1]}-${parts[0]}`; 
-
-            try {
-                const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
-                let countSameDate = 0;
-
-                matchesSnap.forEach(d => {
-                    if (d.id.startsWith(formattedDate)) countSameDate++;
-                });
-
-                const indexStr = String(countSameDate + 1).padStart(2, '0');
-                const calculatedId = `${formattedDate}-${indexStr}`;
-                gameIdPreview.textContent = `games/Monopoly/matches/${calculatedId}`;
-                gameIdPreview.dataset.id = calculatedId;
-            } catch (err) {
-                const fallbackId = `${formattedDate}-01`;
-                gameIdPreview.textContent = `games/Monopoly/matches/${fallbackId}`;
-                gameIdPreview.dataset.id = fallbackId;
-            }
-
-            togglePropertyFields();
+      rows.forEach(row => {
+        const badge = row.querySelector('.winner-badge');
+        if (winningRows.includes(row)) {
+          badge.classList.remove('hidden');
+          row.classList.add('border-amber-500/50', 'bg-amber-500/5');
+        } else {
+          badge.classList.add('hidden');
+          row.classList.remove('border-amber-500/50', 'bg-amber-500/5');
         }
+      });
+    }
 
-        function isAugust2026OrLater(dateVal) {
-            if (!dateVal || !dateVal.includes('-')) return false;
-            const [y, m] = dateVal.split('-').map(Number);
-            return y > 2026 || (y === 2026 && m >= 8);
-        }
+    function attachListeners() {
+      document.querySelectorAll('.player-score').forEach(input => {
+        input.removeEventListener('input', updateWinner);
+        input.addEventListener('input', updateWinner);
+      });
+    }
 
-        function togglePropertyFields() {
-            const isAug2026 = isAugust2026OrLater(matchDate.value);
-            document.querySelectorAll('.property-box').forEach(box => {
-                if (isAug2026) box.classList.remove('hidden');
-                else box.classList.add('hidden');
-            });
-        }
+    attachListeners();
 
-        function createPlayerRow(isFirst = false, initialEarnings = 0) {
-            const card = document.createElement('div');
-            card.className = "player-card bg-slate-900/80 border border-slate-700/60 rounded-xl p-4 space-y-3 relative";
+    // Add Player Row
+    document.getElementById('addPlayerBtn').addEventListener('click', () => {
+      const playerList = document.getElementById('playerList');
+      const count = playerList.querySelectorAll('.player-row').length + 1;
+      const newRow = document.createElement('div');
+      newRow.className = 'player-row bg-slate-950/60 border border-slate-800/80 rounded-2xl p-4 flex items-center gap-3 transition';
+      newRow.innerHTML = `
+        <div class="winner-badge hidden text-amber-400 flex items-center">
+          <span class="material-icons text-xl">emoji_events</span>
+        </div>
+        <input type="text" placeholder="Player Name" class="player-name bg-transparent border-0 font-semibold text-white placeholder-slate-500 focus:outline-none flex-1 text-sm" value="Player ${count}">
+        <div class="flex items-center gap-2">
+          <input type="number" placeholder="Score" class="player-score bg-slate-900 border border-slate-700 text-white text-right px-3 py-2 rounded-xl w-24 text-sm font-bold focus:border-amber-500 focus:outline-none" value="0">
+          <span class="text-xs text-slate-500 font-bold">PTS</span>
+        </div>
+      `;
+      playerList.appendChild(newRow);
+      attachListeners();
+    });
 
-            card.innerHTML = `
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div class="flex-1 w-full space-y-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Select Player Member / Custom Guest</label>
-                        <select class="member-select bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white w-full focus:outline-none focus:border-purple-500">
-                            <option value="">-- Choose Registered Member --</option>
-                            ${registeredMembersList.map(m => `<option value="${m}">${m}</option>`).join('')}
-                            <option value="GUEST_CUSTOM">+ Enter Custom Guest Name...</option>
-                        </select>
-                        <input type="text" class="custom-guest-name hidden bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-amber-300 w-full mt-1" placeholder="Enter Guest Name (Excluded from Leaderboard)">
-                    </div>
+    // Score Card Screenshot & WhatsApp / Native Share
+    document.getElementById('shareScoreBtn').addEventListener('click', async () => {
+      const target = document.getElementById('matchCard');
+      const matchUrl = window.location.href;
+      const shareMessage = `🎮 VIP Gamers Monopoly Results:\nCheck Match Record: ${matchUrl}`;
 
-                    <div class="w-full sm:w-44 space-y-1">
-                        <div class="flex justify-between items-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Earnings Net ($)</label>
-                            <button type="button" class="toggle-neg-btn text-[10px] bg-slate-800 hover:bg-slate-700 text-amber-400 px-1.5 py-0.5 rounded border border-slate-700 font-mono transition" title="Toggle Positive/Negative">± Neg</button>
-                        </div>
-                        <input type="text" inputmode="decimal" class="player-earnings bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 text-xs text-emerald-400 font-mono font-bold w-full" value="${initialEarnings}" placeholder="0" required>
-                    </div>
-
-                    <div class="flex items-center gap-2 pt-4 sm:pt-3">
-                        <label class="inline-flex items-center gap-1.5 cursor-pointer">
-                            <input type="radio" name="winnerRadio" class="winner-radio accent-amber-500" ${isFirst ? 'checked' : ''}>
-                            <span class="text-xs text-amber-400 font-bold">Winner</span>
-                        </label>
-                        <button type="button" class="remove-row-btn p-1 text-slate-500 hover:text-red-400 rounded transition" title="Remove Player">
-                            <span class="material-icons text-base">delete</span>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="property-box ${isAugust2026OrLater(matchDate.value) ? '' : 'hidden'} pt-3 border-t border-slate-800 space-y-2">
-                    <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block">August 2026+ Property Collection (Max 26 Total)</span>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-[10px] text-slate-400">Cities (Max 20):</label>
-                            <input type="number" min="0" max="20" class="cities-input bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white w-full" value="0">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] text-slate-400">Stations & Utilities (Max 6):</label>
-                            <input type="number" min="0" max="6" class="stations-input bg-slate-800 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white w-full" value="0">
-                        </div>
-                    </div>
-                </div>
-            `;
-
-            const select = card.querySelector('.member-select');
-            const customGuestName = card.querySelector('.custom-guest-name');
-            const removeBtn = card.querySelector('.remove-row-btn');
-            const toggleNegBtn = card.querySelector('.toggle-neg-btn');
-            const earningsInput = card.querySelector('.player-earnings');
-
-            select.addEventListener('change', () => {
-                if (select.value === 'GUEST_CUSTOM') {
-                    customGuestName.classList.remove('hidden');
-                    customGuestName.required = true;
-                } else {
-                    customGuestName.classList.add('hidden');
-                    customGuestName.required = false;
-                }
-            });
-
-            // Toggle positive/negative button functionality for mobile virtual keyboards
-            toggleNegBtn.addEventListener('click', () => {
-                let val = earningsInput.value.trim();
-                if (val.startsWith('-')) {
-                    earningsInput.value = val.substring(1);
-                    earningsInput.classList.remove('text-rose-400');
-                    earningsInput.classList.add('text-emerald-400');
-                } else {
-                    earningsInput.value = '-' + val;
-                    earningsInput.classList.remove('text-emerald-400');
-                    earningsInput.classList.add('text-rose-400');
-                }
-            });
-
-            removeBtn.addEventListener('click', () => {
-                if (document.querySelectorAll('.player-card').length <= 2) {
-                    alert("A game match requires at least 2 players.");
-                    return;
-                }
-                card.remove();
-            });
-
-            playerRowsContainer.appendChild(card);
-        }
-
-        matchDate.addEventListener('change', updateGameIdPreview);
-        document.getElementById('addPlayerRowBtn').addEventListener('click', () => createPlayerRow(false));
-
-        document.getElementById('matchForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const customGameId = gameIdPreview.dataset.id;
-            if (!customGameId) {
-                alert("Please select a valid date.");
-                return;
-            }
-
-            const playerCards = document.querySelectorAll('.player-card');
-            const playersData = [];
-
-            playerCards.forEach(card => {
-                const selectVal = card.querySelector('.member-select').value;
-                const customGuestVal = card.querySelector('.custom-guest-name').value;
-                const earningsVal = Number(card.querySelector('.player-earnings').value || 0);
-                const isWinnerVal = card.querySelector('.winner-radio').checked;
-                const citiesVal = Number(card.querySelector('.cities-input').value || 0);
-                const stationsVal = Number(card.querySelector('.stations-input').value || 0);
-
-                const name = selectVal === 'GUEST_CUSTOM' ? (customGuestVal || 'Guest') : selectVal;
-                const isGuest = selectVal === 'GUEST_CUSTOM';
-
-                playersData.push({
-                    name: name,
-                    isGuest: isGuest,
-                    isMember: !isGuest,
-                    cash: earningsVal,
-                    earnings: earningsVal,
-                    isWinner: isWinnerVal,
-                    cities: citiesVal,
-                    stations: stationsVal
-                });
-            });
-
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Saving Match Record...";
-
-            try {
-                const matchData = {
-                    gameId: customGameId,
-                    date: matchDate.value,
-                    location: locationInput.value,
-                    players: playersData,
-                    createdAt: new Date().toISOString()
-                };
-
-                const docRef = doc(db, "games", "Monopoly", "matches", customGameId);
-                await setDoc(docRef, matchData);
-
-                showStatus(`Match record ${customGameId} successfully saved! Redirecting...`, "success");
-                setTimeout(() => window.location.href = `view.html?game=${encodeURIComponent(customGameId)}`, 1200);
-
-            } catch (err) {
-                showStatus(err.message || "Failed to save match record.", "error");
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Save Match Record";
-            }
+      try {
+        const canvas = await html2canvas(target, {
+          backgroundColor: '#020617',
+          scale: 2,
+          windowWidth: target.scrollWidth + 40
         });
 
-        function showStatus(msg, type) {
-            formStatus.classList.remove('hidden');
-            formStatus.textContent = msg;
-            if (type === 'success') {
-                formStatus.className = "text-xs p-3 rounded-xl border bg-emerald-950/80 text-emerald-300 border-emerald-800";
-            } else {
-                formStatus.className = "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800";
-            }
-        }
+        canvas.toBlob(async (blob) => {
+          const imageFile = new File([blob], 'vip-gamers-score.png', { type: 'image/png' });
 
-        initPage();
-    </script>
+          if (navigator.canShare && navigator.canShare({ files: [imageFile] })) {
+            await navigator.share({
+              files: [imageFile],
+              title: 'VIP Gamers Match',
+              text: shareMessage
+            });
+          } else if (navigator.share) {
+            await navigator.share({
+              title: 'VIP Gamers Match',
+              text: shareMessage,
+              url: matchUrl
+            });
+          } else {
+            const waLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareMessage)}`;
+            window.open(waLink, '_blank');
+          }
+        }, 'image/png');
+      } catch (err) {
+        console.error('Share failure:', err);
+      }
+    });
+
+    document.getElementById('copyLinkBtn').addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    });
+  </script>
 </body>
 </html>
