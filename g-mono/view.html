@@ -27,7 +27,7 @@
         </div>
     </nav>
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-        <!-- Wrapper container to provide fixed-ratio margins when capturing images -->
+        <!-- Frame container providing clean margin during image export -->
         <div id="shareableSnapshotContainer" class="p-3 sm:p-5 bg-slate-900 rounded-[2rem]">
             <div id="inspectorCard" class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
                 <div id="loadingState" class="py-12 text-center text-slate-400 space-y-3">
@@ -56,21 +56,21 @@
                 <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-white">Share Link Only</p>
-                        <p class="text-[10px] text-slate-400">Direct link to view this record online</p>
+                        <p class="text-[10px] text-slate-400">Direct URL to record overview</p>
                     </div>
                     <span class="material-icons text-amber-400 text-sm">link</span>
                 </button>
                 <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-white">Share Snapshot Image</p>
-                        <p class="text-[10px] text-slate-400">Fixed-ratio scorecard (clean without edit button)</p>
+                        <p class="text-[10px] text-slate-400">Fixed-ratio scorecard without buttons</p>
                     </div>
                     <span class="material-icons text-emerald-400 text-sm">image</span>
                 </button>
                 <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-amber-300">Share Image + Link Caption (WhatsApp)</p>
-                        <p class="text-[10px] text-amber-200/70">Card snapshot with link in caption</p>
+                        <p class="text-[10px] text-amber-200/70">Scorecard image with record link in text</p>
                     </div>
                     <span class="material-icons text-amber-400 text-sm">send</span>
                 </button>
@@ -233,20 +233,28 @@
             openShareModalBtn.classList.remove('hidden');
         }
 
-        // FULL COMPREHENSIVE STATS FOR EVERY SINGLE PLAYER METRIC
+        // FULL RANKED OVERVIEW + DEEP FACTS INSPECTOR
         async function renderPlayerView(name) {
             const matchesRef = collection(db, "games", "Monopoly", "matches");
             const snapshot = await getDocs(matchesRef);
             let playedMatches = [];
+            
             let totalWins = 0;
-            let totalRankedPlayed = 0;
-            let totalPracticePlayed = 0;
+            let rankedWins = 0;
+            let rankedCount = 0;
+            let practiceWins = 0;
+            let practiceCount = 0;
+
             let totalEarnings = 0;
-            let bestEarnings = -Infinity;
-            let worstEarnings = Infinity;
+            let bestEarnings = -Infinity, bestSession = null;
+            let worstEarnings = Infinity, worstSession = null;
+            let smallestProfit = Infinity, smallestProfitSession = null;
+            let smallestLoss = -Infinity, smallestLossSession = null;
+
             let totalCities = 0;
             let totalStations = 0;
-            let mostPropsInSingleMatch = 0;
+            let maxPropsSingle = 0;
+            let runningStreak = 0, longestStreak = 0;
 
             snapshot.forEach(docSnap => {
                 const game = docSnap.data();
@@ -255,9 +263,6 @@
                 if (pData) {
                     const memberCount = players.filter(pl => pl.isMember !== false && !pl.isGuest).length;
                     const isRanked = memberCount > 2;
-                    if (isRanked) totalRankedPlayed++;
-                    else totalPracticePlayed++;
-
                     const isWinner = pData.isWinner || false;
                     const cash = Number(pData.earnings ?? pData.cash ?? 0);
                     const c = Number(pData.cities || 0);
@@ -266,12 +271,31 @@
 
                     if (isWinner) totalWins++;
                     totalEarnings += cash;
-                    if (cash > bestEarnings) bestEarnings = cash;
-                    if (cash < worstEarnings) worstEarnings = cash;
+
+                    if (isRanked) {
+                        rankedCount++;
+                        if (isWinner) rankedWins++;
+                    } else {
+                        practiceCount++;
+                        if (isWinner) practiceWins++;
+                    }
+
+                    if (cash > bestEarnings) { bestEarnings = cash; bestSession = docSnap.id; }
+                    if (cash < worstEarnings) { worstEarnings = cash; worstSession = docSnap.id; }
+
+                    if (cash > 0 && cash < smallestProfit) { smallestProfit = cash; smallestProfitSession = docSnap.id; }
+                    if (cash < 0 && cash > smallestLoss) { smallestLoss = cash; smallestLossSession = docSnap.id; }
 
                     totalCities += c;
                     totalStations += s;
-                    if (matchProps > mostPropsInSingleMatch) mostPropsInSingleMatch = matchProps;
+                    if (matchProps > maxPropsSingle) maxPropsSingle = matchProps;
+
+                    if (isWinner) {
+                        runningStreak++;
+                        if (runningStreak > longestStreak) longestStreak = runningStreak;
+                    } else {
+                        runningStreak = 0;
+                    }
 
                     playedMatches.push({
                         id: docSnap.id,
@@ -294,102 +318,136 @@
             const matchCount = playedMatches.length;
             if (bestEarnings === -Infinity) bestEarnings = 0;
             if (worstEarnings === Infinity) worstEarnings = 0;
+            if (smallestProfit === Infinity) smallestProfit = 0;
+            if (smallestLoss === -Infinity) smallestLoss = 0;
 
             const winRate = matchCount > 0 ? ((totalWins / matchCount) * 100).toFixed(1) : "0.0";
+            const rankedWinRate = rankedCount > 0 ? ((rankedWins / rankedCount) * 100).toFixed(1) : "0.0";
             const avgEarnings = matchCount > 0 ? Math.round(totalEarnings / matchCount) : 0;
-            const totalPropsAll = totalCities + totalStations;
-            const avgPropsPerMatch = matchCount > 0 ? (totalPropsAll / matchCount).toFixed(1) : "0.0";
+            const totalProps = totalCities + totalStations;
+
+            // Sort matches descending by date/id
+            playedMatches.sort((a, b) => b.id.localeCompare(a.id));
+            const firstGameObj = [...playedMatches].reverse()[0];
+            const latestGameObj = playedMatches[0];
 
             inspectorContent.innerHTML = `
-                <!-- Header Banner -->
+                <!-- Player Profile Header -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700/60 pb-6 gap-4">
                     <div class="flex items-center gap-4">
                         <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-3xl font-black">
                             ${name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                            <h1 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                            <h1 class="text-2xl font-black text-white flex items-center gap-2">
                                 <span>${name}</span>
                             </h1>
-                            <p class="text-xs text-slate-400 mt-0.5">Comprehensive Career Telemetry & Match Logs</p>
+                            <p class="text-xs text-slate-400 mt-0.5">Player Career Telemetry & Ranked Performance</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- 1. Primary Metrics Grid -->
+                <!-- 1. Ranked vs Overall Performance Overview -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-2xl text-center space-y-0.5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Total Matches</span>
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-2xl text-center space-y-1">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Sessions</span>
                         <p class="text-2xl font-black text-white font-mono">${matchCount}</p>
-                        <span class="text-[9px] text-emerald-400 font-medium block">${totalRankedPlayed} Ranked / ${totalPracticePlayed} Practice</span>
+                        <span class="text-[9px] text-emerald-400 font-medium block">${rankedCount} Ranked / ${practiceCount} Practice</span>
                     </div>
-                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-2xl text-center space-y-0.5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Total Wins</span>
-                        <p class="text-2xl font-black text-emerald-400 font-mono">${totalWins}</p>
-                        <span class="text-[9px] text-slate-400 font-medium block">${winRate}% Win Rate</span>
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-2xl text-center space-y-1">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Official Ranked Wins</span>
+                        <p class="text-2xl font-black text-amber-400 font-mono">${rankedWins}</p>
+                        <span class="text-[9px] text-slate-400 font-medium block">${rankedWinRate}% Ranked Win Rate</span>
                     </div>
-                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-2xl text-center space-y-0.5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Career Net Total</span>
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-2xl text-center space-y-1">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Career Net Total</span>
                         <p class="text-2xl font-black font-mono ${totalEarnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
                             ${totalEarnings.toLocaleString()}
                         </p>
-                        <span class="text-[9px] text-slate-400 font-medium block">Avg ${avgEarnings.toLocaleString()} / match</span>
+                        <span class="text-[9px] text-slate-400 font-medium block">Avg ${avgEarnings.toLocaleString()} / session</span>
                     </div>
-                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-2xl text-center space-y-0.5">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Properties Claimed</span>
-                        <p class="text-2xl font-black text-amber-300 font-mono">${totalPropsAll}</p>
-                        <span class="text-[9px] text-slate-400 font-medium block">Avg ${avgPropsPerMatch} / match</span>
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-2xl text-center space-y-1">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Overall Wins</span>
+                        <p class="text-2xl font-black text-emerald-400 font-mono">${totalWins}</p>
+                        <span class="text-[9px] text-slate-400 font-medium block">${winRate}% Total Win Rate</span>
                     </div>
                 </div>
 
-                <!-- 2. Detailed Breakdown Cards (Financial & Asset Telemetry) -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- Financial Performance -->
+                <!-- 2. Financial Highs, Lows, and Margins -->
+                <div class="space-y-3 pt-2">
+                    <h2 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <span class="material-icons text-amber-400 text-base">payments</span> Financial Highs, Lows & Margins
+                    </h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono">
+                        <div class="p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 font-sans uppercase font-bold block">Most Earned (Win)</span>
+                            <span class="text-lg font-bold text-emerald-400">${bestEarnings.toLocaleString()}</span>
+                            <span class="text-[9px] text-slate-500 font-sans block truncate">${bestSession ? 'Match ' + bestSession : 'N/A'}</span>
+                        </div>
+                        <div class="p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 font-sans uppercase font-bold block">Most Lost (Deficit)</span>
+                            <span class="text-lg font-bold text-rose-400">${worstEarnings.toLocaleString()}</span>
+                            <span class="text-[9px] text-slate-500 font-sans block truncate">${worstSession ? 'Match ' + worstSession : 'N/A'}</span>
+                        </div>
+                        <div class="p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 font-sans uppercase font-bold block">Smallest Profit</span>
+                            <span class="text-lg font-bold text-emerald-300">${smallestProfit.toLocaleString()}</span>
+                            <span class="text-[9px] text-slate-500 font-sans block truncate">${smallestProfitSession ? 'Match ' + smallestProfitSession : 'N/A'}</span>
+                        </div>
+                        <div class="p-3 bg-slate-900/80 rounded-2xl border border-slate-800">
+                            <span class="text-[10px] text-slate-400 font-sans uppercase font-bold block">Smallest Loss</span>
+                            <span class="text-lg font-bold text-rose-300">${smallestLoss.toLocaleString()}</span>
+                            <span class="text-[9px] text-slate-500 font-sans block truncate">${smallestLossSession ? 'Match ' + smallestLossSession : 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Key Facts & Milestones -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-2xl space-y-3">
                         <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                            <span class="material-icons text-sm">payments</span> Financial Records
+                            <span class="material-icons text-sm">history_edu</span> Key Timeline Facts
                         </h3>
                         <div class="space-y-2 text-xs font-mono">
-                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
-                                <span class="text-slate-400 font-sans">Highest Single Match:</span>
-                                <span class="text-emerald-400 font-bold">${bestEarnings.toLocaleString()}</span>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">First Game:</span>
+                                <span class="text-slate-200 font-bold">${firstGameObj ? `${firstGameObj.date} (${firstGameObj.id})` : 'N/A'}</span>
                             </div>
-                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
-                                <span class="text-slate-400 font-sans">Lowest Match Score:</span>
-                                <span class="${worstEarnings >= 0 ? 'text-slate-300' : 'text-rose-400'} font-bold">${worstEarnings.toLocaleString()}</span>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">Latest Game:</span>
+                                <span class="text-slate-200 font-bold">${latestGameObj ? `${latestGameObj.date} (${latestGameObj.id})` : 'N/A'}</span>
                             </div>
-                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
-                                <span class="text-slate-400 font-sans">Average Cash Flow:</span>
-                                <span class="text-sky-300 font-bold">${avgEarnings.toLocaleString()}</span>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">Longest Win Streak:</span>
+                                <span class="text-amber-400 font-bold">${longestStreak} In A Row</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Property Portfolio Telemetry -->
                     <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-2xl space-y-3">
                         <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                            <span class="material-icons text-sm">domain</span> Property Portfolio Stats
+                            <span class="material-icons text-sm">domain</span> Asset & Empire Facts
                         </h3>
                         <div class="space-y-2 text-xs font-mono">
-                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
-                                <span class="text-slate-400 font-sans">Total Cities Claimed:</span>
-                                <span class="text-amber-300 font-bold">${totalCities}</span>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">Total Properties:</span>
+                                <span class="text-amber-300 font-bold">${totalProps} (${totalCities} Cities, ${totalStations} Stations)</span>
                             </div>
-                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
-                                <span class="text-slate-400 font-sans">Stations & Utilities:</span>
-                                <span class="text-blue-300 font-bold">${totalStations}</span>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">Max Props in 1 Match:</span>
+                                <span class="text-amber-400 font-bold">${maxPropsSingle} Properties</span>
                             </div>
-                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
-                                <span class="text-slate-400 font-sans">Max Props in One Match:</span>
-                                <span class="text-emerald-400 font-bold">${mostPropsInSingleMatch}</span>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800">
+                                <span class="text-slate-400 font-sans">Practice Session Wins:</span>
+                                <span class="text-slate-300 font-bold">${practiceWins} Wins</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- 3. Recorded Matches Table -->
-                <div class="space-y-3 pt-2">
-                    <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Historical Match Archive</h2>
+                <!-- 4. Historical Match Logs Table -->
+                <div class="space-y-3 pt-4 border-t border-slate-700/60">
+                    <h2 class="text-sm font-black text-slate-300 uppercase tracking-wider">Historical Match Archive</h2>
                     ${matchCount === 0 ? `
                         <p class="text-xs text-slate-400 py-4 text-center">No match history records found for player "${name}".</p>
                     ` : `
@@ -497,7 +555,6 @@
             const container = document.getElementById('shareableSnapshotContainer');
             const originalStyle = container.getAttribute('style') || '';
             
-            // Fixed width frame
             container.style.width = '720px';
             container.style.maxWidth = '720px';
 
