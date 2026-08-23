@@ -3,116 +3,322 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Overview</title>
+    <title>Account Overview & Player Career Intelligence</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+    <style> 
+        body { font-family: 'Google Sans', sans-serif; }
+        .stat-card {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(51, 65, 85, 0.6);
+        }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
-    
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
     <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
             <a href="../index.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
                 <span class="material-icons text-base">arrow_back</span> Portal Gateway
             </a>
-            <button id="signOutBtn" class="text-xs bg-red-950/80 hover:bg-red-900 text-red-300 px-3 py-1.5 rounded-lg border border-red-800 font-medium transition">
-                Sign Out
-            </button>
+            <div class="flex items-center gap-3">
+                <a href="../g-mono/g-mono.html" class="text-xs bg-amber-500/10 hover:bg-amber-500 text-amber-300 hover:text-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/30 font-bold transition flex items-center gap-1">
+                    <span class="material-icons text-sm">casino</span> Monopoly Suite
+                </a>
+                <button id="signOutBtn" class="text-xs bg-red-950/80 hover:bg-red-900 text-red-300 px-3 py-1.5 rounded-xl border border-red-800 font-medium transition">
+                    Sign Out
+                </button>
+            </div>
         </div>
     </nav>
-
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
-            
-            <div class="flex items-center gap-4 border-b border-slate-700/60 pb-6">
-                <div class="w-16 h-16 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-3xl font-bold">
-                    <span class="material-icons text-3xl">person</span>
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
+        
+        <!-- Account ID & Member Identity Banner -->
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/60 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-3xl font-extrabold">
+                    <span id="userAvatarLetter">U</span>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold text-white" id="userEmail">Loading User Profile...</h1>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-2xl font-black text-white" id="userEmail">Loading User Profile...</h1>
+                        <span id="roleBadge" class="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-slate-800 text-slate-400 border border-slate-700">Standard</span>
+                    </div>
                     <p class="text-xs text-slate-400 font-mono mt-0.5">UID: <span id="userUid">...</span></p>
                 </div>
             </div>
+            <div class="text-right">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Linked Profile</span>
+                <a href="#" id="viewLinkedProfileLink" class="text-sm font-bold text-amber-400 hover:underline flex items-center gap-1 justify-end mt-0.5">
+                    <span id="linkedMemberName">Not Bound</span>
+                    <span class="material-icons text-xs">open_in_new</span>
+                </a>
+            </div>
+        </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 space-y-1">
-                    <span class="text-xs text-slate-400 font-semibold uppercase">Account Role & Verification</span>
-                    <p id="userRole" class="text-sm font-bold text-slate-200">Checking authorization...</p>
+        <!-- CAREER FINANCIAL MILESTONES (Most Earned, Most Lost, Most Profit, Smallest Profit, Smallest Loss) -->
+        <div class="space-y-3">
+            <h2 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                <span class="material-icons text-amber-400 text-base">insights</span> Career Highs, Lows & Margins
+            </h2>
+            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                <div class="stat-card p-4 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Most Earned (Top Win)</span>
+                    <p id="statMostEarned" class="text-xl font-black text-emerald-400 font-mono">0</p>
+                    <span id="statMostEarnedDate" class="text-[9px] text-slate-500 truncate block">No wins yet</span>
                 </div>
+                <div class="stat-card p-4 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Most Lost (Worst Deficit)</span>
+                    <p id="statMostLost" class="text-xl font-black text-rose-400 font-mono">0</p>
+                    <span id="statMostLostDate" class="text-[9px] text-slate-500 truncate block">No losses</span>
+                </div>
+                <div class="stat-card p-4 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Max Profit Margin</span>
+                    <p id="statMaxProfitMargin" class="text-xl font-black text-amber-300 font-mono">0</p>
+                    <span id="statMaxProfitDate" class="text-[9px] text-slate-500 truncate block">Largest single victory</span>
+                </div>
+                <div class="stat-card p-4 rounded-2xl text-center space-y-1">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Smallest Profit</span>
+                    <p id="statSmallestProfit" class="text-xl font-black text-emerald-300 font-mono">0</p>
+                    <span id="statSmallestProfitDate" class="text-[9px] text-slate-500 truncate block">Narrowest win</span>
+                </div>
+                <div class="stat-card p-4 rounded-2xl text-center space-y-1 col-span-2 sm:col-span-1">
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Smallest Loss</span>
+                    <p id="statSmallestLoss" class="text-xl font-black text-rose-300 font-mono">0</p>
+                    <span id="statSmallestLossDate" class="text-[9px] text-slate-500 truncate block">Closest defeat</span>
+                </div>
+            </div>
+        </div>
 
-                <div class="bg-slate-900/80 border border-slate-700/50 rounded-xl p-4 space-y-1">
-                    <span class="text-xs text-slate-400 font-semibold uppercase">Linked Monopoly Member Profile</span>
-                    <p id="playerLink" class="text-sm font-bold text-amber-400">
-                        <a href="#" id="viewPlayerProfile" class="hover:underline flex items-center gap-1">
-                            <span id="linkedMemberName">View Match Record</span>
-                            <span class="material-icons text-sm">open_in_new</span>
-                        </a>
-                    </p>
+        <!-- COMPREHENSIVE CAREER FACTS & MILESTONES -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Game History Facts -->
+            <div class="stat-card p-5 rounded-3xl space-y-3">
+                <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                    <span class="material-icons text-sm">history_edu</span> Session & Streak Facts
+                </h3>
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-sans">First Game Recorded:</span>
+                        <span id="factFirstGame" class="text-slate-200 font-bold">N/A</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-sans">Latest Game Session:</span>
+                        <span id="factLatestGame" class="text-slate-200 font-bold">N/A</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-sans">Longest Win Streak:</span>
+                        <span id="factWinStreak" class="text-amber-400 font-bold">0 In A Row</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-sans">Ranked Match Win Rate:</span>
+                        <span id="factRankedWinRate" class="text-emerald-400 font-bold">0%</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Navigation Links -->
-            <div class="pt-4 border-t border-slate-700/50 flex flex-wrap gap-3">
-                <a href="history.html" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-xs font-bold rounded-xl transition">
-                    View Account Activity Logs
-                </a>
-                <a href="../g-mono/g-mono.html" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition">
-                    Open Monopoly Suite
-                </a>
+            <!-- Property & Empire Facts -->
+            <div class="stat-card p-5 rounded-3xl space-y-3">
+                <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                    <span class="material-icons text-sm">domain</span> Empire & Asset Facts
+                </h3>
+                <div class="space-y-2 text-xs font-mono">
+                    <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-sans">Total Properties Acquired:</span>
+                        <span id="factTotalProps" class="text-amber-300 font-bold">0</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-sans">Most Props In 1 Match:</span>
+                        <span id="factMaxProps" class="text-amber-400 font-bold">0 Props</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-sans">Total Cities Claimed:</span>
+                        <span id="factTotalCities" class="text-slate-200 font-bold">0</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
+                        <span class="text-slate-400 font-sans">Stations & Utilities Owned:</span>
+                        <span id="factTotalStations" class="text-blue-300 font-bold">0</span>
+                    </div>
+                </div>
             </div>
+        </div>
 
+        <!-- Navigation Links -->
+        <div class="pt-2 flex flex-wrap gap-3">
+            <a href="history.html" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+                <span class="material-icons text-sm">manage_accounts</span> Account Audit Logs
+            </a>
+            <a href="../g-mono/leaderboard.html" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow">
+                <span class="material-icons text-sm">emoji_events</span> Check Standings
+            </a>
         </div>
     </main>
 
     <script type="module">
-        import { auth, db, doc, getDoc, onAuthStateChanged, signOut } from "../web-info/firebase.js";
-
+        import { auth, db, doc, getDoc, getDocs, collection, onAuthStateChanged, signOut } from "../web-info/firebase.js";
+        
         const userEmail = document.getElementById('userEmail');
         const userUid = document.getElementById('userUid');
-        const userRole = document.getElementById('userRole');
+        const roleBadge = document.getElementById('roleBadge');
+        const userAvatarLetter = document.getElementById('userAvatarLetter');
         const linkedMemberName = document.getElementById('linkedMemberName');
-        const viewPlayerProfile = document.getElementById('viewPlayerProfile');
+        const viewLinkedProfileLink = document.getElementById('viewLinkedProfileLink');
+
+        // Milestone Elements
+        const statMostEarned = document.getElementById('statMostEarned');
+        const statMostEarnedDate = document.getElementById('statMostEarnedDate');
+        const statMostLost = document.getElementById('statMostLost');
+        const statMostLostDate = document.getElementById('statMostLostDate');
+        const statMaxProfitMargin = document.getElementById('statMaxProfitMargin');
+        const statMaxProfitDate = document.getElementById('statMaxProfitDate');
+        const statSmallestProfit = document.getElementById('statSmallestProfit');
+        const statSmallestProfitDate = document.getElementById('statSmallestProfitDate');
+        const statSmallestLoss = document.getElementById('statSmallestLoss');
+        const statSmallestLossDate = document.getElementById('statSmallestLossDate');
+
+        // Fact Elements
+        const factFirstGame = document.getElementById('factFirstGame');
+        const factLatestGame = document.getElementById('factLatestGame');
+        const factWinStreak = document.getElementById('factWinStreak');
+        const factRankedWinRate = document.getElementById('factRankedWinRate');
+        const factTotalProps = document.getElementById('factTotalProps');
+        const factMaxProps = document.getElementById('factMaxProps');
+        const factTotalCities = document.getElementById('factTotalCities');
+        const factTotalStations = document.getElementById('factTotalStations');
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
                 window.location.href = "sign-up-in.html";
                 return;
             }
-
             userEmail.textContent = user.email || "Authenticated User";
             userUid.textContent = user.uid;
+            userAvatarLetter.textContent = (user.email || 'U').charAt(0).toUpperCase();
 
-            // Check linked member profile in /users/{uid}
-            let targetProfileName = user.email ? user.email.split('@')[0] : user.uid;
+            // Admin Authorization Check
+            try {
+                const adminDoc = await getDoc(doc(db, "admin", "uuids"));
+                if (adminDoc.exists() && adminDoc.data().allowed_uids?.includes(user.uid)) {
+                    roleBadge.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800";
+                    roleBadge.textContent = "Admin";
+                }
+            } catch(e) {}
 
+            // Find linked member name
+            let profileName = user.email ? user.email.split('@')[0] : user.uid;
             try {
                 const userDocSnap = await getDoc(doc(db, "users", user.uid));
                 if (userDocSnap.exists() && userDocSnap.data().linkedMemberName) {
-                    targetProfileName = userDocSnap.data().linkedMemberName;
-                    linkedMemberName.textContent = `Verified Member: ${targetProfileName}`;
-                } else {
-                    linkedMemberName.textContent = `Member Profile (${targetProfileName})`;
+                    profileName = userDocSnap.data().linkedMemberName;
                 }
-            } catch(e) {
-                linkedMemberName.textContent = `Profile (${targetProfileName})`;
-            }
+            } catch(e) {}
 
-            viewPlayerProfile.href = `../g-mono/view.html?player=${encodeURIComponent(targetProfileName)}`;
+            linkedMemberName.textContent = profileName;
+            viewLinkedProfileLink.href = `../g-mono/view.html?player=${encodeURIComponent(profileName)}`;
 
-            // Check admin status
-            try {
-                const adminDoc = await getDoc(doc(db, "admin", "uuids"));
-                const isMasterAdmin = user.uid === "MASTER_PERMANENT_ADMIN_UUID";
-                if (isMasterAdmin || (adminDoc.exists() && adminDoc.data().allowed_uids?.includes(user.uid))) {
-                    userRole.innerHTML = `<span class="text-emerald-400 font-bold flex items-center gap-1"><span class="material-icons text-sm">verified</span> Authorized Admin</span>`;
-                } else {
-                    userRole.innerHTML = `<span class="text-slate-300">Standard Account</span>`;
-                }
-            } catch (e) {
-                userRole.textContent = "Standard Account";
-            }
+            loadPlayerTelemetry(profileName);
         });
+
+        async function loadPlayerTelemetry(playerName) {
+            try {
+                const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
+                const userSessions = [];
+
+                matchesSnap.forEach(d => {
+                    const game = d.data();
+                    const players = game.players || [];
+                    const p = players.find(x => x.name?.toLowerCase() === playerName.toLowerCase());
+                    if (p) {
+                        const memberCount = players.filter(pl => pl.isMember !== false && !pl.isGuest).length;
+                        userSessions.push({
+                            id: d.id,
+                            date: game.date || d.id.substring(0, 10),
+                            earnings: Number(p.cash ?? p.earnings ?? 0),
+                            isWinner: p.isWinner || false,
+                            isRanked: memberCount > 2,
+                            cities: Number(p.cities || 0),
+                            stations: Number(p.stations || 0),
+                            totalProps: Number(p.cities || 0) + Number(p.stations || 0)
+                        });
+                    }
+                });
+
+                if (userSessions.length === 0) return;
+
+                // Sort chronologically (oldest to newest)
+                userSessions.sort((a, b) => a.date.localeCompare(b.date));
+
+                // 1. First & Latest Game
+                factFirstGame.textContent = `${userSessions[0].date} (${userSessions[0].id})`;
+                factLatestGame.textContent = `${userSessions[userSessions.length - 1].date} (${userSessions[userSessions.length - 1].id})`;
+
+                // 2. Financial Highs, Lows, Margins
+                let mostEarned = -Infinity, mostEarnedSession = null;
+                let mostLost = Infinity, mostLostSession = null;
+                let smallestProfit = Infinity, smallestProfitSession = null;
+                let smallestLoss = -Infinity, smallestLossSession = null;
+
+                let runningStreak = 0, maxStreak = 0;
+                let rankedWins = 0, rankedMatches = 0;
+                let totalCities = 0, totalStations = 0, maxPropsSingle = 0;
+
+                userSessions.forEach(s => {
+                    const e = s.earnings;
+                    if (e > 0) {
+                        if (e > mostEarned) { mostEarned = e; mostEarnedSession = s; }
+                        if (e < smallestProfit) { smallestProfit = e; smallestProfitSession = s; }
+                    } else if (e < 0) {
+                        if (e < mostLost) { mostLost = e; mostLostSession = s; }
+                        if (e > smallestLoss) { smallestLoss = e; smallestLossSession = s; }
+                    }
+
+                    if (s.isWinner) {
+                        runningStreak++;
+                        if (runningStreak > maxStreak) maxStreak = runningStreak;
+                    } else {
+                        runningStreak = 0;
+                    }
+
+                    if (s.isRanked) {
+                        rankedMatches++;
+                        if (s.isWinner) rankedWins++;
+                    }
+
+                    totalCities += s.cities;
+                    totalStations += s.stations;
+                    if (s.totalProps > maxPropsSingle) maxPropsSingle = s.totalProps;
+                });
+
+                if (mostEarnedSession) {
+                    statMostEarned.textContent = mostEarned.toLocaleString();
+                    statMostEarnedDate.textContent = `on ${mostEarnedSession.date}`;
+                    statMaxProfitMargin.textContent = mostEarned.toLocaleString();
+                    statMaxProfitDate.textContent = `Match ${mostEarnedSession.id}`;
+                }
+                if (mostLostSession) {
+                    statMostLost.textContent = mostLost.toLocaleString();
+                    statMostLostDate.textContent = `on ${mostLostSession.date}`;
+                }
+                if (smallestProfitSession) {
+                    statSmallestProfit.textContent = smallestProfit.toLocaleString();
+                    statSmallestProfitDate.textContent = `on ${smallestProfitSession.date}`;
+                }
+                if (smallestLossSession) {
+                    statSmallestLoss.textContent = smallestLoss.toLocaleString();
+                    statSmallestLossDate.textContent = `on ${smallestLossSession.date}`;
+                }
+
+                factWinStreak.textContent = `${maxStreak} Game(s) In A Row`;
+                factRankedWinRate.textContent = rankedMatches > 0 ? `${((rankedWins / rankedMatches) * 100).toFixed(1)}% (${rankedWins}/${rankedMatches})` : "0%";
+                factTotalProps.textContent = (totalCities + totalStations).toLocaleString();
+                factTotalCities.textContent = totalCities.toLocaleString();
+                factTotalStations.textContent = totalStations.toLocaleString();
+                factMaxProps.textContent = `${maxPropsSingle} Properties`;
+
+            } catch (err) {
+                console.error("Account telemetry error:", err);
+            }
+        }
 
         document.getElementById('signOutBtn')?.addEventListener('click', () => {
             signOut(auth).then(() => window.location.href = "sign-up-in.html");
