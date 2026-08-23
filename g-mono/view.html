@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monopoly Suite - Record Inspector</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style> body { font-family: 'Google Sans', sans-serif; } </style>
@@ -27,6 +27,7 @@
         </div>
     </nav>
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
+        <!-- Wrapper container to provide fixed-ratio margins when capturing images -->
         <div id="shareableSnapshotContainer" class="p-3 sm:p-5 bg-slate-900 rounded-[2rem]">
             <div id="inspectorCard" class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
                 <div id="loadingState" class="py-12 text-center text-slate-400 space-y-3">
@@ -62,7 +63,7 @@
                 <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-white">Share Snapshot Image</p>
-                        <p class="text-[10px] text-slate-400">Fixed ratio scorecard (clean without edit button)</p>
+                        <p class="text-[10px] text-slate-400">Fixed-ratio scorecard (clean without edit button)</p>
                     </div>
                     <span class="material-icons text-emerald-400 text-sm">image</span>
                 </button>
@@ -232,30 +233,56 @@
             openShareModalBtn.classList.remove('hidden');
         }
 
+        // FULL COMPREHENSIVE STATS FOR EVERY SINGLE PLAYER METRIC
         async function renderPlayerView(name) {
             const matchesRef = collection(db, "games", "Monopoly", "matches");
             const snapshot = await getDocs(matchesRef);
             let playedMatches = [];
             let totalWins = 0;
+            let totalRankedPlayed = 0;
+            let totalPracticePlayed = 0;
             let totalEarnings = 0;
+            let bestEarnings = -Infinity;
+            let worstEarnings = Infinity;
+            let totalCities = 0;
+            let totalStations = 0;
+            let mostPropsInSingleMatch = 0;
 
             snapshot.forEach(docSnap => {
                 const game = docSnap.data();
                 const players = game.players || [];
                 const pData = players.find(p => p.name?.toLowerCase() === name.toLowerCase());
                 if (pData) {
+                    const memberCount = players.filter(pl => pl.isMember !== false && !pl.isGuest).length;
+                    const isRanked = memberCount > 2;
+                    if (isRanked) totalRankedPlayed++;
+                    else totalPracticePlayed++;
+
                     const isWinner = pData.isWinner || false;
                     const cash = Number(pData.earnings ?? pData.cash ?? 0);
+                    const c = Number(pData.cities || 0);
+                    const s = Number(pData.stations || 0);
+                    const matchProps = c + s;
+
                     if (isWinner) totalWins++;
                     totalEarnings += cash;
+                    if (cash > bestEarnings) bestEarnings = cash;
+                    if (cash < worstEarnings) worstEarnings = cash;
+
+                    totalCities += c;
+                    totalStations += s;
+                    if (matchProps > mostPropsInSingleMatch) mostPropsInSingleMatch = matchProps;
+
                     playedMatches.push({
                         id: docSnap.id,
                         date: game.date || docSnap.id.substring(0, 10),
                         location: game.location || 'N/A',
                         earnings: cash,
                         isWinner: isWinner,
-                        cities: Number(pData.cities || 0),
-                        stations: Number(pData.stations || 0),
+                        isRanked: isRanked,
+                        cities: c,
+                        stations: s,
+                        totalProps: matchProps,
                         isMember: pData.isMember !== false && !pData.isGuest
                     });
                 }
@@ -265,42 +292,104 @@
             inspectorContent.classList.remove('hidden');
 
             const matchCount = playedMatches.length;
+            if (bestEarnings === -Infinity) bestEarnings = 0;
+            if (worstEarnings === Infinity) worstEarnings = 0;
+
             const winRate = matchCount > 0 ? ((totalWins / matchCount) * 100).toFixed(1) : "0.0";
+            const avgEarnings = matchCount > 0 ? Math.round(totalEarnings / matchCount) : 0;
+            const totalPropsAll = totalCities + totalStations;
+            const avgPropsPerMatch = matchCount > 0 ? (totalPropsAll / matchCount).toFixed(1) : "0.0";
 
             inspectorContent.innerHTML = `
-                <div class="flex items-center gap-4 border-b border-slate-700/60 pb-6">
-                    <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-3xl font-bold">
-                        <span class="material-icons text-3xl">emoji_events</span>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                            <span>${name}</span>
-                        </h1>
-                        <p class="text-xs text-slate-400 mt-1">Player Profile & Historical Career Record</p>
+                <!-- Header Banner -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-700/60 pb-6 gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-3xl font-black">
+                            ${name.charAt(0).toUpperCase()}
+                        </div>
+                        <div>
+                            <h1 class="text-2xl font-extrabold text-white flex items-center gap-2">
+                                <span>${name}</span>
+                            </h1>
+                            <p class="text-xs text-slate-400 mt-0.5">Comprehensive Career Telemetry & Match Logs</p>
+                        </div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-xl text-center">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Matches</span>
-                        <p class="text-xl font-bold text-white font-mono mt-0.5">${matchCount}</p>
+
+                <!-- 1. Primary Metrics Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-2xl text-center space-y-0.5">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Total Matches</span>
+                        <p class="text-2xl font-black text-white font-mono">${matchCount}</p>
+                        <span class="text-[9px] text-emerald-400 font-medium block">${totalRankedPlayed} Ranked / ${totalPracticePlayed} Practice</span>
                     </div>
-                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-xl text-center">
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-2xl text-center space-y-0.5">
                         <span class="text-[10px] text-slate-400 font-bold uppercase">Total Wins</span>
-                        <p class="text-xl font-bold text-emerald-400 font-mono mt-0.5">${totalWins}</p>
+                        <p class="text-2xl font-black text-emerald-400 font-mono">${totalWins}</p>
+                        <span class="text-[9px] text-slate-400 font-medium block">${winRate}% Win Rate</span>
                     </div>
-                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-xl text-center">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Win Rate</span>
-                        <p class="text-xl font-bold text-amber-400 font-mono mt-0.5">${winRate}%</p>
-                    </div>
-                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-xl text-center">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase">Net Score</span>
-                        <p class="text-xl font-bold font-mono mt-0.5 ${totalEarnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-2xl text-center space-y-0.5">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Career Net Total</span>
+                        <p class="text-2xl font-black font-mono ${totalEarnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
                             ${totalEarnings.toLocaleString()}
                         </p>
+                        <span class="text-[9px] text-slate-400 font-medium block">Avg ${avgEarnings.toLocaleString()} / match</span>
+                    </div>
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-3.5 rounded-2xl text-center space-y-0.5">
+                        <span class="text-[10px] text-slate-400 font-bold uppercase">Properties Claimed</span>
+                        <p class="text-2xl font-black text-amber-300 font-mono">${totalPropsAll}</p>
+                        <span class="text-[9px] text-slate-400 font-medium block">Avg ${avgPropsPerMatch} / match</span>
                     </div>
                 </div>
+
+                <!-- 2. Detailed Breakdown Cards (Financial & Asset Telemetry) -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- Financial Performance -->
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-2xl space-y-3">
+                        <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                            <span class="material-icons text-sm">payments</span> Financial Records
+                        </h3>
+                        <div class="space-y-2 text-xs font-mono">
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
+                                <span class="text-slate-400 font-sans">Highest Single Match:</span>
+                                <span class="text-emerald-400 font-bold">${bestEarnings.toLocaleString()}</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
+                                <span class="text-slate-400 font-sans">Lowest Match Score:</span>
+                                <span class="${worstEarnings >= 0 ? 'text-slate-300' : 'text-rose-400'} font-bold">${worstEarnings.toLocaleString()}</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
+                                <span class="text-slate-400 font-sans">Average Cash Flow:</span>
+                                <span class="text-sky-300 font-bold">${avgEarnings.toLocaleString()}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Property Portfolio Telemetry -->
+                    <div class="bg-slate-900/80 border border-slate-700/50 p-4 rounded-2xl space-y-3">
+                        <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
+                            <span class="material-icons text-sm">domain</span> Property Portfolio Stats
+                        </h3>
+                        <div class="space-y-2 text-xs font-mono">
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
+                                <span class="text-slate-400 font-sans">Total Cities Claimed:</span>
+                                <span class="text-amber-300 font-bold">${totalCities}</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
+                                <span class="text-slate-400 font-sans">Stations & Utilities:</span>
+                                <span class="text-blue-300 font-bold">${totalStations}</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-slate-950 rounded-xl border border-slate-800/80">
+                                <span class="text-slate-400 font-sans">Max Props in One Match:</span>
+                                <span class="text-emerald-400 font-bold">${mostPropsInSingleMatch}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Recorded Matches Table -->
                 <div class="space-y-3 pt-2">
-                    <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Recorded Matches</h2>
+                    <h2 class="text-sm font-bold text-slate-300 uppercase tracking-wider">Historical Match Archive</h2>
                     ${matchCount === 0 ? `
                         <p class="text-xs text-slate-400 py-4 text-center">No match history records found for player "${name}".</p>
                     ` : `
@@ -311,25 +400,33 @@
                                         <th class="py-2.5 px-3">Game ID</th>
                                         <th class="py-2.5 px-3">Date</th>
                                         <th class="py-2.5 px-3">Location</th>
+                                        <th class="py-2.5 px-3 text-center">Type</th>
                                         <th class="py-2.5 px-3 text-center">Result</th>
-                                        <th class="py-2.5 px-3 text-right">Earnings</th>
+                                        <th class="py-2.5 px-3 text-center">Props</th>
+                                        <th class="py-2.5 px-3 text-right">Net</th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-slate-700/50 text-xs">
+                                <tbody class="divide-y divide-slate-700/50 text-xs font-mono">
                                     ${playedMatches.map(m => `
                                         <tr class="hover:bg-slate-800/40">
-                                            <td class="py-3 px-3 font-mono font-bold text-amber-400">
+                                            <td class="py-3 px-3 font-bold text-amber-400">
                                                 <a href="view.html?game=${encodeURIComponent(m.id)}" class="hover:underline flex items-center gap-1">
                                                     <span>${m.id}</span>
                                                     <span class="material-icons text-xs">open_in_new</span>
                                                 </a>
                                             </td>
-                                            <td class="py-3 px-3 text-slate-300 font-mono">${m.date}</td>
-                                            <td class="py-3 px-3 text-slate-300">${m.location}</td>
-                                            <td class="py-3 px-3 text-center font-bold ${m.isWinner ? 'text-emerald-400' : 'text-slate-500'}">
+                                            <td class="py-3 px-3 text-slate-300">${m.date}</td>
+                                            <td class="py-3 px-3 text-slate-300 font-sans">${m.location}</td>
+                                            <td class="py-3 px-3 text-center">
+                                                <span class="px-2 py-0.5 rounded text-[9px] font-bold font-sans uppercase ${m.isRanked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-400'}">
+                                                    ${m.isRanked ? 'Ranked' : 'Practice'}
+                                                </span>
+                                            </td>
+                                            <td class="py-3 px-3 text-center font-bold font-sans ${m.isWinner ? 'text-emerald-400' : 'text-slate-500'}">
                                                 ${m.isWinner ? 'Winner' : 'Participant'}
                                             </td>
-                                            <td class="py-3 px-3 text-right font-mono font-bold ${m.earnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                                            <td class="py-3 px-3 text-center text-amber-300 font-bold">${m.totalProps}</td>
+                                            <td class="py-3 px-3 text-right font-bold ${m.earnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
                                                 ${m.earnings.toLocaleString()}
                                             </td>
                                         </tr>
@@ -374,7 +471,7 @@
         function setupPlayerShare(name) {
             currentShareDetails.url = `https://sepal-vip.github.io/vip-games/g-mono/view.html?player=${encodeURIComponent(name)}`;
             currentShareDetails.title = `Monopoly Player Profile: ${name}`;
-            currentShareDetails.caption = `${name}'s Monopoly Career Standings: ${currentShareDetails.url}`;
+            currentShareDetails.caption = `${name}'s Monopoly Career Standings & Stats: ${currentShareDetails.url}`;
         }
 
         // Modal Controls
@@ -400,7 +497,7 @@
             const container = document.getElementById('shareableSnapshotContainer');
             const originalStyle = container.getAttribute('style') || '';
             
-            // Set fixed capture width for constant aspect ratio across devices
+            // Fixed width frame
             container.style.width = '720px';
             container.style.maxWidth = '720px';
 
@@ -411,7 +508,6 @@
                 windowWidth: 1024
             });
 
-            // Restore elements
             container.setAttribute('style', originalStyle);
             if (editBtn) editBtn.style.display = '';
 
