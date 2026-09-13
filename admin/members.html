@@ -1,341 +1,274 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Global Member Roster & Management Hub</title>
+    <title>Member Roster Management</title>
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/vip-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style> 
-        body { font-family: 'Google Sans', sans-serif; } 
+    
+    <!-- Global Liquid Glass Stylesheet & Theme Controller -->
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950">
-    <!-- Top Navigation -->
-    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden">
+    
+    <!-- Liquid Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="glass-panel sticky top-0 z-50 transition-colors duration-500">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <a href="master.html" class="flex items-center gap-1 text-slate-400 hover:text-white text-xs font-semibold transition">
-                    <span class="material-icons text-sm">arrow_back</span> Master Admin Control
-                    <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4"></span>
+                <a href="master.html" class="flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-semibold transition">
+                    <span class="material-icons text-sm">arrow_back</span> Master Admin
+                    <img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4">
                 </a>
-                <span class="text-slate-700">|</span>
-                <span class="text-emerald-400 font-extrabold text-sm flex items-center gap-1.5 tracking-wide">
-                    <span class="material-icons text-base text-emerald-500">group</span> Global Member Roster Hub
+                <span class="text-slate-300 dark:text-slate-700">|</span>
+                <span class="text-orange-600 dark:text-orange-400 font-extrabold text-sm flex items-center gap-1.5 tracking-wide">
+                    <span class="material-icons text-base text-orange-500">group</span> Official Member Roster
                 </span>
             </div>
             <div class="flex items-center gap-3">
-                <span id="authBadge" class="text-xs px-3 py-1 rounded-full font-bold bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1.5">
-                    <span class="material-icons text-xs animate-spin">sync</span> Verifying Security...
-                </span>
-                <button id="refreshMembersBtn" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-800 font-medium transition flex items-center gap-1 shadow">
-                    <span class="material-icons text-sm">refresh</span> Refresh Roster
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-orange-500 transition-colors" title="Toggle Theme">
+                    <span class="material-icons" id="themeIcon">light_mode</span>
                 </button>
+                <span id="authBadge" class="text-xs px-3 py-1 rounded-full font-bold bg-orange-500/10 text-orange-600 dark:text-orange-300 border border-orange-500/30 flex items-center gap-1.5">
+                    <span class="material-icons text-xs animate-spin">sync</span> Verifying Permissions...
+                </span>
             </div>
         </div>
     </nav>
 
     <!-- Main Workspace -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
-        <!-- Access Restricted View -->
-        <div id="accessDenied" class="hidden bg-red-950/80 border border-red-800/80 rounded-3xl p-8 text-center space-y-4 max-w-2xl mx-auto shadow-2xl">
-            <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto">
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-6 relative z-10">
+        
+        <!-- Access Restricted Guard -->
+        <div id="accessDenied" class="hidden glass-panel border-rose-500/30 rounded-3xl p-8 text-center space-y-4 max-w-2xl mx-auto shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center mx-auto">
                 <span class="material-icons text-3xl">gpp_bad</span>
             </div>
-            <h1 class="text-2xl font-bold text-white">Member Management Access Restricted</h1>
-            <p class="text-xs text-red-200 leading-relaxed">
-                Your account UID (<code id="userUidDisplay" class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">...</code>) is not authorized in <code class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">/admin/uuids</code>.
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Admin Access Restricted</h1>
+            <p class="text-xs text-rose-600 dark:text-rose-300 leading-relaxed">
+                Your authenticated account (<code id="userUidDisplay" class="bg-white/50 dark:bg-slate-900 px-2 py-1 rounded text-orange-600 dark:text-orange-400 font-mono">...</code>) is not authorized in <code class="bg-white/50 dark:bg-slate-900 px-2 py-1 rounded text-orange-600 dark:text-orange-400 font-mono">/admin/uuids</code>.
             </p>
         </div>
 
+        <!-- Members Workspace -->
         <div id="membersWorkspace" class="hidden space-y-6">
-            <header class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            
+            <!-- Hero Header Glass Card -->
+            <header class="glass-panel border-orange-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 class="text-2xl font-black text-white flex items-center gap-2">
-                        Global Member Directory &amp; Profile Registry
+                    <h1 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        Monopoly Member Directory &amp; Permissions
                     </h1>
-                    <p class="text-xs text-slate-400 mt-1">Unified member roster used across Monopoly Suite, leaderboards, and user account bindings.</p>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Register new member profiles, remove former members, and maintain official leaderboard eligibility.</p>
                 </div>
-                <div class="bg-slate-950 border border-slate-800 px-3.5 py-2 rounded-xl text-xs text-slate-300 font-mono flex items-center gap-2">
-                    <span class="material-icons text-sm text-emerald-400">group</span>
-                    <span>Total Members: <strong id="totalMembersCount" class="text-emerald-400">0</strong></span>
+                <div class="bg-white/40 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 px-3.5 py-2 rounded-2xl text-xs font-mono text-slate-700 dark:text-slate-300 flex items-center gap-2 shadow-sm">
+                    <span class="material-icons text-sm text-emerald-500">group</span>
+                    <span>Total Members: <strong id="memberCountHeader" class="text-orange-600 dark:text-orange-400 font-bold">0</strong></span>
                 </div>
             </header>
 
-            <div id="statusAlert" class="hidden text-xs p-3 rounded-xl border font-medium"></div>
+            <!-- Status Message Feedback -->
+            <div id="statusBox" class="hidden text-xs p-3.5 rounded-2xl border font-medium"></div>
 
-            <!-- Two Column Actions: Add Member & Link Account -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Register Profile Card -->
-                <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4 shadow-xl">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <span class="material-icons text-sm">person_add</span> Register New Member Profile
+            <!-- Two-Column Grid: Form & List -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                
+                <!-- Left: Create Member Form -->
+                <div class="glass-panel rounded-3xl p-6 space-y-4 shadow-xl">
+                    <div class="border-b border-slate-200 dark:border-slate-800/80 pb-3">
+                        <h2 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-icons text-sm">person_add</span> Register New Member
                         </h2>
                     </div>
-                    <form id="addMemberForm" class="space-y-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full Member Name</label>
-                            <input type="text" id="newMemberName" required placeholder="Enter Full Name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                    <form id="createMemberForm" class="space-y-4">
+                        <div class="space-y-1">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Member Name</label>
+                            <input type="text" id="newMemberName" required placeholder="e.g. Mitansh" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 shadow-inner">
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Role / Note (Optional)</label>
-                            <input type="text" id="newMemberNote" placeholder="e.g. Club Founder..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
-                        </div>
-                        <button type="submit" id="saveMemberBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20">
-                            <span class="material-icons text-sm">save</span> Register Member
+                        <button type="submit" id="submitMemberBtn" class="w-full py-2.5 bg-blue-500 hover:bg-blue-400 text-slate-950 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow-md shadow-orange-500/20">
+                            <span class="material-icons text-sm">add_circle</span> Add Member to Roster
                         </button>
                     </form>
+                    <p class="text-[11px] text-slate-500 leading-relaxed pt-2">
+                        Registered members are saved to the <code class="bg-white/50 dark:bg-slate-950 px-1 rounded text-blue-600 dark:text-blue-400">/players</code> collection and immediately become selectable across match logs.
+                    </p>
                 </div>
 
-                <!-- Link Account Card -->
-                <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4 shadow-xl">
-                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                        <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <span class="material-icons text-sm">link</span> Bind User Auth UID to Member
+                <!-- Right: Active Members List -->
+                <div class="md:col-span-2 glass-panel rounded-3xl p-6 space-y-4 shadow-xl">
+                    <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800/80 pb-3">
+                        <h2 class="text-xs font-bold text-slate-800 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-icons text-sm text-orange-500">list</span> Official Member Profiles
                         </h2>
+                        <span id="memberCountBadge" class="text-[10px] font-mono text-slate-500 font-bold">Loading members...</span>
                     </div>
-                    <form id="linkAccountForm" class="space-y-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Firebase Auth UID</label>
-                            <input type="text" id="targetUidInput" required placeholder="Paste UID..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Member Profile</label>
-                            <select id="memberSelectDropdown" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
-                                <option value="">-- Choose Member Profile --</option>
-                            </select>
-                        </div>
-                        <button type="submit" id="saveLinkBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20">
-                            <span class="material-icons text-sm">link</span> Save Binding
-                        </button>
-                    </form>
+                    <div id="membersContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+                        <p class="col-span-full text-xs text-slate-500 text-center py-8">Fetching member roster from Firestore...</p>
+                    </div>
                 </div>
+
             </div>
 
-            <!-- Active Members Grid -->
-            <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4 shadow-xl">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
-                    <div>
-                        <h2 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                            <span class="material-icons text-sm text-amber-400">badge</span> Active Global System Members
-                        </h2>
-                    </div>
-                    <input type="text" id="memberSearchInput" placeholder="Filter member name..." class="w-full sm:w-72 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-                </div>
-                <div id="membersGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <p class="text-xs text-slate-500 col-span-full py-6 text-center">Loading global member roster...</p>
-                </div>
-            </div>
         </div>
     </main>
 
-    <script type="module" src="../web-info/p-admin-list.js"></script>
+    <!-- Member Roster Logic Module -->
     <script type="module">
         import { auth, db, doc, getDoc, getDocs, setDoc, deleteDoc, collection, onAuthStateChanged } from "../web-info/firebase.js";
         import { PERMANENT_MASTER_ADMIN_UID, isPermanentAdmin } from "../web-info/p-admin-list.js";
 
-        // Global Debug Logger Engine
-        if (localStorage.getItem('debugging') === null) {
-            localStorage.setItem('debugging', '0');
-        }
-        function debugLog(...args) {
-            if (localStorage.getItem('debugging') === '1') {
-                console.log("[DEBUG:admin/members.html]", ...args);
-            }
-        }
-        debugLog("Initializing Member Directory admin hub...");
-
         const authBadge = document.getElementById('authBadge');
         const accessDenied = document.getElementById('accessDenied');
-        const userUidDisplay = document.getElementById('userUidDisplay');
         const membersWorkspace = document.getElementById('membersWorkspace');
-        const statusAlert = document.getElementById('statusAlert');
-        const refreshMembersBtn = document.getElementById('refreshMembersBtn');
-        const totalMembersCount = document.getElementById('totalMembersCount');
-        const addMemberForm = document.getElementById('addMemberForm');
+        const userUidDisplay = document.getElementById('userUidDisplay');
+        const memberCountHeader = document.getElementById('memberCountHeader');
+        const memberCountBadge = document.getElementById('memberCountBadge');
+        const membersContainer = document.getElementById('membersContainer');
+        const createMemberForm = document.getElementById('createMemberForm');
         const newMemberName = document.getElementById('newMemberName');
-        const newMemberNote = document.getElementById('newMemberNote');
-        const saveMemberBtn = document.getElementById('saveMemberBtn');
-        const linkAccountForm = document.getElementById('linkAccountForm');
-        const targetUidInput = document.getElementById('targetUidInput');
-        const memberSelectDropdown = document.getElementById('memberSelectDropdown');
-        const saveLinkBtn = document.getElementById('saveLinkBtn');
-        const memberSearchInput = document.getElementById('memberSearchInput');
-        const membersGrid = document.getElementById('membersGrid');
+        const submitMemberBtn = document.getElementById('submitMemberBtn');
+        const statusBox = document.getElementById('statusBox');
 
-        let rawMembersList = [];
+        let membersRoster = [];
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                showAccessDenied("Not Authenticated");
+                showDenied("Not Authenticated");
                 return;
             }
             userUidDisplay.textContent = user.uid;
             try {
                 const adminDoc = await getDoc(doc(db, "admin", "uuids"));
-                let allowedUids = adminDoc.exists() ? (adminDoc.data().allowed_uids || []) : [];
-                if (PERMANENT_MASTER_ADMIN_UID && !allowedUids.includes(PERMANENT_MASTER_ADMIN_UID)) {
-                    allowedUids.unshift(PERMANENT_MASTER_ADMIN_UID);
-                }
-                const isAuthorized = allowedUids.includes(user.uid) || isPermanentAdmin(user.uid);
+                let allowed = adminDoc.exists() ? (adminDoc.data().allowed_uids || []) : [];
+                if (!allowed.includes(PERMANENT_MASTER_ADMIN_UID)) allowed.unshift(PERMANENT_MASTER_ADMIN_UID);
+                
+                const isAuthorized = allowed.includes(user.uid) || isPermanentAdmin(user.uid);
                 if (isAuthorized) {
-                    authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1.5";
+                    authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5";
                     authBadge.textContent = "Authorized Master Admin";
                     accessDenied.classList.add('hidden');
                     membersWorkspace.classList.remove('hidden');
-                    loadAllMemberData();
+                    loadMembers();
                 } else {
-                    showAccessDenied(user.uid);
+                    showDenied(user.uid);
                 }
             } catch (err) {
-                showAccessDenied(user.uid);
+                showDenied(user.uid);
             }
         });
 
-        function showAccessDenied(uid) {
-            authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-red-950 text-red-300 border border-red-800";
+        function showDenied(uid) {
+            authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-rose-500/10 text-rose-600 dark:text-rose-300 border border-rose-500/30";
             authBadge.textContent = "Access Restricted";
             userUidDisplay.textContent = uid || "Unknown UID";
             accessDenied.classList.remove('hidden');
             membersWorkspace.classList.add('hidden');
         }
 
-        async function loadAllMemberData() {
+        async function loadMembers() {
             try {
-                const membersSnap = await getDocs(collection(db, "players"));
-                const memberMap = new Map();
-                membersSnap.forEach(d => {
+                const snap = await getDocs(collection(db, "players"));
+                membersRoster = [];
+                snap.forEach(d => {
                     const data = d.data() || {};
                     const name = data.name || d.id;
-                    if (name) {
-                        memberMap.set(name, { id: d.id, name: name, note: data.note || "Registered Member" });
-                    }
+                    if (name) membersRoster.push({ id: d.id, name: name });
                 });
-                rawMembersList = Array.from(memberMap.values()).sort((a, b) => a.name.localeCompare(b.name));
-                totalMembersCount.textContent = rawMembersList.length;
-
-                memberSelectDropdown.innerHTML = `<option value="">-- Choose Member Profile --</option>` +
-                    rawMembersList.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
-                renderMembersGrid();
+                membersRoster.sort((a, b) => a.name.localeCompare(b.name));
+                memberCountHeader.textContent = membersRoster.length;
+                memberCountBadge.textContent = `${membersRoster.length} Registered Members`;
+                renderMembers();
             } catch (err) {
-                showAlert("Failed to load member roster from Firestore.", "error");
+                membersContainer.innerHTML = `<p class="col-span-full text-xs text-rose-500 text-center py-6">Failed to load member roster.</p>`;
             }
         }
 
-        function renderMembersGrid() {
-            const queryVal = memberSearchInput.value.toLowerCase().trim();
-            const filtered = rawMembersList.filter(m => m.name.toLowerCase().includes(queryVal));
-            if (filtered.length === 0) {
-                membersGrid.innerHTML = `<p class="text-xs text-slate-500 col-span-full py-6 text-center">No member profiles match search query.</p>`;
+        function renderMembers() {
+            if (membersRoster.length === 0) {
+                membersContainer.innerHTML = `<p class="col-span-full text-xs text-slate-500 text-center py-8">No official members currently registered.</p>`;
                 return;
             }
-            membersGrid.innerHTML = filtered.map(m => `
-                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-3">
-                    <div class="flex justify-between items-start gap-2">
-                        <div>
-                            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
-                                <span class="material-icons text-emerald-400 text-sm">person</span>
-                                <span>${m.name}</span>
-                            </h3>
-                            <p class="text-[10px] text-slate-400">${m.note || 'Registered Member'}</p>
+            membersContainer.innerHTML = membersRoster.map(m => `
+                <div class="flex items-center justify-between p-3 bg-white/40 dark:bg-slate-950/70 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:border-orange-500/30 transition">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-xl bg-orange-500/15 text-orange-600 dark:text-orange-400 flex items-center justify-center font-bold text-xs">
+                            ${m.name.charAt(0).toUpperCase()}
                         </div>
-                        <button onclick="deleteMemberProfile('${m.name}')" class="p-1 text-slate-500 hover:text-red-400 transition" title="Delete Member">
-                            <span class="material-icons text-sm">delete</span>
-                        </button>
+                        <div>
+                            <span class="text-xs font-bold text-slate-900 dark:text-white block">${m.name}</span>
+                            <span class="text-[9px] text-slate-500 font-mono">ID: ${m.id}</span>
+                        </div>
                     </div>
-                    <div class="pt-2 border-t border-slate-900 flex justify-between items-center text-[10px]">
-                        <a href="../g-mono/view.html?player=${encodeURIComponent(m.name)}" class="text-emerald-400 font-semibold hover:underline">
-                            Inspect Career
+                    <div class="flex items-center gap-1">
+                        <a href="../g-mono/view.html?player=${encodeURIComponent(m.name)}" class="p-1 text-slate-400 hover:text-blue-500 transition" title="Inspect Player">
+                            <span class="material-icons text-base">open_in_new</span>
                         </a>
-                        <span class="text-slate-500 font-mono">Global Profile</span>
+                        <button onclick="removeMember('${m.id}', '${m.name}')" class="p-1 text-slate-400 hover:text-rose-500 transition" title="Delete Member">
+                            <span class="material-icons text-base">delete</span>
+                        </button>
                     </div>
                 </div>
             `).join('');
         }
 
-        addMemberForm.addEventListener('submit', async (e) => {
+        createMemberForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const nameVal = newMemberName.value.trim();
-            const noteVal = newMemberNote.value.trim();
-            if (!nameVal) return;
-            saveMemberBtn.disabled = true;
-            saveMemberBtn.textContent = "Registering...";
+            const name = newMemberName.value.trim();
+            if (!name) return;
+            
+            submitMemberBtn.disabled = true;
+            submitMemberBtn.textContent = "Saving...";
+
             try {
-                await setDoc(doc(db, "players", nameVal), {
-                    name: nameVal,
-                    note: noteVal || "Registered Global Member",
+                await setDoc(doc(db, "players", name), {
+                    name: name,
                     createdAt: new Date().toISOString()
-                }, { merge: true });
-                showAlert(`Member profile "${nameVal}" registered!`, "success");
+                });
                 newMemberName.value = '';
-                newMemberNote.value = '';
-                saveMemberBtn.disabled = false;
-                saveMemberBtn.textContent = "Register Member Profile";
-                loadAllMemberData();
+                showStatus(`Member "${name}" successfully registered!`, "success");
+                loadMembers();
             } catch (err) {
-                showAlert(err.message || "Failed to register member.", "error");
-                saveMemberBtn.disabled = false;
-                saveMemberBtn.textContent = "Register Member Profile";
+                showStatus(err.message || "Failed to add member.", "error");
+            } finally {
+                submitMemberBtn.disabled = false;
+                submitMemberBtn.textContent = "Add Member to Roster";
             }
         });
 
-        linkAccountForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const uidVal = targetUidInput.value.trim();
-            const memberVal = memberSelectDropdown.value;
-            if (!uidVal || !memberVal) return;
-            saveLinkBtn.disabled = true;
-            saveLinkBtn.textContent = "Binding...";
+        window.removeMember = async (id, name) => {
+            if (!confirm(`Are you sure you want to remove member "${name}"? Historical match entries will remain intact.`)) return;
             try {
-                await setDoc(doc(db, "users", uidVal), {
-                    linkedMemberName: memberVal,
-                    linkedAt: new Date().toISOString(),
-                    linkedBy: auth.currentUser?.uid || 'admin'
-                }, { merge: true });
-                showAlert(`Bound Auth UID to Member Profile "${memberVal}"!`, "success");
-                targetUidInput.value = '';
-                memberSelectDropdown.value = '';
-                saveLinkBtn.disabled = false;
-                saveLinkBtn.textContent = "Save Member Binding";
+                await deleteDoc(doc(db, "players", id));
+                showStatus(`Member "${name}" removed from active roster.`, "success");
+                loadMembers();
             } catch (err) {
-                showAlert(err.message || "Failed to bind UID.", "error");
-                saveLinkBtn.disabled = false;
-                saveLinkBtn.textContent = "Save Member Binding";
-            }
-        });
-
-        window.deleteMemberProfile = async (memberName) => {
-            if (!confirm(`Delete global member profile "${memberName}"?`)) return;
-            try {
-                await deleteDoc(doc(db, "players", memberName));
-                showAlert(`Member profile "${memberName}" removed.`, "success");
-                loadAllMemberData();
-            } catch (err) {
-                showAlert(err.message || "Failed to delete member profile.", "error");
+                showStatus(err.message || "Failed to remove member.", "error");
             }
         };
 
-        function showAlert(msg, type) {
-            statusAlert.classList.remove('hidden');
-            statusAlert.textContent = msg;
-            statusAlert.className = type === 'success' ? "text-xs p-3 rounded-xl border bg-emerald-950/80 text-emerald-300 border-emerald-800 font-medium" : "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800 font-medium";
+        function showStatus(msg, type) {
+            statusBox.classList.remove('hidden');
+            statusBox.textContent = msg;
+            statusBox.className = type === 'success'
+                ? "text-xs p-3.5 rounded-2xl border bg-emerald-500/10 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300 border-emerald-500/30 font-medium"
+                : "text-xs p-3.5 rounded-2xl border bg-rose-500/10 dark:bg-rose-950/80 text-rose-600 dark:text-rose-300 border-rose-500/30 font-medium";
         }
-
-        memberSearchInput.addEventListener('input', renderMembersGrid);
-        refreshMembersBtn.addEventListener('click', loadAllMemberData);
-
-        // Offline Service Worker Bootstrap
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
-            });
-        }
-        window.addEventListener('offline', () => {
-            window.location.href = '/offline.html';
-        });
     </script>
 </body>
 </html>

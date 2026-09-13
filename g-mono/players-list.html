@@ -1,98 +1,117 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monopoly Member & Guest Directory</title>
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Global Liquid Glass Stylesheet & Theme Controller -->
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+
     <style> 
         body { font-family: 'Google Sans', sans-serif; } 
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden">
+    
+    <!-- Liquid Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
     <!-- Top Navigation -->
-    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+    <nav class="glass-panel sticky top-0 z-50 transition-colors duration-500">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <a href="g-mono.html" class="flex items-center gap-1 text-slate-400 hover:text-white text-xs font-semibold transition">
+                <a href="g-mono.html" class="flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-semibold transition">
                     <span class="material-icons text-sm">arrow_back</span> Monopoly Suite
-                    <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4"></span>
+                    <img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4">
                 </a>
-                <span class="text-slate-700">|</span>
-                <span class="text-amber-400 font-extrabold text-sm flex items-center gap-1.5">
-                    <span class="material-icons text-base text-amber-500">group</span> Player Directory
+                <span class="text-slate-300 dark:text-slate-700">|</span>
+                <span class="text-emerald-600 dark:text-emerald-400 font-extrabold text-sm flex items-center gap-1.5">
+                    <span class="material-icons text-base text-emerald-500">group</span> Player Directory
                 </span>
             </div>
-            <a href="leaderboard.html" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 px-3.5 py-1.5 rounded-xl border border-slate-800 font-medium transition flex items-center gap-1">
-                <span class="material-icons text-sm text-amber-400">emoji_events</span> Standings
-            </a>
+            <div class="flex items-center gap-3">
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-emerald-500 transition-colors" title="Toggle Theme">
+                    <span class="material-icons" id="themeIcon">light_mode</span>
+                </button>
+                <a href="leaderboard.html" class="text-xs bg-white/40 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 font-medium transition flex items-center gap-1 shadow-sm">
+                    <span class="material-icons text-sm text-amber-500">emoji_events</span> Standings
+                </a>
+            </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-8">
-        <!-- Header Banner -->
-        <header class="bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-8 relative z-10">
+        
+        <!-- Header Banner Glass Card -->
+        <header class="glass-panel border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ring-1 ring-emerald-500/20">
             <div>
-                <h1 class="text-2xl sm:text-3xl font-black text-white">Player &amp; Member Directory</h1>
-                <p class="text-xs text-slate-400 mt-1">Official registered members from <code class="bg-slate-950 px-1.5 py-0.5 rounded text-amber-300 font-mono">/players</code> and guest casual participants.</p>
+                <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Player &amp; Member Directory</h1>
+                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Official registered members from <code class="bg-white/50 dark:bg-slate-950 px-1.5 py-0.5 rounded text-emerald-600 dark:text-emerald-400 font-mono">/players</code> and guest casual participants[cite: 1].</p>
             </div>
             <div class="flex items-center gap-3 w-full md:w-auto">
                 <div class="relative w-full md:w-72">
-                    <span class="material-icons absolute left-3 top-2.5 text-slate-500 text-sm">search</span>
-                    <input type="text" id="playerSearchInput" placeholder="Filter members or guests..." class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <span class="material-icons absolute left-3 top-2.5 text-slate-400 text-sm">search</span>
+                    <input type="text" id="playerSearchInput" placeholder="Filter members or guests..." class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl pl-9 pr-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500 shadow-inner">
                 </div>
             </div>
         </header>
 
         <!-- SECTION 1: Registered Official Members -->
         <section class="space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
-                    <h2 class="text-sm font-black text-white uppercase tracking-wider">Registered System Members</h2>
-                    <span id="memberCountBadge" class="text-[10px] font-mono text-blue-400 font-bold bg-blue-950/80 px-2.5 py-0.5 rounded-full border border-blue-800">
+                    <h2 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Registered System Members</h2>
+                    <span id="memberCountBadge" class="text-[10px] font-mono text-blue-600 dark:text-blue-400 font-bold bg-blue-500/15 px-2.5 py-0.5 rounded-full border border-blue-500/30">
                         0 Members
                     </span>
                 </div>
                 <span class="text-[10px] text-slate-500">Ranked Leaderboard Eligible</span>
             </div>
-
             <div id="membersGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div class="col-span-full py-10 text-center text-slate-500 font-sans text-xs">
-                    Loading registered members...
+                    Loading registered members...[cite: 1]
                 </div>
             </div>
         </section>
 
         <!-- SECTION 2: Guest Players -->
         <section class="space-y-4 pt-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800/80 pb-3">
                 <div class="flex items-center gap-2">
                     <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
-                    <h2 class="text-sm font-black text-white uppercase tracking-wider">Guest Players</h2>
-                    <span id="guestCountBadge" class="text-[10px] font-mono text-amber-400 font-bold bg-amber-950/80 px-2.5 py-0.5 rounded-full border border-amber-800">
+                    <h2 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Guest Players</h2>
+                    <span id="guestCountBadge" class="text-[10px] font-mono text-amber-600 dark:text-amber-400 font-bold bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-500/30">
                         0 Guests
                     </span>
                 </div>
                 <span class="text-[10px] text-slate-500">Casual &amp; Practice Sessions</span>
             </div>
-
             <div id="guestsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 <div class="col-span-full py-10 text-center text-slate-500 font-sans text-xs">
-                    Loading guest participants...
+                    Loading guest participants...[cite: 1]
                 </div>
             </div>
         </section>
+
     </main>
 
     <script type="module">
         import { db, collection, getDocs } from "../web-info/firebase.js";
 
-        // Global Debug Logger Engine
         if (localStorage.getItem('debugging') === null) {
             localStorage.setItem('debugging', '0');
         }
@@ -115,7 +134,6 @@
 
         async function loadDirectoryData() {
             try {
-                // 1. Fetch Registered Members from Firestore
                 const membersSnap = await getDocs(collection(db, "players"));
                 const registeredMap = new Map();
                 membersSnap.forEach(d => {
@@ -126,11 +144,9 @@
                     }
                 });
 
-                // 2. Fetch Match Sessions to aggregate telemetry and identify guests
                 const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
                 matchesData = [];
                 const guestMap = new Map();
-
                 matchesSnap.forEach(d => {
                     const data = d.data();
                     matchesData.push({ id: d.id, ...data });
@@ -139,7 +155,6 @@
                         const pName = (p.name || '').trim();
                         if (!pName) return;
                         const lower = pName.toLowerCase();
-                        // If marked as guest or not in registered /players collection
                         if (p.isGuest === true || p.isMember === false || !registeredMap.has(lower)) {
                             if (!guestMap.has(lower) && !registeredMap.has(lower)) {
                                 guestMap.set(lower, { name: pName, isGuest: true, note: "Casual Guest" });
@@ -151,13 +166,10 @@
                 membersList = Array.from(registeredMap.values()).sort((a, b) => a.name.localeCompare(b.name));
                 guestsList = Array.from(guestMap.values()).sort((a, b) => a.name.localeCompare(b.name));
 
-                debugLog("Loaded Members count:", membersList.length, "Guests count:", guestsList.length);
-
                 renderAll();
             } catch (err) {
-                debugLog("Load Error:", err);
-                membersGrid.innerHTML = `<div class="col-span-full py-8 text-center text-rose-400 font-sans text-xs">Failed to load member roster.</div>`;
-                guestsGrid.innerHTML = `<div class="col-span-full py-8 text-center text-rose-400 font-sans text-xs">Failed to load guest list.</div>`;
+                membersGrid.innerHTML = `<div class="col-span-full py-8 text-center text-rose-500 font-sans text-xs">Failed to load member roster.</div>`;
+                guestsGrid.innerHTML = `<div class="col-span-full py-8 text-center text-rose-500 font-sans text-xs">Failed to load guest list.</div>`;
             }
         }
 
@@ -193,49 +205,46 @@
         function generateCardHtml(player) {
             const stats = calculatePlayerStats(player.name);
             const isGuest = player.isGuest;
-
             return `
-                <a href="view.html?${isGuest ? 'guest' : 'player'}=${encodeURIComponent(player.name)}" class="bg-slate-900/90 border border-slate-800 hover:border-amber-500/50 rounded-3xl p-5 space-y-4 shadow-xl flex flex-col justify-between transition group">
+                <a href="view.html?${isGuest ? 'guest' : 'player'}=${encodeURIComponent(player.name)}" class="glass-panel rounded-3xl p-5 space-y-4 shadow-xl flex flex-col justify-between transition group hover:border-amber-500/40">
                     <div class="space-y-3">
                         <div class="flex justify-between items-start">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 rounded-2xl ${isGuest ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'} border flex items-center justify-center font-bold text-lg group-hover:scale-105 transition">
+                                <div class="w-12 h-12 rounded-2xl ${isGuest ? 'bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400' : 'bg-blue-500/15 border-blue-500/30 text-blue-600 dark:text-blue-400'} border flex items-center justify-center font-bold text-lg group-hover:scale-105 transition shadow-sm">
                                     ${player.name.charAt(0).toUpperCase()}
                                 </div>
                                 <div>
-                                    <h3 class="text-base font-extrabold text-white group-hover:text-amber-400 transition">${player.name}</h3>
-                                    <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border ${isGuest ? 'bg-amber-950 text-amber-300 border-amber-800' : 'bg-blue-950 text-blue-300 border border-blue-800'}">
+                                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">${player.name}</h3>
+                                    <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border ${isGuest ? 'bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30' : 'bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30'}">
                                         ${isGuest ? 'Guest Player' : 'Registered Member'}
                                     </span>
                                 </div>
                             </div>
-                            <span class="material-icons text-slate-600 group-hover:text-amber-400 transition text-base">open_in_new</span>
+                            <span class="material-icons text-slate-400 group-hover:text-amber-500 transition text-base">open_in_new</span>
                         </div>
-
                         <div class="grid grid-cols-3 gap-2 pt-1 text-center font-mono">
-                            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800/80">
-                                <span class="text-[9px] text-slate-500 block font-sans uppercase font-bold">Matches</span>
-                                <span class="text-xs font-bold text-white">${stats.totalPlayed}</span>
+                            <div class="bg-white/40 dark:bg-slate-950/70 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                                <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-sans uppercase font-bold">Matches</span>
+                                <span class="text-xs font-bold text-slate-900 dark:text-white">${stats.totalPlayed}</span>
                             </div>
-                            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800/80">
-                                <span class="text-[9px] text-slate-500 block font-sans uppercase font-bold">Wins</span>
-                                <span class="text-xs font-bold text-amber-400">${stats.wins}</span>
+                            <div class="bg-white/40 dark:bg-slate-950/70 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                                <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-sans uppercase font-bold">Wins</span>
+                                <span class="text-xs font-bold text-amber-600 dark:text-amber-400">${stats.wins}</span>
                             </div>
-                            <div class="bg-slate-950 p-2 rounded-xl border border-slate-800/80">
-                                <span class="text-[9px] text-slate-500 block font-sans uppercase font-bold">Win Rate</span>
-                                <span class="text-xs font-bold text-emerald-400">${stats.winRate}%</span>
+                            <div class="bg-white/40 dark:bg-slate-950/70 p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                                <span class="text-[9px] text-slate-500 dark:text-slate-400 block font-sans uppercase font-bold">Win Rate</span>
+                                <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400">${stats.winRate}%</span>
                             </div>
                         </div>
                     </div>
-
-                    <div class="pt-3 border-t border-slate-800 space-y-1.5 text-xs font-mono">
-                        <div class="flex justify-between text-slate-400">
+                    <div class="pt-3 border-t border-slate-200 dark:border-slate-800 space-y-1.5 text-xs font-mono">
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
                             <span>Career Net:</span>
-                            <strong class="${stats.totalScore >= 0 ? 'text-emerald-400' : 'text-rose-400'}">$${stats.totalScore.toLocaleString()}</strong>
+                            <strong class="${stats.totalScore >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}">$${stats.totalScore.toLocaleString()}</strong>
                         </div>
-                        <div class="flex justify-between text-slate-400">
+                        <div class="flex justify-between text-slate-500 dark:text-slate-400">
                             <span>Best Single Game:</span>
-                            <strong class="text-amber-400">$${stats.bestScore.toLocaleString()}</strong>
+                            <strong class="text-amber-600 dark:text-amber-400">$${stats.bestScore.toLocaleString()}</strong>
                         </div>
                     </div>
                 </a>
@@ -244,7 +253,6 @@
 
         function renderAll() {
             const query = playerSearchInput.value.toLowerCase().trim();
-
             const filteredMembers = membersList.filter(m => m.name.toLowerCase().includes(query));
             const filteredGuests = guestsList.filter(g => g.name.toLowerCase().includes(query));
 
@@ -267,20 +275,17 @@
         playerSearchInput.addEventListener('input', renderAll);
         loadDirectoryData();
     </script>
-
-    <!-- Offline Service Worker & Redirect Bootstrap -->
+    
+    <!-- Offline Service Worker Bootstrap -->
     <script>
-        (function() {
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                        .catch(() => {});
-                });
-            }
-            window.addEventListener('offline', () => {
-                window.location.href = '/offline.html';
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
             });
-        })();
+        }
+        window.addEventListener('offline', () => {
+            window.location.href = '/offline.html';
+        });
     </script>
 </body>
 </html>

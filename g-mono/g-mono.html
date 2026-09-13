@@ -1,200 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monopoly Suite - Central Hub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Global Liquid Glass Stylesheet & Theme Controller -->
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+
     <style> 
         body { font-family: 'Google Sans', sans-serif; } 
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden">
+    
+    <!-- Liquid Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
     <!-- Top Navigation -->
-    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+    <nav class="glass-panel sticky top-0 z-50 transition-colors duration-500">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="../index.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium transition">
+            <a href="../index.html" class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium transition">
                 <span class="material-icons text-base">arrow_back</span> Gateway
-                <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4"></span>
+                <img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4">
             </a>
-            <div class="flex items-center gap-2 text-amber-400 font-extrabold text-sm">
-                <img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-6 h-6">
-                <span>Monopoly Suite</span>
+            <div class="flex items-center gap-4">
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-emerald-500 transition-colors" title="Toggle Theme">
+                    <span class="material-icons" id="themeIcon">light_mode</span>
+                </button>
+                <div class="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 font-extrabold text-sm">
+                    <img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-6 h-6">
+                    <span>Monopoly Suite</span>
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Workspace -->
-    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-8">
-        <!-- Hero Header -->
-        <header class="bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 space-y-8 relative z-10">
+        
+        <!-- Hero Header Glass Card -->
+        <header class="glass-panel border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 ring-1 ring-emerald-500/20">
             <div class="space-y-2">
                 <div class="flex items-center gap-2">
-                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
-                    <span class="text-xs font-black uppercase tracking-wider text-amber-400">Game Management Center</span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-xs font-black uppercase tracking-wider text-emerald-600 dark:text-emerald-400">Game Management Center</span>
                 </div>
-                <h1 class="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                <h1 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
                     Monopoly Match &amp; Record Center
                 </h1>
-                <p class="text-slate-400 text-xs sm:text-sm max-w-2xl">
+                <p class="text-slate-600 dark:text-slate-400 text-xs sm:text-sm max-w-2xl font-medium leading-relaxed">
                     Log match sessions, analyze monthly and yearly leaderboards, track custom property collections, audit player telemetry, and manage game access.
                 </p>
             </div>
-            <a href="add.html" class="px-5 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-2xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-amber-500/20 shrink-0">
+            <a href="add.html" class="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-black rounded-2xl text-xs sm:text-sm transition flex items-center gap-2 shadow-lg shadow-emerald-600/25 border border-emerald-400/30 shrink-0">
                 <span class="material-icons text-base">add_circle</span> Record New Match
             </a>
         </header>
 
-        <!-- Feature Grid -->
+        <!-- Feature Grid (8 Glass Cards) -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+            
             <!-- Card 1: Leaderboard -->
-            <a href="leaderboard.html" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-amber-500/50 transition duration-300 group flex flex-col justify-between shadow-xl">
+            <a href="leaderboard.html" class="glass-panel rounded-3xl p-6 hover:border-amber-500/60 dark:hover:border-amber-400/60 transition duration-300 group flex flex-col justify-between shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-slate-950 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-slate-950 transition duration-300 shadow-sm">
                         <span class="material-icons text-2xl">emoji_events</span>
                     </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-white group-hover:text-amber-400 transition">Leaderboards</h2>
-                        <p class="text-xs text-slate-400 mt-1">Monthly, Yearly, and Career rankings with full High &amp; Low performance records.</p>
+                        <h2 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">Leaderboards</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Monthly, Yearly, and Career rankings with full High &amp; Low performance records.</p>
                     </div>
                 </div>
-                <div class="pt-4 mt-6 border-t border-slate-800/80 text-xs font-bold text-amber-400 flex items-center justify-between">
+                <div class="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between">
                     <span>Open Standings</span>
                     <span class="material-icons text-sm group-hover:translate-x-1 transition">arrow_forward</span>
                 </div>
             </a>
 
             <!-- Card 2: Match History -->
-            <a href="history.html" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-blue-500/50 transition duration-300 group flex flex-col justify-between shadow-xl">
+            <a href="history.html" class="glass-panel rounded-3xl p-6 hover:border-blue-500/60 dark:hover:border-blue-400/60 transition duration-300 group flex flex-col justify-between shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-slate-950 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-500/30 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-white transition duration-300 shadow-sm">
                         <span class="material-icons text-2xl">history</span>
                     </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-white group-hover:text-blue-400 transition">Match History</h2>
-                        <p class="text-xs text-slate-400 mt-1">Comprehensive match archive, session IDs, ranked badges, and venue tags.</p>
+                        <h2 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">Match History</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Comprehensive match archive, session IDs, ranked badges, and venue tags.</p>
                     </div>
                 </div>
-                <div class="pt-4 mt-6 border-t border-slate-800/80 text-xs font-bold text-blue-400 flex items-center justify-between">
+                <div class="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center justify-between">
                     <span>Browse Logs</span>
                     <span class="material-icons text-sm group-hover:translate-x-1 transition">arrow_forward</span>
                 </div>
             </a>
 
             <!-- Card 3: Members & Players -->
-            <a href="players-list.html" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-emerald-500/50 transition duration-300 group flex flex-col justify-between shadow-xl">
+            <a href="players-list.html" class="glass-panel rounded-3xl p-6 hover:border-emerald-500/60 dark:hover:border-emerald-400/60 transition duration-300 group flex flex-col justify-between shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-slate-950 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-500/30 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition duration-300 shadow-sm">
                         <span class="material-icons text-2xl">group</span>
                     </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-white group-hover:text-emerald-400 transition">Member Directory</h2>
-                        <p class="text-xs text-slate-400 mt-1">Registered roster profiles, player win rates, and dedicated guest player views.</p>
+                        <h2 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition">Member Directory</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Registered roster profiles, player win rates, and dedicated guest player views.</p>
                     </div>
                 </div>
-                <div class="pt-4 mt-6 border-t border-slate-800/80 text-xs font-bold text-emerald-400 flex items-center justify-between">
+                <div class="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-between">
                     <span>Inspect Players</span>
                     <span class="material-icons text-sm group-hover:translate-x-1 transition">arrow_forward</span>
                 </div>
             </a>
 
             <!-- Card 4: Record Match -->
-            <a href="add.html" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-purple-500/50 transition duration-300 group flex flex-col justify-between shadow-xl">
+            <a href="add.html" class="glass-panel rounded-3xl p-6 hover:border-purple-500/60 dark:hover:border-purple-400/60 transition duration-300 group flex flex-col justify-between shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-400 flex items-center justify-center border border-purple-500/20 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-slate-950 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-500/30 group-hover:scale-110 group-hover:bg-purple-500 group-hover:text-white transition duration-300 shadow-sm">
                         <span class="material-icons text-2xl">post_add</span>
                     </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-white group-hover:text-purple-400 transition">Record Match</h2>
-                        <p class="text-xs text-slate-400 mt-1">Log match sessions with auto ID generation and 26-property live tallying.</p>
+                        <h2 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition">Record Match</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Log match sessions with auto ID generation and 26-property live tallying.</p>
                     </div>
                 </div>
-                <div class="pt-4 mt-6 border-t border-slate-800/80 text-xs font-bold text-purple-400 flex items-center justify-between">
+                <div class="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs font-bold text-purple-600 dark:text-purple-400 flex items-center justify-between">
                     <span>Create Entry</span>
                     <span class="material-icons text-sm group-hover:translate-x-1 transition">arrow_forward</span>
                 </div>
             </a>
 
-            <!-- Card 5: Monthly Overview -->
-            <a href="overview.html" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-sky-500/50 transition duration-300 group flex flex-col justify-between shadow-xl">
+            <!-- Card 5: Performance Overview -->
+            <a href="overview.html" class="glass-panel rounded-3xl p-6 hover:border-sky-500/60 dark:hover:border-sky-400/60 transition duration-300 group flex flex-col justify-between shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-sky-500/10 text-sky-400 flex items-center justify-center border border-sky-500/20 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-slate-950 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-sky-500/15 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-500/30 group-hover:scale-110 group-hover:bg-sky-500 group-hover:text-white transition duration-300 shadow-sm">
                         <span class="material-icons text-2xl">query_stats</span>
                     </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-white group-hover:text-sky-400 transition">Performance Overview</h2>
-                        <p class="text-xs text-slate-400 mt-1">Aggregate metrics across cash volume, win margins, and property accumulation.</p>
+                        <h2 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition">Performance Overview</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Aggregate metrics across cash volume, win margins, and property accumulation.</p>
                     </div>
                 </div>
-                <div class="pt-4 mt-6 border-t border-slate-800/80 text-xs font-bold text-sky-400 flex items-center justify-between">
+                <div class="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs font-bold text-sky-600 dark:text-sky-400 flex items-center justify-between">
                     <span>View Analytics</span>
                     <span class="material-icons text-sm group-hover:translate-x-1 transition">arrow_forward</span>
                 </div>
             </a>
 
             <!-- Card 6: Score Calculator -->
-            <a href="count.html" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-teal-500/50 transition duration-300 group flex flex-col justify-between shadow-xl">
+            <a href="count.html" class="glass-panel rounded-3xl p-6 hover:border-teal-500/60 dark:hover:border-teal-400/60 transition duration-300 group flex flex-col justify-between shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-teal-500/10 text-teal-400 flex items-center justify-center border border-teal-500/20 group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-slate-950 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-teal-500/15 text-teal-600 dark:text-teal-400 flex items-center justify-center border border-teal-500/30 group-hover:scale-110 group-hover:bg-teal-500 group-hover:text-slate-950 transition duration-300 shadow-sm">
                         <span class="material-icons text-2xl">calculate</span>
                     </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-white group-hover:text-teal-400 transition">Score Calculator</h2>
-                        <p class="text-xs text-slate-400 mt-1">Audit net worth, count bank notes, select city colors, and export scorecard images.</p>
+                        <h2 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-teal-600 dark:group-hover:text-teal-400 transition">Score Calculator</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Audit net worth, count bank notes, select city colors, and export scorecard images.</p>
                     </div>
                 </div>
-                <div class="pt-4 mt-6 border-t border-slate-800/80 text-xs font-bold text-teal-400 flex items-center justify-between">
+                <div class="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs font-bold text-teal-600 dark:text-teal-400 flex items-center justify-between">
                     <span>Open Calculator</span>
                     <span class="material-icons text-sm group-hover:translate-x-1 transition">arrow_forward</span>
                 </div>
             </a>
 
             <!-- Card 7: Admin Controls -->
-            <a href="admin.html" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-rose-500/50 transition duration-300 group flex flex-col justify-between shadow-xl">
+            <a href="admin.html" class="glass-panel rounded-3xl p-6 hover:border-rose-500/60 dark:hover:border-rose-400/60 transition duration-300 group flex flex-col justify-between shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-400 flex items-center justify-center border border-rose-500/20 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-slate-950 transition duration-300">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/15 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-500/30 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition duration-300 shadow-sm">
                         <span class="material-icons text-2xl">admin_panel_settings</span>
                     </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-white group-hover:text-rose-400 transition">Admin Panel</h2>
-                        <p class="text-xs text-slate-400 mt-1">Authorized UID controls to verify match integrity and authorize administrators.</p>
+                        <h2 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition">Admin Panel</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Authorized UID controls to verify match integrity and authorize administrators.</p>
                     </div>
                 </div>
-                <div class="pt-4 mt-6 border-t border-slate-800/80 text-xs font-bold text-rose-400 flex items-center justify-between">
+                <div class="pt-4 mt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs font-bold text-rose-600 dark:text-rose-400 flex items-center justify-between">
                     <span>Manage Access</span>
                     <span class="material-icons text-sm group-hover:translate-x-1 transition">arrow_forward</span>
                 </div>
             </a>
 
-            <!-- Card 8: Live Game & Dice Tracker (Anti-Cheat Referee) -->
-            <a href="tracker.html" class="bg-slate-900/90 border border-amber-500/40 rounded-3xl p-6 hover:border-amber-400 transition duration-300 group flex flex-col justify-between shadow-xl relative overflow-hidden">
-                <div class="absolute -right-6 -top-6 w-24 h-24 bg-amber-500/10 rounded-full blur-xl pointer-events-none"></div>
+            <!-- Card 8: Live Game & Dice Tracker -->
+            <a href="tracker.html" class="glass-panel border-amber-500/40 rounded-3xl p-6 hover:border-amber-400 transition duration-300 group flex flex-col justify-between shadow-xl relative overflow-hidden">
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-400 flex items-center justify-center border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-slate-950 transition duration-300">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center border border-amber-500/30 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-slate-950 transition duration-300 shadow-sm">
                             <span class="material-icons text-2xl">casino</span>
                         </div>
                     </div>
                     <div>
-                        <h2 class="text-base font-extrabold text-white group-hover:text-amber-400 transition">Game &amp; Dice Tracker</h2>
-                        <p class="text-xs text-slate-400 mt-1">Multiplayer referee engine: real-time cloud turns, rent settlements, debt forgiveness, and master device control.</p>
+                        <h2 class="text-base font-extrabold text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">Game &amp; Dice Tracker</h2>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Multiplayer referee engine: real-time cloud turns, rent settlements, debt forgiveness, and master device control.</p>
                     </div>
                 </div>
-                <div class="pt-4 mt-4 border-t border-slate-800/80 text-xs font-bold text-amber-400 flex items-center justify-between">
+                <div class="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800/80 text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center justify-between">
                     <span>Launch Live Referee</span>
                     <span class="material-icons text-sm group-hover:translate-x-1 transition">arrow_forward</span>
                 </div>
             </a>
+
         </div>
     </main>
 
     <!-- Global Debugging & Offline Sync Scripts -->
     <script>
         (function() {
-            // Debugging Logger Engine
             if (localStorage.getItem('debugging') === null) {
                 localStorage.setItem('debugging', '0');
             }
@@ -205,18 +226,13 @@
             }
             debugLog('Monopoly Suite Hub initialized.');
 
-            // Service Worker Registration
             if ('serviceWorker' in navigator) {
                 window.addEventListener('load', () => {
                     navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                        .then((reg) => debugLog('ServiceWorker active on scope:', reg.scope))
-                        .catch((err) => debugLog('ServiceWorker error:', err));
+                        .catch(() => {});
                 });
             }
-
-            // Offline network listener
             window.addEventListener('offline', () => {
-                debugLog('Connection dropped. Redirecting to offline standby...');
                 window.location.href = '/offline.html';
             });
         })();

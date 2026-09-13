@@ -1,117 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Master Admin Control Panel</title>
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/vip-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Global Liquid Glass Stylesheet & Theme Controller -->
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+
     <style>
         body { font-family: 'Google Sans', sans-serif; }
         .tab-btn.active {
-            background-color: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
-            border-color: #f59e0b;
+            background-color: rgba(249, 115, 22, 0.2);
+            color: #fb923c;
+            border-color: rgba(249, 115, 22, 0.4);
         }
+        .tab-btn.primary.active {
+            background-color: rgba(59, 130, 246, 0.12);
+            color: #60a5fa;
+            border-color: rgba(59, 130, 246, 0.45);
+        }
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
-    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden">
+    
+    <!-- Liquid Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="glass-panel sticky top-0 z-50 transition-colors duration-500">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center gap-3">
-                <a href="../index.html" class="flex items-center gap-1 text-slate-400 hover:text-white text-xs font-semibold transition">
+                <a href="../index.html" class="flex items-center gap-1 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white text-xs font-semibold transition">
                     <span class="material-icons text-sm">arrow_back</span> Gateway
-                    <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4"></span>
+                    <img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4">
                 </a>
-                <span class="text-slate-700">|</span>
-                <span class="text-amber-400 font-extrabold text-sm flex items-center gap-1.5 tracking-wide">
-                    <span class="material-icons text-base text-amber-500">security</span> Master Control Panel
+                <span class="text-slate-300 dark:text-slate-700">|</span>
+                <span class="text-blue-600 dark:text-blue-400 font-extrabold text-sm flex items-center gap-1.5 tracking-wide">
+                    <span class="material-icons text-base text-blue-500">security</span> Master Control Panel
                 </span>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-                <a href="members.html" class="text-xs bg-slate-900 hover:bg-slate-800 text-amber-300 px-3.5 py-1.5 rounded-xl border border-slate-800 font-medium transition flex items-center gap-1">
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-orange-500 transition-colors mr-1" title="Toggle Theme">
+                    <span class="material-icons" id="themeIcon">light_mode</span>
+                </button>
+                <a href="../admin/members.html" class="text-xs bg-white/40 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-800 text-emerald-600 dark:text-emerald-300 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 font-medium transition flex items-center gap-1 shadow-sm">
                     <span class="material-icons text-sm">group</span> Members
                 </a>
-                <a href="an.html" class="text-xs bg-slate-900 hover:bg-slate-800 text-sky-300 px-3.5 py-1.5 rounded-xl border border-slate-800 font-medium transition flex items-center gap-1">
+                <a href="../admin/analytics.html" class="text-xs bg-white/40 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-800 text-emerald-600 dark:text-emerald-300 px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 font-medium transition flex items-center gap-1 shadow-sm">
                     <span class="material-icons text-sm">analytics</span> Analytics
                 </a>
-                <span id="authBadge" class="text-xs px-3 py-1 rounded-full font-bold bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1.5">
+                <span id="authBadge" class="text-xs px-3 py-1 rounded-full font-bold bg-orange-500/10 text-orange-600 dark:text-orange-300 border border-orange-500/30 flex items-center gap-1.5">
                     <span class="material-icons text-xs animate-spin">sync</span> Verifying Permissions...
                 </span>
             </div>
         </div>
     </nav>
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
-        <div id="accessDenied" class="hidden bg-red-950/80 border border-red-800/80 rounded-3xl p-8 text-center space-y-4 max-w-2xl mx-auto shadow-2xl">
-            <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto">
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-6 relative z-10">
+        
+        <!-- Access Restricted Guard -->
+        <div id="accessDenied" class="hidden glass-panel border-rose-500/30 rounded-3xl p-8 text-center space-y-4 max-w-2xl mx-auto shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 flex items-center justify-center mx-auto">
                 <span class="material-icons text-3xl">gpp_bad</span>
             </div>
-            <h1 class="text-2xl font-bold text-white">Master Admin Access Restricted</h1>
-            <p class="text-xs text-red-200 leading-relaxed">
-                Your authenticated Firebase Auth UID (<code id="userUidDisplay" class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">...</code>) is not authorized in <code class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">/admin/uuids</code>.
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white">Master Admin Access Restricted</h1>
+            <p class="text-xs text-rose-600 dark:text-rose-300 leading-relaxed">
+                Your authenticated Firebase Auth UID (<code id="userUidDisplay" class="bg-white/50 dark:bg-slate-900 px-2 py-1 rounded text-orange-600 dark:text-orange-400 font-mono">...</code>) is not authorized in <code class="bg-white/50 dark:bg-slate-900 px-2 py-1 rounded text-orange-600 dark:text-orange-400 font-mono">/admin/uuids</code>[cite: 1].
             </p>
         </div>
+
+        <!-- Master Workspace -->
         <div id="masterPanel" class="hidden space-y-6">
-            <header class="bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/30 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            
+            <!-- Hero Glass Card -->
+            <header class="glass-panel border-orange-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <div class="flex items-center gap-2">
-                        <h1 class="text-2xl font-black text-white">Global Platform Operations</h1>
-                        <span class="px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">Super Admin</span>
+                        <h1 class="text-2xl font-black text-slate-900 dark:text-white">Global Platform Operations</h1>
+                        <span class="px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full bg-orange-500/15 text-blue-600 dark:text-blue-300 border border-blue-500/30">Super Admin</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-1">Full system authority over Monopoly match records, user member bindings, system problems, and rules.</p>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">Full system authority over Monopoly match records, user member bindings, system problems, and rules[cite: 1].</p>
                 </div>
-                <div class="bg-slate-950 border border-slate-800 px-3.5 py-2 rounded-xl text-xs text-slate-300 font-mono flex items-center gap-2">
-                    <span class="material-icons text-sm text-emerald-400">verified_user</span>
-                    <span>UID: <strong id="activeUidText" class="text-amber-400">...</strong></span>
+                <div class="bg-white/40 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 px-3.5 py-2 rounded-2xl text-xs text-slate-700 dark:text-slate-300 font-mono flex items-center gap-2 shadow-sm">
+                    <span class="material-icons text-sm text-emerald-500">verified_user</span>
+                    <span>UID: <strong id="activeUidText" class="text-orange-600 dark:text-orange-400 font-semibold">...</strong></span>
                 </div>
             </header>
-            <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-2 overflow-x-auto" id="masterTabsNav">
-                <button data-tab="tab-admins" class="tab-btn active px-4 py-2 text-xs font-bold rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5 shrink-0">
+
+            <!-- Navigation Tabs -->
+            <div class="flex flex-wrap gap-2 border-b border-slate-200 dark:border-slate-800 pb-2 overflow-x-auto" id="masterTabsNav">
+                <button data-tab="tab-admins" class="tab-btn primary active px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5 shrink-0">
                     <span class="material-icons text-sm">admin_panel_settings</span> Admin UIDs &amp; Safeguard
                 </button>
-                <button data-tab="tab-linker" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5 shrink-0">
+                <button data-tab="tab-linker" class="tab-btn primary px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5 shrink-0">
                     <span class="material-icons text-sm">link</span> Member Account Linker
                 </button>
-                <button data-tab="tab-matches" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5 shrink-0">
+                <button data-tab="tab-matches" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5 shrink-0">
                     <span class="material-icons text-sm">casino</span> Monopoly Matches
                 </button>
-                <button data-tab="tab-backup" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5 shrink-0">
+                <button data-tab="tab-backup" class="tab-btn px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition flex items-center gap-1.5 shrink-0">
                     <span class="material-icons text-sm">backup</span> Backup &amp; Utilities
                 </button>
             </div>
-            <div id="masterStatus" class="hidden text-xs p-3 rounded-xl border font-medium"></div>
 
+            <div id="masterStatus" class="hidden text-xs p-3.5 rounded-2xl border font-medium"></div>
+
+            <!-- Tab 1: Authorized UIDs -->
             <section id="tab-admins" class="tab-content space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div class="md:col-span-2 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4">
-                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <div class="md:col-span-2 glass-panel rounded-3xl p-6 space-y-4 shadow-xl">
+                        <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800/80 pb-3">
                             <div>
-                                <h2 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Authorized Admin UIDs</h2>
-                                <p class="text-xs text-slate-400 mt-0.5">Firebase UIDs in <code class="bg-slate-950 px-1 rounded text-amber-300">/admin/uuids</code> document.</p>
+                                <h2 class="text-xs font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">Authorized Admin UIDs</h2>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Firebase UIDs configured in <code class="bg-white/50 dark:bg-slate-950 px-1 rounded text-blue-600 dark:text-blue-300">/admin/uuids</code>[cite: 1].</p>
                             </div>
-                            <span class="material-icons text-slate-500">key</span>
+                            <span class="material-icons text-slate-400">key</span>
                         </div>
-                        <div id="uuidsListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1">
-                            <p class="text-xs text-slate-400">Loading admin UIDs list...</p>
+                        <div id="uuidsListContainer" class="space-y-2 max-h-64 overflow-y-auto pr-1 custom-scroll">
+                            <p class="text-xs text-slate-500">Loading admin UIDs list...[cite: 1]</p>
                         </div>
-                        <form id="addAdminForm" class="pt-4 border-t border-slate-800 space-y-3">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Add New Authorized Admin Firebase UID</label>
+                        <form id="addAdminForm" class="pt-4 border-t border-slate-200 dark:border-slate-800/80 space-y-3">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Add New Authorized Admin UID</label>
                             <div class="flex gap-2">
-                                <input type="text" id="newAdminUidInput" required placeholder="Paste user Firebase UID string..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-amber-500">
-                                <button type="submit" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition shrink-0">Authorize UID</button>
+                                <input type="text" id="newAdminUidInput" required placeholder="Paste user Firebase UID string..." class="flex-1 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-emerald-500 shadow-inner">
+                                <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-white font-bold text-xs rounded-xl transition shrink-0 shadow-md shadow-emerald-500/20">Authorize UID</button>
                             </div>
                         </form>
                     </div>
-                    <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4">
-                        <h2 class="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+
+                    <div class="glass-panel rounded-3xl p-6 space-y-4 shadow-xl">
+                        <h2 class="text-xs font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
                             <span class="material-icons text-sm">shield</span> Permanent Master Admin
                         </h2>
-                        <div class="space-y-2 text-xs text-slate-300">
-                            <p class="text-slate-400 leading-relaxed">The permanent admin UID is hardcoded as a fail-safe safeguard so master rights cannot be locked out.</p>
-                            <div class="p-3 bg-slate-950 rounded-xl border border-slate-800 font-mono text-[11px] text-amber-300 break-all">
-                                <span class="text-slate-500 block font-sans text-[9px] uppercase font-bold mb-1">Hardcoded Master Constant:</span>
+                        <div class="space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                            <p class="text-slate-500 dark:text-slate-400 leading-relaxed">The permanent admin UID is hardcoded as a fail-safe safeguard so master administrative rights cannot be locked out[cite: 1].</p>
+                            <div class="p-3 bg-white/40 dark:bg-slate-950/70 rounded-2xl border border-slate-200 dark:border-slate-800 font-mono text-[11px] text-orange-600 dark:text-orange-300 break-all shadow-inner">
+                                <span class="text-slate-400 block font-sans text-[9px] uppercase font-bold mb-1">Hardcoded Master Constant:</span>
                                 <span id="permanentMasterUidText">MASTER_PERMANENT_ADMIN_UUID</span>
                             </div>
                         </div>
@@ -119,63 +158,65 @@
                 </div>
             </section>
 
+            <!-- Tab 2: Member Account Linker -->
             <section id="tab-linker" class="tab-content hidden space-y-6">
-                <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-6">
-                    <div class="border-b border-slate-800 pb-4">
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <span class="material-icons text-blue-400">link</span> Bind User Auth UID to Member Profile
+                <div class="glass-panel rounded-3xl p-6 space-y-6 shadow-xl">
+                    <div class="border-b border-slate-200 dark:border-slate-800/80 pb-4">
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="material-icons text-blue-500">link</span> Bind User Auth UID to Member Profile
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Users must be linked to an official registered member profile by an admin.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Users must be linked to an official registered member profile to display personalized telemetry[cite: 1].</p>
                     </div>
                     <form id="linkAccountForm" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Account Firebase UID</label>
-                            <input type="text" id="targetUidInput" required placeholder="Paste user UID..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-blue-500">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Target Firebase UID</label>
+                            <input type="text" id="targetUidInput" required placeholder="Paste user UID..." class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white font-mono focus:outline-none focus:border-blue-500 shadow-inner">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Monopoly Member Profile Name</label>
-                            <select id="memberProfileSelect" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-blue-500">
-                                <option value="">-- Choose Official Member Profile --</option>
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Monopoly Profile Roster</label>
+                            <select id="memberProfileSelect" required class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-blue-500 shadow-inner">
+                                <option value="">-- Choose Official Member Profile --[cite: 1]</option>
                             </select>
                         </div>
                         <div class="flex items-end">
-                            <button type="submit" class="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1">
+                            <button type="submit" class="w-full py-2 bg-orange-600 hover:bg-orange-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow-md shadow-orange-600/20">
                                 <span class="material-icons text-sm">link</span> Save Member Binding
                             </button>
                         </div>
                     </form>
-                    <div class="pt-4 border-t border-slate-800 space-y-3">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">Current Account-Member Bindings</h3>
-                        <div id="linkedAccountsContainer" class="space-y-2 max-h-48 overflow-y-auto">
-                            <p class="text-xs text-slate-500">Loading linked user profiles...</p>
+                    <div class="pt-4 border-t border-slate-200 dark:border-slate-800/80 space-y-3">
+                        <h3 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Active Account-Member Bindings</h3>
+                        <div id="linkedAccountsContainer" class="space-y-2 max-h-48 overflow-y-auto custom-scroll">
+                            <p class="text-xs text-slate-500">Loading linked user profiles...[cite: 1]</p>
                         </div>
                     </div>
                 </div>
             </section>
 
+            <!-- Tab 3: Monopoly Matches -->
             <section id="tab-matches" class="tab-content hidden space-y-6">
-                <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-6">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
+                <div class="glass-panel rounded-3xl p-6 space-y-6 shadow-xl">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-slate-800/80 pb-4">
                         <div>
-                            <h2 class="text-base font-bold text-white flex items-center gap-2">
-                                <span class="material-icons text-amber-400">casino</span> Monopoly Match Master Management
+                            <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                <span class="material-icons text-amber-500">casino</span> Monopoly Match Master Management
                             </h2>
-                            <p class="text-xs text-slate-400 mt-1">Audit, edit, or delete game match documents stored under <code class="bg-slate-950 px-1 rounded text-amber-300">games/Monopoly/matches</code>.</p>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Audit, edit, or delete game match documents stored under <code class="bg-white/50 dark:bg-slate-950 px-1 rounded text-amber-600 dark:text-amber-300">games/Monopoly/matches</code>[cite: 1].</p>
                         </div>
-                        <a href="../g-mono/add.html" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition flex items-center gap-1 shadow">
+                        <a href="../g-mono/add.html" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition flex items-center gap-1 shadow-md shadow-amber-500/20">
                             <span class="material-icons text-sm">add_circle</span> Record New Match
                         </a>
                     </div>
                     <div class="flex gap-3">
-                        <input type="text" id="matchSearchInput" placeholder="Filter by Game ID, player or venue..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
-                        <button id="refreshMatchesBtn" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1">
+                        <input type="text" id="matchSearchInput" placeholder="Filter by Game ID, player or venue..." class="flex-1 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-orange-500 shadow-inner">
+                        <button id="refreshMatchesBtn" class="px-3 py-2 bg-white/40 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 text-xs font-bold rounded-xl transition flex items-center gap-1 border border-slate-200 dark:border-slate-800 shadow-sm">
                             <span class="material-icons text-sm">refresh</span> Refresh Logs
                         </button>
                     </div>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto custom-scroll">
                         <table class="w-full text-left text-sm border-collapse">
                             <thead>
-                                <tr class="text-slate-400 border-b border-slate-800 text-xs uppercase tracking-wider">
+                                <tr class="text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800/80 text-xs uppercase tracking-wider">
                                     <th class="py-2.5 px-3">Game Path ID</th>
                                     <th class="py-2.5 px-3">Date</th>
                                     <th class="py-2.5 px-3">Venue</th>
@@ -183,9 +224,9 @@
                                     <th class="py-2.5 px-3 text-right">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody id="masterMatchesTable" class="divide-y divide-slate-800/60 text-xs font-mono">
+                            <tbody id="masterMatchesTable" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-xs font-mono">
                                 <tr>
-                                    <td colspan="5" class="py-8 text-center text-slate-500 font-sans">Loading game match records...</td>
+                                    <td colspan="5" class="py-8 text-center text-slate-500 font-sans">Loading game match records...[cite: 1]</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -193,54 +234,80 @@
                 </div>
             </section>
 
+            <!-- Tab 4: Backup & Utilities (Blue, Green, Red) -->
             <section id="tab-backup" class="tab-content hidden space-y-6">
-                <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-6">
-                    <div class="border-b border-slate-800 pb-4">
-                        <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            <span class="material-icons text-emerald-400">backup</span> Data Backup &amp; Maintenance
+                <div class="glass-panel rounded-3xl p-6 space-y-6 shadow-xl">
+                    <div class="border-b border-slate-200 dark:border-slate-800/80 pb-4">
+                        <h2 class="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="material-icons text-blue-500">settings_backup_restore</span> Data Backup &amp; System Maintenance
                         </h2>
-                        <p class="text-xs text-slate-400 mt-1">Export system records into formatted JSON, import backup data, or trigger standings re-indexing.</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Export database snapshots, restore previous JSON backups, or recalculate leaderboard standings.</p>
                     </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div class="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 flex flex-col justify-between">
-                            <div>
-                                <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Export System Data</h3>
-                                <p class="text-xs text-slate-400 mt-1">Generates a downloadable JSON file containing all match logs and members.</p>
+                        
+                        <!-- 1. Export System Data (BLUE) -->
+                        <div class="p-5 bg-blue-500/10 dark:bg-blue-950/40 border border-blue-500/30 rounded-2xl space-y-4 flex flex-col justify-between shadow-sm">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-1.5 text-blue-600 dark:text-blue-400">
+                                    <span class="material-icons text-sm">cloud_download</span>
+                                    <h3 class="text-xs font-black uppercase tracking-wider">Export Snapshot</h3>
+                                </div>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Compiles all authorized admins, registered members, and Monopoly match history into a downloadable JSON file.
+                                </p>
                             </div>
-                            <button id="downloadBackupBtn" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow">
-                                <span class="material-icons text-sm">download</span> Download JSON Backup
+                            <button id="downloadBackupBtn" type="button" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-md shadow-blue-600/20 border border-blue-400/30">
+                                <span class="material-icons text-sm">download</span> Download System Backup
                             </button>
                         </div>
-                        <div class="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 flex flex-col justify-between">
-                            <div>
-                                <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Import System Data</h3>
-                                <p class="text-xs text-slate-400 mt-1">Upload a previously exported JSON backup file to restore records.</p>
+
+                        <!-- 2. Import System Data (GREEN) -->
+                        <div class="p-5 bg-emerald-500/10 dark:bg-emerald-950/40 border border-emerald-500/30 rounded-2xl space-y-4 flex flex-col justify-between shadow-sm">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                                    <span class="material-icons text-sm">cloud_upload</span>
+                                    <h3 class="text-xs font-black uppercase tracking-wider">Restore Database</h3>
+                                </div>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Upload an existing system backup JSON file to merge or restore matches and player records into Firestore.
+                                </p>
                             </div>
                             <div>
                                 <input type="file" id="importJsonFile" accept=".json" class="hidden">
-                                <button id="triggerImportBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow">
-                                    <span class="material-icons text-sm">upload</span> Upload &amp; Import JSON
+                                <button id="triggerImportBtn" type="button" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-md shadow-emerald-600/20 border border-emerald-400/30">
+                                    <span class="material-icons text-sm">upload_file</span> Upload &amp; Restore JSON
                                 </button>
                             </div>
                         </div>
-                        <div class="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 flex flex-col justify-between">
-                            <div>
-                                <h3 class="text-xs font-bold text-blue-400 uppercase tracking-wider">Re-Compute Standings</h3>
-                                <p class="text-xs text-slate-400 mt-1">Forces instant calculation of wins, cash volume, and property collections.</p>
+
+                        <!-- 3. Re-Compute Standings (RED) -->
+                        <div class="p-5 bg-rose-500/10 dark:bg-rose-950/40 border border-rose-500/30 rounded-2xl space-y-4 flex flex-col justify-between shadow-sm">
+                            <div class="space-y-1">
+                                <div class="flex items-center gap-1.5 text-rose-600 dark:text-rose-400">
+                                    <span class="material-icons text-sm">restart_alt</span>
+                                    <h3 class="text-xs font-black uppercase tracking-wider">Re-Compute Standings</h3>
+                                </div>
+                                <p class="text-[11px] text-slate-600 dark:text-slate-400 leading-relaxed">
+                                    Audits all matches, re-indexes win tallies, property ratios (22 cities / 6 stations), and refreshes cached rankings.
+                                </p>
                             </div>
-                            <button id="reindexStandingsBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow">
-                                <span class="material-icons text-sm">refresh</span> Re-Index Standings
+                            <button id="reindexStandingsBtn" type="button" class="w-full py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-md shadow-rose-600/20 border border-rose-400/30">
+                                <span class="material-icons text-sm">sync</span> Run Full Audit &amp; Re-Index
                             </button>
                         </div>
+
                     </div>
                 </div>
             </section>
+
         </div>
     </main>
 
+    <!-- Master Admin Logic Module -->
     <script type="module">
         import { auth, db, doc, getDoc, getDocs, setDoc, deleteDoc, collection, onAuthStateChanged } from "../web-info/firebase.js";
-        import { PERMANENT_MASTER_ADMIN_UID } from "../web-info/p-admin-list.js";
+        import { PERMANENT_MASTER_ADMIN_UID, isPermanentAdmin } from "../web-info/p-admin-list.js";
 
         const authBadge = document.getElementById('authBadge');
         const accessDenied = document.getElementById('accessDenied');
@@ -265,6 +332,7 @@
         const reindexStandingsBtn = document.getElementById('reindexStandingsBtn');
 
         permanentMasterUidText.textContent = PERMANENT_MASTER_ADMIN_UID;
+
         let allowedUidsList = [];
         let allMatchesData = [];
 
@@ -291,9 +359,9 @@
                 if (!allowedUidsList.includes(PERMANENT_MASTER_ADMIN_UID)) {
                     allowedUidsList.unshift(PERMANENT_MASTER_ADMIN_UID);
                 }
-                const isAuthorized = allowedUidsList.includes(user.uid) || user.uid === PERMANENT_MASTER_ADMIN_UID;
+                const isAuthorized = allowedUidsList.includes(user.uid) || isPermanentAdmin(user.uid);
                 if (isAuthorized) {
-                    authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1.5";
+                    authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-orange-500/10 text-orange-600 dark:text-orange-300 border border-orange-500/30 flex items-center gap-1.5";
                     authBadge.textContent = "Authorized Master Admin";
                     accessDenied.classList.add('hidden');
                     masterPanel.classList.remove('hidden');
@@ -310,7 +378,7 @@
         });
 
         function showAccessDenied(uid) {
-            authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-red-950 text-red-300 border border-red-800";
+            authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-rose-500/10 text-rose-600 dark:text-rose-300 border border-rose-500/30";
             authBadge.textContent = "Access Restricted";
             userUidDisplay.textContent = uid || "Unknown UID";
             accessDenied.classList.remove('hidden');
@@ -339,12 +407,12 @@
                 const isPermanent = uid === PERMANENT_MASTER_ADMIN_UID;
                 const isCurrent = uid === auth.currentUser?.uid;
                 return `
-                    <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 font-mono text-xs">
-                        <span class="text-slate-200 truncate ${isCurrent ? 'text-amber-400 font-bold' : ''}">${uid}</span>
+                    <div class="flex items-center justify-between bg-white/40 dark:bg-slate-950/70 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 font-mono text-xs">
+                        <span class="text-slate-800 dark:text-slate-200 truncate ${isCurrent ? 'text-orange-600 dark:text-orange-400 font-bold' : ''}">${uid}</span>
                         <div class="flex items-center gap-2 shrink-0">
-                            ${isPermanent ? '<span class="text-[9px] bg-rose-950 text-rose-300 border border-rose-800 px-2 py-0.5 rounded-full font-sans font-bold">Permanent</span>' : ''}
-                            ${isCurrent ? '<span class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-2 py-0.5 rounded-full font-sans font-bold">You</span>' : ''}
-                            ${!isPermanent ? `<button onclick="removeAdminUid('${uid}')" class="p-1 text-slate-500 hover:text-red-400 transition"><span class="material-icons text-base">delete</span></button>` : ''}
+                            ${isPermanent ? '<span class="text-[9px] bg-rose-500/10 text-rose-600 dark:text-rose-300 border border-rose-500/30 px-2 py-0.5 rounded-full font-sans font-bold">Permanent</span>' : ''}
+                            ${isCurrent ? '<span class="text-[9px] bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/30 px-2 py-0.5 rounded-full font-sans font-bold">You</span>' : ''}
+                            ${!isPermanent ? `<button onclick="removeAdminUid('${uid}')" class="p-1 text-slate-400 hover:text-rose-500 transition"><span class="material-icons text-base">delete</span></button>` : ''}
                         </div>
                     </div>
                 `;
@@ -416,9 +484,9 @@
                     return;
                 }
                 linkedAccountsContainer.innerHTML = linkedList.map(item => `
-                    <div class="flex items-center justify-between bg-slate-950 p-2.5 rounded-xl border border-slate-800 text-xs">
-                        <span class="font-mono text-slate-300">${item.uid}</span>
-                        <span class="text-blue-400 font-bold bg-blue-950/80 px-2.5 py-0.5 rounded-full border border-blue-800">Member: ${item.linkedMemberName}</span>
+                    <div class="flex items-center justify-between bg-white/40 dark:bg-slate-950/70 p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-xs">
+                        <span class="font-mono text-slate-700 dark:text-slate-300">${item.uid}</span>
+                        <span class="text-orange-600 dark:text-orange-400 font-bold bg-orange-500/10 px-2.5 py-0.5 rounded-full border border-orange-500/30">Member: ${item.linkedMemberName}</span>
                     </div>
                 `).join('');
             } catch (e) {}
@@ -432,7 +500,7 @@
                 allMatchesData.sort((a, b) => b.id.localeCompare(a.id));
                 renderMasterMatches();
             } catch (err) {
-                masterMatchesTable.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-red-400">Failed to load matches.</td></tr>`;
+                masterMatchesTable.innerHTML = `<tr><td colspan="5" class="py-6 text-center text-rose-500">Failed to load matches.</td></tr>`;
             }
         }
 
@@ -447,20 +515,20 @@
                 const players = m.players || [];
                 const isRanked = players.filter(p => p.isMember !== false && !p.isGuest).length > 2;
                 return `
-                    <tr class="hover:bg-slate-800/40 transition">
-                        <td class="py-3 px-3 text-amber-400 font-bold">
+                    <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 transition">
+                        <td class="py-3 px-3 text-amber-600 dark:text-amber-400 font-bold">
                             <a href="../g-mono/view.html?game=${encodeURIComponent(m.id)}" class="hover:underline flex items-center gap-1">
                                 <span>${m.id}</span>
                                 <span class="material-icons text-xs">open_in_new</span>
                             </a>
                         </td>
-                        <td class="py-3 px-3 text-slate-300">${m.date || 'N/A'}</td>
-                        <td class="py-3 px-3 text-slate-200 font-sans">${m.location || 'N/A'}</td>
+                        <td class="py-3 px-3 text-slate-600 dark:text-slate-300">${m.date || 'N/A'}</td>
+                        <td class="py-3 px-3 text-slate-800 dark:text-slate-200 font-sans">${m.location || 'N/A'}</td>
                         <td class="py-3 px-3 text-center">
-                            <span class="px-2 py-0.5 rounded text-[9px] font-bold font-sans uppercase ${isRanked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">${isRanked ? 'Ranked' : 'Practice'}</span>
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold font-sans uppercase ${isRanked ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'}">${isRanked ? 'Ranked' : 'Practice'}</span>
                         </td>
                         <td class="py-3 px-3 text-right">
-                            <button onclick="deleteMatchRecord('${m.id}')" class="p-1 text-slate-400 hover:text-red-400 transition"><span class="material-icons text-base">delete</span></button>
+                            <button onclick="deleteMatchRecord('${m.id}')" class="p-1 text-slate-400 hover:text-rose-500 transition"><span class="material-icons text-base">delete</span></button>
                         </td>
                     </tr>
                 `;
@@ -481,73 +549,162 @@
         matchSearchInput.addEventListener('input', renderMasterMatches);
         refreshMatchesBtn.addEventListener('click', loadMasterMatches);
 
-        downloadBackupBtn.addEventListener('click', () => {
-            const systemData = { timestamp: new Date().toISOString(), allowedAdminUids: allowedUidsList, matches: allMatchesData };
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(systemData, null, 2));
-            const a = document.createElement('a');
-            a.href = dataStr;
-            a.download = `system_backup_${new Date().toISOString().slice(0, 10)}.json`;
-            a.click();
-            a.remove();
-            showMasterMsg("System JSON backup downloaded!", "success");
+        // 1. EXPORT SYSTEM DATA (BLUE)
+        downloadBackupBtn.addEventListener('click', async () => {
+            downloadBackupBtn.disabled = true;
+            downloadBackupBtn.innerHTML = `<span class="material-icons text-sm animate-spin">sync</span> Generating Backup...`;
+
+            try {
+                const playersSnap = await getDocs(collection(db, "players"));
+                const playersList = [];
+                playersSnap.forEach(d => playersList.push({ id: d.id, ...d.data() }));
+
+                const usersSnap = await getDocs(collection(db, "users"));
+                const usersList = [];
+                usersSnap.forEach(d => usersList.push({ id: d.id, ...d.data() }));
+
+                const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
+                const matchesList = [];
+                matchesSnap.forEach(d => matchesList.push({ id: d.id, ...d.data() }));
+
+                const systemBackup = {
+                    version: "2.0",
+                    timestamp: new Date().toISOString(),
+                    exportedBy: auth.currentUser?.uid || "admin",
+                    allowedAdminUids: allowedUidsList,
+                    players: playersList,
+                    linkedUsers: usersList,
+                    matches: matchesList
+                };
+
+                const blob = new Blob([JSON.stringify(systemBackup, null, 2)], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `vip_games_backup_${new Date().toISOString().slice(0, 10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                showMasterMsg(`Backup complete! Exported ${matchesList.length} matches and ${playersList.length} registered members.`, "success");
+            } catch (err) {
+                console.error("Export error:", err);
+                showMasterMsg("Export failed: " + err.message, "error");
+            } finally {
+                downloadBackupBtn.disabled = false;
+                downloadBackupBtn.innerHTML = `<span class="material-icons text-sm">download</span> Download System Backup`;
+            }
         });
 
+        // 2. IMPORT & RESTORE SYSTEM DATA (GREEN)
         triggerImportBtn.addEventListener('click', () => importJsonFile.click());
+
         importJsonFile.addEventListener('change', async (e) => {
             const file = e.target.files[0];
             if (!file) return;
+
             const reader = new FileReader();
             reader.onload = async function(event) {
                 try {
                     const parsed = JSON.parse(event.target.result);
-                    let count = 0;
+                    let matchesCount = 0;
+                    let playersCount = 0;
+
                     if (Array.isArray(parsed.matches)) {
                         for (const m of parsed.matches) {
                             if (m.id) {
-                                await setDoc(doc(db, "games", "Monopoly", "matches", m.id), m, { merge: true });
-                                count++;
+                                const matchId = m.id;
+                                const matchCopy = { ...m };
+                                delete matchCopy.id;
+                                await setDoc(doc(db, "games", "Monopoly", "matches", matchId), matchCopy, { merge: true });
+                                matchesCount++;
                             }
                         }
                     }
-                    showMasterMsg(`Successfully imported ${count} match records!`, "success");
+
+                    if (Array.isArray(parsed.players)) {
+                        for (const p of parsed.players) {
+                            if (p.id) {
+                                const playerId = p.id;
+                                const playerCopy = { ...p };
+                                delete playerCopy.id;
+                                await setDoc(doc(db, "players", playerId), playerCopy, { merge: true });
+                                playersCount++;
+                            }
+                        }
+                    }
+
+                    showMasterMsg(`Restore successful: Restored ${matchesCount} matches and ${playersCount} members.`, "success");
                     loadMasterMatches();
+                    loadMemberOptions();
                 } catch (err) {
-                    showMasterMsg("Failed to import JSON file.", "error");
+                    console.error("Import error:", err);
+                    showMasterMsg("Failed to import JSON: " + err.message, "error");
+                } finally {
+                    importJsonFile.value = '';
                 }
             };
             reader.readAsText(file);
         });
 
-        reindexStandingsBtn.addEventListener('click', () => showMasterMsg("Leaderboard rankings re-indexed live.", "success"));
+        // 3. RE-COMPUTE & AUDIT STANDINGS (RED)
+        reindexStandingsBtn.addEventListener('click', async () => {
+            reindexStandingsBtn.disabled = true;
+            reindexStandingsBtn.innerHTML = `<span class="material-icons text-sm animate-spin">sync</span> Auditing Records...`;
+
+            try {
+                const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
+                let totalMatches = 0;
+                let rankedMatches = 0;
+                let auditedPlayers = new Set();
+
+                matchesSnap.forEach(d => {
+                    totalMatches++;
+                    const data = d.data();
+                    const players = data.players || [];
+                    const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
+
+                    if (memberCount > 2) {
+                        rankedMatches++;
+                        players.forEach(p => {
+                            if (p.name) auditedPlayers.add(p.name);
+                        });
+                    }
+                });
+
+                sessionStorage.clear();
+
+                showMasterMsg(`Audit complete: Recalculated ${totalMatches} total sessions (${rankedMatches} ranked matches across ${auditedPlayers.size} player profiles).`, "success");
+                loadMasterMatches();
+            } catch (err) {
+                console.error("Re-index error:", err);
+                showMasterMsg("Re-index failed: " + err.message, "error");
+            } finally {
+                reindexStandingsBtn.disabled = false;
+                reindexStandingsBtn.innerHTML = `<span class="material-icons text-sm">sync</span> Run Full Audit &amp; Re-Index`;
+            }
+        });
 
         function showMasterMsg(msg, type) {
             masterStatus.classList.remove('hidden');
             masterStatus.textContent = msg;
-            masterStatus.className = type === 'success' ? "text-xs p-3 rounded-xl border bg-emerald-950/85 text-emerald-300 border-emerald-800 font-medium" : "text-xs p-3 rounded-xl border bg-red-950/85 text-red-300 border-red-800 font-medium";
+            masterStatus.className = type === 'success' 
+                ? "text-xs p-3.5 rounded-2xl border bg-emerald-500/10 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-300 border-emerald-500/30 font-medium" 
+                : "text-xs p-3.5 rounded-2xl border bg-rose-500/10 dark:bg-rose-950/80 text-rose-600 dark:text-rose-300 border-rose-500/30 font-medium";
         }
     </script>
+    
+    <!-- Offline Service Worker Bootstrap -->
     <script>
-  // 1. Register Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('../sw.js')
-        .then((reg) => {
-          if (localStorage.getItem('debugging') === '1') {
-            console.log('[DEBUG] Service Worker registered:', reg.scope);
-          }
-        })
-        .catch((err) => {
-          if (localStorage.getItem('debugging') === '1') {
-            console.error('[DEBUG] Service Worker registration failed:', err);
-          }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+            });
+        }
+        window.addEventListener('offline', () => {
+            window.location.href = '/offline.html';
         });
-    });
-  }
-
-  // 2. Instant redirect to offline page if connection drops while browsing
-  window.addEventListener('offline', () => {
-    window.location.href = '/offline.html';
-  });
-</script>
+    </script>
 </body>
 </html>

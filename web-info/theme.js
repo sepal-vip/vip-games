@@ -1,5 +1,3 @@
-// web-info/theme.js
-
 // 1. Apply theme immediately to avoid screen flash
 const htmlElement = document.documentElement;
 if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {

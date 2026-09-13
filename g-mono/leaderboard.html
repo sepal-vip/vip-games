@@ -1,50 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monopoly Auto Leaderboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+    
+    <!-- Global Liquid Glass Stylesheet & Theme Controller -->
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+
+    <style> 
+        body { font-family: 'Google Sans', sans-serif; } 
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
-    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950 transition-colors duration-500 relative overflow-x-hidden">
+    
+    <!-- Liquid Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Top Navigation -->
+    <nav class="glass-panel sticky top-0 z-50 transition-colors duration-500">
         <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+            <a href="g-mono.html" class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium transition">
                 <span class="material-icons text-base">arrow_back</span> Monopoly Suite
-                <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4"></span>
+                <img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4">
             </a>
-            <div class="flex items-center gap-2">
-                <button id="openShareModalBtn" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1 shadow">
+            <div class="flex items-center gap-3">
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-amber-500 transition-colors" title="Toggle Theme">
+                    <span class="material-icons" id="themeIcon">light_mode</span>
+                </button>
+                <button id="openShareModalBtn" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1 shadow-md shadow-amber-500/20">
                     <span class="material-icons text-sm">share</span> Share Standings
                 </button>
             </div>
         </div>
     </nav>
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
-        <div id="shareableSnapshotContainer" class="p-3 sm:p-5 bg-slate-950 rounded-[2rem]">
-            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6">
+
+    <!-- Main Content Workspace -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6 relative z-10">
+        <div id="shareableSnapshotContainer" class="p-1 sm:p-2 rounded-[2rem]">
+            <div class="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 ring-1 ring-amber-500/20">
+                
+                <!-- Header & Timeframe Nav -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 dark:border-slate-800/80 pb-6">
                     <div>
-                        <h1 class="text-2xl font-black text-white flex items-center gap-2">
-                            <span class="material-icons text-amber-400">emoji_events</span> Official Leaderboards
+                        <h1 class="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <span class="material-icons text-amber-500">emoji_events</span> Official Leaderboards
                         </h1>
-                        <p class="text-xs text-slate-400 mt-0.5">Automated standings. Exclusively calculates ranked matches (&gt;2 registered members).</p>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">Automated standings. Exclusively calculates ranked matches (&gt;2 registered members)[cite: 1].</p>
                     </div>
-                    <div class="flex rounded-xl bg-slate-950 p-1 border border-slate-800" id="timeframeNav">
-                        <button data-tf="month" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition">Monthly</button>
-                        <button data-tf="year" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Yearly</button>
-                        <button data-tf="lifetime" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Lifetime</button>
+                    <div class="flex rounded-2xl bg-white/40 dark:bg-slate-950/70 p-1 border border-slate-200 dark:border-slate-800" id="timeframeNav">
+                        <button data-tf="month" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 transition shadow-sm">Monthly</button>
+                        <button data-tf="year" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Yearly</button>
+                        <button data-tf="lifetime" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Lifetime</button>
                     </div>
                 </div>
-                <div id="filterBar" class="flex flex-wrap gap-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80">
+
+                <!-- Filters -->
+                <div id="filterBar" class="flex flex-wrap gap-4 bg-white/30 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-inner">
                     <div id="monthGroup">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Month</label>
-                        <select id="monthSelect" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Month</label>
+                        <select id="monthSelect" class="bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 shadow-sm">
                             <option value="01">January</option>
                             <option value="02">February</option>
                             <option value="03">March</option>
@@ -60,8 +89,8 @@
                         </select>
                     </div>
                     <div id="yearGroup">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Year</label>
-                        <select id="yearSelect" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Year</label>
+                        <select id="yearSelect" class="bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500 shadow-sm">
                             <option value="2027">2027</option>
                             <option value="2026">2026</option>
                             <option value="2025">2025</option>
@@ -69,90 +98,95 @@
                         </select>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
+
+                <!-- Leaderboard Table -->
+                <div class="overflow-x-auto custom-scroll">
                     <table class="w-full text-left text-sm border-collapse">
                         <thead>
-                            <tr id="tableHeaders" class="text-slate-400 border-b border-slate-800 text-xs uppercase tracking-wider"></tr>
+                            <tr id="tableHeaders" class="text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800/80 text-xs uppercase tracking-wider"></tr>
                         </thead>
-                        <tbody id="leaderboardBody" class="divide-y divide-slate-800/60 text-xs font-mono">
+                        <tbody id="leaderboardBody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-xs font-mono">
                             <tr>
-                                <td colspan="8" class="py-8 text-center text-slate-400 font-sans">Loading leaderboard rankings...</td>
+                                <td colspan="8" class="py-8 text-center text-slate-400 font-sans">Loading leaderboard rankings...[cite: 1]</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="pt-6 border-t border-slate-800 space-y-3">
-                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                        <span class="material-icons text-sm">equalizer</span> Record Highs & Lows (Most & Least)
+
+                <!-- Record Highs & Lows Table -->
+                <div class="pt-6 border-t border-slate-200 dark:border-slate-800/80 space-y-3">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                        <span class="material-icons text-sm">equalizer</span> Record Highs &amp; Lows (Most &amp; Least)
                     </h3>
-                    <div class="overflow-x-auto">
+                    <div class="overflow-x-auto custom-scroll">
                         <table class="w-full text-left text-xs border-collapse">
                             <thead>
-                                <tr class="text-slate-400 border-b border-slate-800 text-[10px] uppercase">
+                                <tr class="text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800/80 text-[10px] uppercase">
                                     <th class="py-2.5 px-3">Performance Metric</th>
-                                    <th class="py-2.5 px-3 text-emerald-400">Most (High)</th>
-                                    <th class="py-2.5 px-3 text-rose-400">Least (Low)</th>
+                                    <th class="py-2.5 px-3 text-emerald-600 dark:text-emerald-400">Most (High)</th>
+                                    <th class="py-2.5 px-3 text-rose-500">Least (Low)</th>
                                 </tr>
                             </thead>
-                            <tbody id="extremesTableBody" class="divide-y divide-slate-800/80 font-mono text-slate-300">
+                            <tbody id="extremesTableBody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 font-mono text-slate-700 dark:text-slate-300">
                                 <tr>
-                                    <td colspan="3" class="py-4 text-center text-slate-500 font-sans">Awaiting leaderboard metrics...</td>
+                                    <td colspan="3" class="py-4 text-center text-slate-400 font-sans">Awaiting leaderboard metrics...[cite: 1]</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
+
             </div>
         </div>
     </main>
 
     <!-- Share Modal -->
     <div id="shareModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                    <span class="material-icons text-amber-400 text-sm">share</span> Share Standings
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="material-icons text-amber-500 text-sm">share</span> Share Standings
                 </h3>
-                <button type="button" id="closeShareModalBtn" class="text-slate-400 hover:text-white">
+                <button type="button" id="closeShareModalBtn" class="text-slate-400 hover:text-slate-700 dark:hover:text-white">
                     <span class="material-icons text-base">close</span>
                 </button>
             </div>
-            <p class="text-xs text-slate-400">Choose your preferred sharing mode:</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Choose your preferred sharing mode:</p>
             <div class="space-y-2.5">
-                <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-white/40 dark:bg-slate-950/70 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between text-left transition shadow-sm">
                     <div>
-                        <p class="text-xs font-bold text-white">Share Link Only</p>
-                        <p class="text-[10px] text-slate-400">Direct URL to leaderboard</p>
+                        <p class="text-xs font-bold text-slate-900 dark:text-white">Share Link Only</p>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400">Direct URL to leaderboard</p>
                     </div>
-                    <span class="material-icons text-amber-400 text-sm">link</span>
+                    <span class="material-icons text-amber-500 text-sm">link</span>
                 </button>
-                <button id="copyLinkBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                <button id="copyLinkBtn" class="w-full p-3.5 bg-white/40 dark:bg-slate-950/70 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between text-left transition shadow-sm">
                     <div>
-                        <p class="text-xs font-bold text-white">Copy Link</p>
-                        <p class="text-[10px] text-slate-400">Copy URL directly to clipboard</p>
+                        <p class="text-xs font-bold text-slate-900 dark:text-white">Copy Link</p>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400">Copy URL directly to clipboard</p>
                     </div>
-                    <span class="material-icons text-sky-400 text-sm">content_copy</span>
+                    <span class="material-icons text-sky-500 text-sm">content_copy</span>
                 </button>
-                <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-white/40 dark:bg-slate-950/70 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between text-left transition shadow-sm">
                     <div>
-                        <p class="text-xs font-bold text-white">Share Snapshot Image</p>
-                        <p class="text-[10px] text-slate-400">Fixed-ratio scorecard image</p>
+                        <p class="text-xs font-bold text-slate-900 dark:text-white">Share Snapshot Image</p>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400">Fixed-ratio scorecard image</p>
                     </div>
-                    <span class="material-icons text-emerald-400 text-sm">image</span>
+                    <span class="material-icons text-emerald-500 text-sm">image</span>
                 </button>
-                <button id="copyImageBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                <button id="copyImageBtn" class="w-full p-3.5 bg-white/40 dark:bg-slate-950/70 hover:bg-white dark:hover:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex items-center justify-between text-left transition shadow-sm">
                     <div>
-                        <p class="text-xs font-bold text-white">Copy Snapshot Image</p>
-                        <p class="text-[10px] text-slate-400">Copy clean image with --- masks</p>
+                        <p class="text-xs font-bold text-slate-900 dark:text-white">Copy Snapshot Image</p>
+                        <p class="text-[10px] text-slate-500 dark:text-slate-400">Copy clean image with --- masks[cite: 1]</p>
                     </div>
-                    <span class="material-icons text-emerald-400 text-sm">photo</span>
+                    <span class="material-icons text-emerald-500 text-sm">photo</span>
                 </button>
-                <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
+                <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition shadow-sm">
                     <div>
-                        <p class="text-xs font-bold text-amber-300">Share Image + Link Caption (WhatsApp)</p>
-                        <p class="text-[10px] text-amber-200/70">Leaderboard snapshot with active URL</p>
+                        <p class="text-xs font-bold text-amber-700 dark:text-amber-300">Share Image + Link Caption (WhatsApp)</p>
+                        <p class="text-[10px] text-amber-600/80 dark:text-amber-200/70">Leaderboard snapshot with active URL</p>
                     </div>
-                    <span class="material-icons text-amber-400 text-sm">send</span>
+                    <span class="material-icons text-amber-500 text-sm">send</span>
                 </button>
             </div>
         </div>
@@ -161,7 +195,6 @@
     <script type="module">
         import { db, collection, getDocs } from "../web-info/firebase.js";
 
-        // Global Debug Logger Engine
         if (localStorage.getItem('debugging') === null) {
             localStorage.setItem('debugging', '0');
         }
@@ -184,12 +217,9 @@
         const extremesTableBody = document.getElementById('extremesTableBody');
         const shareModal = document.getElementById('shareModal');
 
-        // Automatically open with the current month and year
         const now = new Date();
         const currentYearStr = String(now.getFullYear());
         const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0');
-
-        debugLog("Detected system date:", { currentYearStr, currentMonthStr });
 
         if (![...yearSelect.options].some(o => o.value === currentYearStr)) {
             const newOpt = document.createElement('option');
@@ -203,11 +233,10 @@
         tfButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 tfButtons.forEach(b => {
-                    b.className = "tf-btn px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition";
+                    b.className = "tf-btn px-4 py-1.5 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
                 });
-                e.target.className = "tf-btn px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition";
+                e.target.className = "tf-btn px-4 py-1.5 text-xs font-bold rounded-xl bg-amber-500 text-slate-950 transition shadow-sm";
                 activeTimeframe = e.target.dataset.tf;
-                debugLog("Timeframe switched to:", activeTimeframe);
                 if (activeTimeframe === 'lifetime') {
                     filterBar.style.display = 'none';
                 } else {
@@ -219,7 +248,6 @@
         });
 
         async function calculateAndRender() {
-            debugLog("Starting calculateAndRender execution for timeframe:", activeTimeframe);
             tableHeaders.innerHTML = `
                 <th class="py-3 px-3">Rank</th>
                 <th class="py-3 px-3">Player Member</th>
@@ -230,17 +258,17 @@
                 <th class="py-3 px-3 text-center">Total Props</th>
                 <th class="py-3 px-3 text-right">Net Cash ($)</th>
             `;
-
             leaderboardBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-sans">Computing leaderboard...</td></tr>`;
+
             try {
                 const snapshot = await getDocs(collection(db, "games", "Monopoly", "matches"));
-                debugLog("Retrieved documents from Firestore:", snapshot.size);
                 const stats = {};
                 snapshot.forEach(docSnap => {
                     const game = docSnap.data();
                     const players = game.players || [];
                     const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
                     if (memberCount <= 2) return;
+
                     const dateStr = game.date || docSnap.id;
                     let year = "", month = "";
                     if (dateStr.includes('-')) {
@@ -248,6 +276,7 @@
                         if (parts[0].length === 4) { year = parts[0]; month = parts[1]; }
                         else if (parts[2]?.length === 4) { year = parts[2]; month = parts[1]; }
                     }
+
                     if (activeTimeframe === 'month' && (year !== yearSelect.value || month !== monthSelect.value)) return;
                     if (activeTimeframe === 'year' && year !== yearSelect.value) return;
 
@@ -264,47 +293,47 @@
                         stats[pName].stations += Number(p.stations || 0);
                     });
                 });
+
                 currentSortedList = Object.values(stats).sort((a, b) => b.cash - a.cash);
-                debugLog("Ranked players computed:", currentSortedList);
 
                 if (currentSortedList.length === 0) {
-                    leaderboardBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-sans">No valid ranked match records (&gt;2 members) found for this timeframe.</td></tr>`;
-                    extremesTableBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500 font-sans">No records present for this timeframe.</td></tr>`;
+                    leaderboardBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-slate-400 font-sans">No valid ranked match records (&gt;2 members) found for this timeframe[cite: 1].</td></tr>`;
+                    extremesTableBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-400 font-sans">No records present for this timeframe.</td></tr>`;
                     return;
                 }
+
                 leaderboardBody.innerHTML = currentSortedList.map((p, idx) => {
                     const totalProps = p.cities + p.stations;
                     return `
-                        <tr class="hover:bg-slate-800/40 border-b border-slate-800/40">
-                            <td class="py-3 px-3 font-bold ${idx === 0 ? 'text-amber-400' : idx === 1 ? 'text-slate-300' : idx === 2 ? 'text-amber-600' : 'text-slate-500'}">
+                        <tr class="hover:bg-white/30 dark:hover:bg-slate-800/40 border-b border-slate-200/60 dark:border-slate-800/40 transition">
+                            <td class="py-3 px-3 font-bold ${idx === 0 ? 'text-amber-500' : idx === 1 ? 'text-slate-400' : idx === 2 ? 'text-amber-700 dark:text-amber-600' : 'text-slate-400'}">
                                 ${idx === 0 ? '#1' : idx === 1 ? '#2' : idx === 2 ? '#3' : `#${idx + 1}`}
                             </td>
-                            <td class="py-3 px-3 font-semibold text-white font-sans">
-                                <a href="view.html?player=${encodeURIComponent(p.name)}" class="hover:underline text-amber-400 flex items-center gap-1">
+                            <td class="py-3 px-3 font-semibold text-slate-900 dark:text-white font-sans">
+                                <a href="view.html?player=${encodeURIComponent(p.name)}" class="hover:underline text-amber-600 dark:text-amber-400 flex items-center gap-1">
                                     <span>${p.name}</span>
                                     <span class="material-icons text-xs">open_in_new</span>
                                 </a>
                             </td>
-                            <td class="py-3 px-3 text-center text-slate-300">${p.matches}</td>
-                            <td class="py-3 px-3 text-center text-emerald-400 font-bold">${p.wins}</td>
-                            <td class="py-3 px-3 text-center text-slate-300">${p.cities}</td>
-                            <td class="py-3 px-3 text-center text-slate-300">${p.stations}</td>
-                            <td class="py-3 px-3 text-center text-amber-400 font-bold">${totalProps}</td>
-                            <td class="py-3 px-3 text-right font-bold ${p.cash >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                            <td class="py-3 px-3 text-center text-slate-600 dark:text-slate-300">${p.matches}</td>
+                            <td class="py-3 px-3 text-center text-emerald-600 dark:text-emerald-400 font-bold">${p.wins}</td>
+                            <td class="py-3 px-3 text-center text-slate-600 dark:text-slate-300">${p.cities}</td>
+                            <td class="py-3 px-3 text-center text-slate-600 dark:text-slate-300">${p.stations}</td>
+                            <td class="py-3 px-3 text-center text-amber-600 dark:text-amber-400 font-bold">${totalProps}</td>
+                            <td class="py-3 px-3 text-right font-bold ${p.cash >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}">
                                 $${p.cash.toLocaleString()}
                             </td>
                         </tr>
                     `;
                 }).join('');
+
                 renderExtremes(currentSortedList);
             } catch (err) {
-                debugLog("calculateAndRender Error:", err);
-                leaderboardBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-red-400 font-sans">Failed to load leaderboard data.</td></tr>`;
+                leaderboardBody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-rose-500 font-sans">Failed to load leaderboard data.</td></tr>`;
             }
         }
 
         function renderExtremes(list) {
-            debugLog("Rendering Extremes High/Low table with count:", list.length);
             const mostWins = [...list].sort((a,b) => b.wins - a.wins)[0];
             const leastWins = [...list].sort((a,b) => a.wins - b.wins)[0];
             const mostMatches = [...list].sort((a,b) => b.matches - a.matches)[0];
@@ -319,42 +348,40 @@
             const leastProps = [...list].sort((a,b) => (a.cities + a.stations) - (b.cities + b.stations))[0];
 
             extremesTableBody.innerHTML = `
-                <tr class="hover:bg-slate-800/30">
-                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Total Wins</td>
-                    <td class="py-2 px-3 text-emerald-400">${mostWins.name} (${mostWins.wins} wins)</td>
-                    <td class="py-2 px-3 text-rose-400">${leastWins.name} (${leastWins.wins} wins)</td>
+                <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 transition">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-700 dark:text-slate-300">Total Wins</td>
+                    <td class="py-2 px-3 text-emerald-600 dark:text-emerald-400">${mostWins.name} (${mostWins.wins} wins)</td>
+                    <td class="py-2 px-3 text-rose-500">${leastWins.name} (${leastWins.wins} wins)</td>
                 </tr>
-                <tr class="hover:bg-slate-800/30">
-                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Matches Played</td>
-                    <td class="py-2 px-3 text-emerald-400">${mostMatches.name} (${mostMatches.matches} matches)</td>
-                    <td class="py-2 px-3 text-rose-400">${leastMatches.name} (${leastMatches.matches} matches)</td>
+                <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 transition">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-700 dark:text-slate-300">Matches Played</td>
+                    <td class="py-2 px-3 text-emerald-600 dark:text-emerald-400">${mostMatches.name} (${mostMatches.matches} matches)</td>
+                    <td class="py-2 px-3 text-rose-500">${leastMatches.name} (${leastMatches.matches} matches)</td>
                 </tr>
-                <tr class="hover:bg-slate-800/30">
-                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Points & Net Cash</td>
-                    <td class="py-2 px-3 text-emerald-400">${mostCash.name} ($${mostCash.cash.toLocaleString()})</td>
-                    <td class="py-2 px-3 text-rose-400">${leastCash.name} ($${leastCash.cash.toLocaleString()})</td>
+                <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 transition">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-700 dark:text-slate-300">Points & Net Cash</td>
+                    <td class="py-2 px-3 text-emerald-600 dark:text-emerald-400">${mostCash.name} ($${mostCash.cash.toLocaleString()})</td>
+                    <td class="py-2 px-3 text-rose-500">${leastCash.name} ($${leastCash.cash.toLocaleString()})</td>
                 </tr>
-                <tr class="hover:bg-slate-800/30">
-                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Cities Claimed</td>
-                    <td class="py-2 px-3 text-emerald-400">${mostCities.name} (${mostCities.cities} cities)</td>
-                    <td class="py-2 px-3 text-rose-400">${leastCities.name} (${leastCities.cities} cities)</td>
+                <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 transition">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-700 dark:text-slate-300">Cities Claimed</td>
+                    <td class="py-2 px-3 text-emerald-600 dark:text-emerald-400">${mostCities.name} (${mostCities.cities} cities)</td>
+                    <td class="py-2 px-3 text-rose-500">${leastCities.name} (${leastCities.cities} cities)</td>
                 </tr>
-                <tr class="hover:bg-slate-800/30">
-                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Stations & Utils</td>
-                    <td class="py-2 px-3 text-emerald-400">${mostStations.name} (${mostStations.stations} items)</td>
-                    <td class="py-2 px-3 text-rose-400">${leastStations.name} (${leastStations.stations} items)</td>
+                <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 transition">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-700 dark:text-slate-300">Stations & Utils</td>
+                    <td class="py-2 px-3 text-emerald-600 dark:text-emerald-400">${mostStations.name} (${mostStations.stations} items)</td>
+                    <td class="py-2 px-3 text-rose-500">${leastStations.name} (${leastStations.stations} items)</td>
                 </tr>
-                <tr class="hover:bg-slate-800/30">
-                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Total Properties</td>
-                    <td class="py-2 px-3 text-emerald-400">${mostProps.name} (${mostProps.cities + mostProps.stations} props)</td>
-                    <td class="py-2 px-3 text-rose-400">${leastProps.name} (${leastProps.cities + leastProps.stations} props)</td>
+                <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 transition">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-700 dark:text-slate-300">Total Properties</td>
+                    <td class="py-2 px-3 text-emerald-600 dark:text-emerald-400">${mostProps.name} (${mostProps.cities + mostProps.stations} props)</td>
+                    <td class="py-2 px-3 text-rose-500">${leastProps.name} (${leastProps.cities + leastProps.stations} props)</td>
                 </tr>
             `;
         }
 
-        // Mask Month and Year as "---" during snapshot capture
         async function captureSnapshotWithMasks() {
-            debugLog("Initiating masked snapshot capture...");
             const monthVal = monthSelect.value;
             const yearVal = yearSelect.value;
             
@@ -366,13 +393,15 @@
             yearSelect.value = "---";
 
             const container = document.getElementById('shareableSnapshotContainer');
-            const canvas = await html2canvas(container, { backgroundColor: '#020617', scale: 2 });
+            const canvas = await html2canvas(container, { 
+                backgroundColor: document.documentElement.classList.contains('dark') ? '#020617' : '#f8fafc', 
+                scale: 2 
+            });
 
             monthSelect.remove(0);
             yearSelect.remove(0);
             monthSelect.value = monthVal;
             yearSelect.value = yearVal;
-            debugLog("Masked snapshot complete; restored selections to:", { monthVal, yearVal });
 
             return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         }
@@ -382,7 +411,6 @@
 
         document.getElementById('shareLinkOnlyBtn').addEventListener('click', async () => {
             const url = window.location.href;
-            debugLog("Sharing link only:", url);
             if (navigator.share) {
                 await navigator.share({ title: 'Monopoly Leaderboard', url });
             } else {
@@ -412,7 +440,7 @@
                     a.click();
                 }
             } catch (err) {
-                debugLog("shareImageOnlyBtn error:", err);
+                console.error("shareImageOnlyBtn error:", err);
             }
             shareModal.classList.add('hidden');
         });
@@ -423,7 +451,6 @@
                 await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
                 alert("Leaderboard snapshot copied to clipboard with masked date fields!");
             } catch (e) {
-                debugLog("copyImageBtn clipboard write failed, fallback download:", e);
                 const blob = await captureSnapshotWithMasks();
                 const a = document.createElement('a');
                 a.href = URL.createObjectURL(blob);
@@ -449,7 +476,7 @@
                     window.open(waUrl, '_blank');
                 }
             } catch (err) {
-                debugLog("shareBothBtn error:", err);
+                console.error("shareBothBtn error:", err);
             }
             shareModal.classList.add('hidden');
         });
@@ -458,28 +485,17 @@
         yearSelect.addEventListener('change', calculateAndRender);
         calculateAndRender();
     </script>
+    
+    <!-- Offline Service Worker Bootstrap -->
     <script>
-  // 1. Register Service Worker
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('../sw.js')
-        .then((reg) => {
-          if (localStorage.getItem('debugging') === '1') {
-            console.log('[DEBUG] Service Worker registered:', reg.scope);
-          }
-        })
-        .catch((err) => {
-          if (localStorage.getItem('debugging') === '1') {
-            console.error('[DEBUG] Service Worker registration failed:', err);
-          }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+            });
+        }
+        window.addEventListener('offline', () => {
+            window.location.href = '/offline.html';
         });
-    });
-  }
-
-  // 2. Instant redirect to offline page if connection drops while browsing
-  window.addEventListener('offline', () => {
-    window.location.href = '/offline.html';
-  });
-</script>
+    </script>
 </body>
 </html>

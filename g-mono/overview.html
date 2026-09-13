@@ -1,29 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Monopoly Suite - Comprehensive Monthly Intelligence</title>
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    
+    <!-- Global Liquid Glass Stylesheet & Theme Controller -->
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+
     <style> 
-        body { font-family: 'Google Sans', sans-serif; }
-        .custom-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        body { font-family: 'Google Sans', sans-serif; } 
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-slate-950">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-sky-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden">
+    
+    <!-- Liquid Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
     <!-- Top Navigation -->
-    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+    <nav class="glass-panel sticky top-0 z-50 transition-colors duration-500">
         <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium transition">
+            <a href="g-mono.html" class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium transition">
                 <span class="material-icons text-base">arrow_back</span> Monopoly Suite
-                <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4"></span>
+                <img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4">
             </a>
             <div class="flex items-center gap-3">
-                <a href="leaderboard.html" class="text-xs bg-slate-900 hover:bg-slate-800 text-amber-300 border border-slate-800 px-3 py-1.5 rounded-xl font-bold transition flex items-center gap-1">
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-sky-500 transition-colors" title="Toggle Theme">
+                    <span class="material-icons" id="themeIcon">light_mode</span>
+                </button>
+                <a href="leaderboard.html" class="text-xs bg-white/40 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-800 text-amber-600 dark:text-amber-400 border border-slate-200 dark:border-slate-800 px-3.5 py-1.5 rounded-xl font-bold transition flex items-center gap-1 shadow-sm">
                     <span class="material-icons text-sm">emoji_events</span> Standings
                 </a>
             </div>
@@ -31,32 +49,32 @@
     </nav>
 
     <!-- Main Workspace Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
-        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-8">
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-6 relative z-10">
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-8 ring-1 ring-sky-500/20">
             
             <!-- Header & Timeframe Tabs -->
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-800 pb-6">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 border-b border-slate-200 dark:border-slate-800/80 pb-6">
                 <div>
-                    <h1 class="text-2xl sm:text-3xl font-black text-white flex items-center gap-2">
-                        <span class="material-icons text-sky-400 text-3xl">analytics</span> Deep Performance Overview
+                    <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                        <span class="material-icons text-sky-500 text-3xl">analytics</span> Deep Performance Overview
                     </h1>
-                    <p id="timeframeSubtitle" class="text-xs text-slate-400 mt-1">Complete statistical telemetry, cash circulation, margins, and property portfolios.</p>
+                    <p id="timeframeSubtitle" class="text-xs text-slate-600 dark:text-slate-400 mt-1">Complete statistical telemetry, cash circulation, margins, and property portfolios.</p>
                 </div>
-                <div class="flex flex-wrap rounded-xl bg-slate-950 p-1 border border-slate-800 gap-1" id="timeframeNav">
-                    <button data-tf="month" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-sky-500 text-slate-950 transition">Monthly</button>
-                    <button data-tf="year" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Yearly</button>
-                    <button data-tf="28days" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Last 28 Days</button>
-                    <button data-tf="lastyear" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Last Year</button>
-                    <button data-tf="lifetime" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Lifetime</button>
+                <div class="flex flex-wrap rounded-2xl bg-white/40 dark:bg-slate-950/70 p-1 border border-slate-200 dark:border-slate-800 gap-1" id="timeframeNav">
+                    <button data-tf="month" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-xl bg-sky-500 text-white transition shadow-sm">Monthly</button>
+                    <button data-tf="year" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Yearly</button>
+                    <button data-tf="28days" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Last 28 Days</button>
+                    <button data-tf="lastyear" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Last Year</button>
+                    <button data-tf="lifetime" class="tf-btn px-3 py-1.5 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Lifetime</button>
                 </div>
             </div>
 
             <!-- Date Selectors & Info Bar -->
-            <div id="filterBar" class="flex flex-wrap items-center justify-between gap-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80">
+            <div id="filterBar" class="flex flex-wrap items-center justify-between gap-4 bg-white/30 dark:bg-slate-950/60 p-4 rounded-2xl border border-slate-200/80 dark:border-slate-800/80 shadow-inner">
                 <div class="flex flex-wrap items-center gap-4">
                     <div id="monthGroup">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Month</label>
-                        <select id="monthSelect" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Select Month</label>
+                        <select id="monthSelect" class="bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500 shadow-sm">
                             <option value="01">January</option>
                             <option value="02">February</option>
                             <option value="03">March</option>
@@ -72,8 +90,8 @@
                         </select>
                     </div>
                     <div id="yearGroup">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Select Year</label>
-                        <select id="yearSelect" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Select Year</label>
+                        <select id="yearSelect" class="bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-sky-500 shadow-sm">
                             <option value="2027">2027</option>
                             <option value="2026">2026</option>
                             <option value="2025">2025</option>
@@ -81,121 +99,120 @@
                         </select>
                     </div>
                 </div>
-                <div class="text-xs text-sky-400 font-mono">
+                <div class="text-xs text-sky-600 dark:text-sky-400 font-mono font-bold">
                     <span id="dateRangeIndicator">Period: Loading...</span>
                 </div>
             </div>
 
             <!-- 1. HIGH LEVEL SUMMARY TILES (8 Data Points) -->
             <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-1">
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Sessions</span>
-                    <p id="mTotalMatches" class="text-xl font-black text-white font-mono">0</p>
-                    <span id="mRankedSub" class="text-[9px] text-emerald-400 block truncate">0 Ranked</span>
+                <div class="bg-white/40 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
+                    <span class="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">Sessions</span>
+                    <p id="mTotalMatches" class="text-xl font-black text-slate-900 dark:text-white font-mono">0</p>
+                    <span id="mRankedSub" class="text-[9px] text-emerald-600 dark:text-emerald-400 block truncate">0 Ranked</span>
                 </div>
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-1">
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Gross Pot</span>
-                    <p id="mGrossPot" class="text-xl font-black text-emerald-400 font-mono">$0</p>
-                    <span class="text-[9px] text-slate-500 block">Total Cash</span>
+                <div class="bg-white/40 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
+                    <span class="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">Gross Pot</span>
+                    <p id="mGrossPot" class="text-xl font-black text-emerald-600 dark:text-emerald-400 font-mono">$0</p>
+                    <span class="text-[9px] text-slate-400 block">Total Cash</span>
                 </div>
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-1">
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Deficit Vol</span>
-                    <p id="mDeficitVol" class="text-xl font-black text-rose-400 font-mono">$0</p>
-                    <span class="text-[9px] text-slate-500 block">Total Debt/Loss</span>
+                <div class="bg-white/40 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
+                    <span class="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">Deficit Vol</span>
+                    <p id="mDeficitVol" class="text-xl font-black text-rose-500 font-mono">$0</p>
+                    <span class="text-[9px] text-slate-400 block">Total Debt/Loss</span>
                 </div>
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-1">
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Avg Win Net</span>
-                    <p id="mAvgWin" class="text-xl font-black text-sky-400 font-mono">$0</p>
-                    <span class="text-[9px] text-slate-500 block">Per Session</span>
+                <div class="bg-white/40 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
+                    <span class="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">Avg Win Net</span>
+                    <p id="mAvgWin" class="text-xl font-black text-sky-600 dark:text-sky-400 font-mono">$0</p>
+                    <span class="text-[9px] text-slate-400 block">Per Session</span>
                 </div>
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-1">
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Properties</span>
-                    <p id="mTotalProps" class="text-xl font-black text-amber-300 font-mono">0</p>
-                    <span id="mPropsBreakdown" class="text-[9px] text-slate-500 block truncate">0C / 0S</span>
+                <div class="bg-white/40 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
+                    <span class="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">Properties</span>
+                    <p id="mTotalProps" class="text-xl font-black text-amber-500 dark:text-amber-400 font-mono">0</p>
+                    <span id="mPropsBreakdown" class="text-[9px] text-slate-400 block truncate">0C / 0S</span>
                 </div>
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-1">
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Top Earner</span>
-                    <p id="mTopEarner" class="text-sm font-bold text-amber-400 truncate mt-1">None</p>
-                    <span id="mTopEarnerVal" class="text-[9px] text-slate-500 block font-mono">$0</span>
+                <div class="bg-white/40 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
+                    <span class="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">Top Earner</span>
+                    <p id="mTopEarner" class="text-sm font-bold text-amber-600 dark:text-amber-400 truncate mt-1">None</p>
+                    <span id="mTopEarnerVal" class="text-[9px] text-slate-400 block font-mono">$0</span>
                 </div>
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-1">
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Active Players</span>
-                    <p id="mPlayerCount" class="text-xl font-black text-white font-mono">0</p>
-                    <span id="mMemberRatio" class="text-[9px] text-blue-400 block truncate">0 Members</span>
+                <div class="bg-white/40 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
+                    <span class="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">Active Players</span>
+                    <p id="mPlayerCount" class="text-xl font-black text-slate-900 dark:text-white font-mono">0</p>
+                    <span id="mMemberRatio" class="text-[9px] text-blue-600 dark:text-blue-400 block truncate">0 Members</span>
                 </div>
-                <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-1">
-                    <span class="text-[9px] text-slate-500 uppercase font-bold tracking-wider block">Avg Game Size</span>
-                    <p id="mAvgGameSize" class="text-xl font-black text-slate-200 font-mono">0.0</p>
-                    <span class="text-[9px] text-slate-500 block">Players/Game</span>
+                <div class="bg-white/40 dark:bg-slate-950/70 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-1 shadow-sm">
+                    <span class="text-[9px] text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider block">Avg Game Size</span>
+                    <p id="mAvgGameSize" class="text-xl font-black text-slate-700 dark:text-slate-200 font-mono">0.0</p>
+                    <span class="text-[9px] text-slate-400 block">Players/Game</span>
                 </div>
             </div>
 
-            <!-- 2. FINANCIAL HIGHS, MARGINS & RECORD FACTS (Granular Deep Data) -->
+            <!-- 2. FINANCIAL HIGHS, MARGINS & RECORD FACTS -->
             <div class="space-y-3">
-                <h2 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <span class="material-icons text-amber-400 text-base">military_tech</span> Period Milestones &amp; Margin Extremes
+                <h2 class="text-xs font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="material-icons text-amber-500 text-base">military_tech</span> Period Milestones &amp; Margin Extremes
                 </h2>
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 font-mono">
-                    <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-center space-y-0.5">
-                        <span class="text-[9px] font-sans font-bold text-slate-500 uppercase block">Biggest Single Win</span>
-                        <div id="factBiggestWin" class="text-base font-bold text-emerald-400">$0</div>
-                        <span id="factBiggestWinName" class="text-[10px] text-slate-400 font-sans block truncate">None</span>
+                    <div class="p-3.5 bg-white/40 dark:bg-slate-950/70 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-0.5 shadow-sm">
+                        <span class="text-[9px] font-sans font-bold text-slate-500 dark:text-slate-400 uppercase block">Biggest Single Win</span>
+                        <div id="factBiggestWin" class="text-base font-bold text-emerald-600 dark:text-emerald-400">$0</div>
+                        <span id="factBiggestWinName" class="text-[10px] text-slate-500 font-sans block truncate">None</span>
                     </div>
-                    <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-center space-y-0.5">
-                        <span class="text-[9px] font-sans font-bold text-slate-500 uppercase block">Worst Loss (Deficit)</span>
-                        <div id="factWorstLoss" class="text-base font-bold text-rose-400">$0</div>
-                        <span id="factWorstLossName" class="text-[10px] text-slate-400 font-sans block truncate">None</span>
+                    <div class="p-3.5 bg-white/40 dark:bg-slate-950/70 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-0.5 shadow-sm">
+                        <span class="text-[9px] font-sans font-bold text-slate-500 dark:text-slate-400 uppercase block">Worst Loss (Deficit)</span>
+                        <div id="factWorstLoss" class="text-base font-bold text-rose-500">$0</div>
+                        <span id="factWorstLossName" class="text-[10px] text-slate-500 font-sans block truncate">None</span>
                     </div>
-                    <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-center space-y-0.5">
-                        <span class="text-[9px] font-sans font-bold text-slate-500 uppercase block">Largest Win Margin</span>
-                        <div id="factMaxMargin" class="text-base font-bold text-amber-300">$0</div>
-                        <span id="factMaxMarginMatch" class="text-[10px] text-slate-400 font-sans block truncate">Over 2nd place</span>
+                    <div class="p-3.5 bg-white/40 dark:bg-slate-950/70 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-0.5 shadow-sm">
+                        <span class="text-[9px] font-sans font-bold text-slate-500 dark:text-slate-400 uppercase block">Largest Win Margin</span>
+                        <div id="factMaxMargin" class="text-base font-bold text-amber-500 dark:text-amber-400">$0</div>
+                        <span id="factMaxMarginMatch" class="text-[10px] text-slate-500 font-sans block truncate">Over 2nd place</span>
                     </div>
-                    <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-center space-y-0.5">
-                        <span class="text-[9px] font-sans font-bold text-slate-500 uppercase block">Narrowest Victory</span>
-                        <div id="factMinMargin" class="text-base font-bold text-sky-300">$0</div>
-                        <span id="factMinMarginMatch" class="text-[10px] text-slate-400 font-sans block truncate">Smallest gap</span>
+                    <div class="p-3.5 bg-white/40 dark:bg-slate-950/70 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-0.5 shadow-sm">
+                        <span class="text-[9px] font-sans font-bold text-slate-500 dark:text-slate-400 uppercase block">Narrowest Victory</span>
+                        <div id="factMinMargin" class="text-base font-bold text-sky-600 dark:text-sky-400">$0</div>
+                        <span id="factMinMarginMatch" class="text-[10px] text-slate-500 font-sans block truncate">Smallest gap</span>
                     </div>
-                    <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-center space-y-0.5">
-                        <span class="text-[9px] font-sans font-bold text-slate-500 uppercase block">Max Props Claimed</span>
-                        <div id="factMaxProps" class="text-base font-bold text-purple-400">0</div>
-                        <span id="factMaxPropsName" class="text-[10px] text-slate-400 font-sans block truncate">In single session</span>
+                    <div class="p-3.5 bg-white/40 dark:bg-slate-950/70 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-0.5 shadow-sm">
+                        <span class="text-[9px] font-sans font-bold text-slate-500 dark:text-slate-400 uppercase block">Max Props Claimed</span>
+                        <div id="factMaxProps" class="text-base font-bold text-purple-600 dark:text-purple-400">0</div>
+                        <span id="factMaxPropsName" class="text-[10px] text-slate-500 font-sans block truncate">In single session</span>
                     </div>
-                    <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800 text-center space-y-0.5">
-                        <span class="text-[9px] font-sans font-bold text-slate-500 uppercase block">Longest Win Streak</span>
-                        <div id="factWinStreak" class="text-base font-bold text-amber-400">0 In A Row</div>
-                        <span id="factWinStreakName" class="text-[10px] text-slate-400 font-sans block truncate">Champion</span>
+                    <div class="p-3.5 bg-white/40 dark:bg-slate-950/70 rounded-2xl border border-slate-200 dark:border-slate-800 text-center space-y-0.5 shadow-sm">
+                        <span class="text-[9px] font-sans font-bold text-slate-500 dark:text-slate-400 uppercase block">Longest Win Streak</span>
+                        <div id="factWinStreak" class="text-base font-bold text-amber-600 dark:text-amber-400">0 In A Row</div>
+                        <span id="factWinStreakName" class="text-[10px] text-slate-500 font-sans block truncate">Champion</span>
                     </div>
                 </div>
             </div>
 
             <!-- 3. VENUE & ACTIVITY BREAKDOWN -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                        <span class="material-icons text-sm text-sky-400">place</span> Venue &amp; Location Distribution
+                <div class="bg-white/40 dark:bg-slate-950/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+                    <h3 class="text-xs font-bold text-slate-800 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                        <span class="material-icons text-sm text-sky-500">place</span> Venue &amp; Location Distribution
                     </h3>
                     <div id="venuesList" class="space-y-1.5 max-h-40 overflow-y-auto custom-scroll text-xs">
-                        <p class="text-slate-500 text-center py-4">Loading location distribution...</p>
+                        <p class="text-slate-500 text-center py-4">Loading location distribution...[cite: 1]</p>
                     </div>
                 </div>
-
-                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
-                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                        <span class="material-icons text-sm text-amber-400">schedule</span> Timeline Cadence &amp; Play Rhythm
+                <div class="bg-white/40 dark:bg-slate-950/70 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-3 shadow-sm">
+                    <h3 class="text-xs font-bold text-slate-800 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-200 dark:border-slate-800/80 pb-2">
+                        <span class="material-icons text-sm text-amber-500">schedule</span> Timeline Cadence &amp; Play Rhythm
                     </h3>
                     <div class="space-y-2 text-xs font-mono">
-                        <div class="flex justify-between p-2 bg-slate-900 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 font-sans">First Match in Period:</span>
-                            <span id="timelineFirstMatch" class="text-slate-200 font-bold">N/A</span>
+                        <div class="flex justify-between p-2 bg-white/50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                            <span class="text-slate-500 dark:text-slate-400 font-sans">First Match in Period:</span>
+                            <span id="timelineFirstMatch" class="text-slate-800 dark:text-slate-200 font-bold">N/A</span>
                         </div>
-                        <div class="flex justify-between p-2 bg-slate-900 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 font-sans">Latest Match in Period:</span>
-                            <span id="timelineLastMatch" class="text-slate-200 font-bold">N/A</span>
+                        <div class="flex justify-between p-2 bg-white/50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                            <span class="text-slate-500 dark:text-slate-400 font-sans">Latest Match in Period:</span>
+                            <span id="timelineLastMatch" class="text-slate-800 dark:text-slate-200 font-bold">N/A</span>
                         </div>
-                        <div class="flex justify-between p-2 bg-slate-900 rounded-xl border border-slate-800">
-                            <span class="text-slate-400 font-sans">Play Pace (Frequency):</span>
-                            <span id="timelinePace" class="text-sky-300 font-bold">0 days / match</span>
+                        <div class="flex justify-between p-2 bg-white/50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-inner">
+                            <span class="text-slate-500 dark:text-slate-400 font-sans">Play Pace (Frequency):</span>
+                            <span id="timelinePace" class="text-sky-600 dark:text-sky-400 font-bold">0 days / match</span>
                         </div>
                     </div>
                 </div>
@@ -205,37 +222,36 @@
             <div class="space-y-4 pt-2">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
-                        <h2 class="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-                            <span class="material-icons text-amber-400 text-base">table_rows</span> Master All-Player Telemetry Matrix
+                        <h2 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <span class="material-icons text-amber-500 text-base">table_rows</span> Master All-Player Telemetry Matrix
                         </h2>
-                        <p class="text-[11px] text-slate-400">Comprehensive overview of all players who joined matches within the active timeframe.</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Comprehensive overview of all players who joined matches within the active timeframe[cite: 1].</p>
                     </div>
                     <div class="w-full sm:w-64">
-                        <input type="text" id="playerTableSearch" placeholder="Filter player in matrix..." class="w-full bg-slate-950 border border-slate-800 text-xs rounded-xl px-3 py-2 text-white focus:outline-none focus:border-sky-500">
+                        <input type="text" id="playerTableSearch" placeholder="Filter player in matrix..." class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-sky-500 shadow-inner">
                     </div>
                 </div>
-
                 <div class="overflow-x-auto custom-scroll">
                     <table class="w-full text-left text-sm border-collapse">
                         <thead>
-                            <tr class="text-slate-400 border-b border-slate-800 text-[10px] uppercase tracking-wider">
-                                <th class="py-3 px-3 cursor-pointer hover:text-white" onclick="sortTable('rank')">Rank</th>
-                                <th class="py-3 px-3 cursor-pointer hover:text-white" onclick="sortTable('name')">Player</th>
+                            <tr class="text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800/80 text-[10px] uppercase tracking-wider">
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('rank')">Rank</th>
+                                <th class="py-3 px-3 cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('name')">Player</th>
                                 <th class="py-3 px-3 text-center">Status</th>
-                                <th class="py-3 px-3 text-center cursor-pointer hover:text-white" onclick="sortTable('matches')">Matches</th>
-                                <th class="py-3 px-3 text-center cursor-pointer hover:text-white" onclick="sortTable('wins')">Wins</th>
-                                <th class="py-3 px-3 text-center cursor-pointer hover:text-white" onclick="sortTable('winRate')">Win Rate</th>
-                                <th class="py-3 px-3 text-center cursor-pointer hover:text-white" onclick="sortTable('cities')">Cities</th>
-                                <th class="py-3 px-3 text-center cursor-pointer hover:text-white" onclick="sortTable('stations')">Stations</th>
-                                <th class="py-3 px-3 text-center cursor-pointer hover:text-white" onclick="sortTable('totalProps')">Props Total</th>
-                                <th class="py-3 px-3 text-right cursor-pointer hover:text-white" onclick="sortTable('bestMatch')">Best Game</th>
-                                <th class="py-3 px-3 text-right cursor-pointer hover:text-white" onclick="sortTable('avgCash')">Avg Net</th>
-                                <th class="py-3 px-3 text-right cursor-pointer hover:text-white" onclick="sortTable('cash')">Net Total</th>
+                                <th class="py-3 px-3 text-center cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('matches')">Matches</th>
+                                <th class="py-3 px-3 text-center cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('wins')">Wins</th>
+                                <th class="py-3 px-3 text-center cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('winRate')">Win Rate</th>
+                                <th class="py-3 px-3 text-center cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('cities')">Cities</th>
+                                <th class="py-3 px-3 text-center cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('stations')">Stations</th>
+                                <th class="py-3 px-3 text-center cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('totalProps')">Props Total</th>
+                                <th class="py-3 px-3 text-right cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('bestMatch')">Best Game</th>
+                                <th class="py-3 px-3 text-right cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('avgCash')">Avg Net</th>
+                                <th class="py-3 px-3 text-right cursor-pointer hover:text-slate-900 dark:hover:text-white" onclick="sortTable('cash')">Net Total</th>
                             </tr>
                         </thead>
-                        <tbody id="masterLeaderboardBody" class="divide-y divide-slate-800/60 text-xs font-mono">
+                        <tbody id="masterLeaderboardBody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-xs font-mono">
                             <tr>
-                                <td colspan="12" class="py-8 text-center text-slate-500 font-sans">Computing matrix analytics...</td>
+                                <td colspan="12" class="py-8 text-center text-slate-500 font-sans">Computing matrix analytics...[cite: 1]</td>
                             </tr>
                         </tbody>
                     </table>
@@ -243,15 +259,15 @@
             </div>
 
             <!-- 5. MATCH SESSION LOGS TABLE -->
-            <div class="space-y-3 pt-6 border-t border-slate-800">
+            <div class="space-y-3 pt-6 border-t border-slate-200 dark:border-slate-800/80">
                 <div class="flex justify-between items-center">
-                    <h2 class="text-sm font-black text-white uppercase tracking-wider">Recorded Session Archive</h2>
-                    <span id="matchRecordsCount" class="text-xs text-slate-400 font-mono">0 Matches Recorded</span>
+                    <h2 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Recorded Session Archive</h2>
+                    <span id="matchRecordsCount" class="text-xs text-slate-500 font-mono">0 Matches Recorded</span>
                 </div>
                 <div class="overflow-x-auto custom-scroll">
                     <table class="w-full text-left text-sm border-collapse">
                         <thead>
-                            <tr class="text-slate-400 border-b border-slate-800 text-xs uppercase tracking-wider">
+                            <tr class="text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800/80 text-xs uppercase tracking-wider">
                                 <th class="py-2.5 px-3">Game Path ID</th>
                                 <th class="py-2.5 px-3">Date</th>
                                 <th class="py-2.5 px-3">Venue</th>
@@ -261,9 +277,9 @@
                                 <th class="py-2.5 px-3 text-right">Winner Net</th>
                             </tr>
                         </thead>
-                        <tbody id="overviewTableBody" class="divide-y divide-slate-800/60 text-xs font-mono">
+                        <tbody id="overviewTableBody" class="divide-y divide-slate-200/60 dark:divide-slate-800/60 text-xs font-mono">
                             <tr>
-                                <td colspan="7" class="py-6 text-center text-slate-500 font-sans">Loading game session logs...</td>
+                                <td colspan="7" class="py-6 text-center text-slate-500 font-sans">Loading game session logs...[cite: 1]</td>
                             </tr>
                         </tbody>
                     </table>
@@ -276,7 +292,6 @@
     <script type="module">
         import { db, collection, getDocs } from "../web-info/firebase.js";
 
-        // Global Debug Logger Engine
         if (localStorage.getItem('debugging') === null) {
             localStorage.setItem('debugging', '0');
         }
@@ -302,7 +317,6 @@
         const timeframeSubtitle = document.getElementById('timeframeSubtitle');
         const dateRangeIndicator = document.getElementById('dateRangeIndicator');
 
-        // Tiles DOM
         const mTotalMatches = document.getElementById('mTotalMatches');
         const mRankedSub = document.getElementById('mRankedSub');
         const mGrossPot = document.getElementById('mGrossPot');
@@ -316,7 +330,6 @@
         const mMemberRatio = document.getElementById('mMemberRatio');
         const mAvgGameSize = document.getElementById('mAvgGameSize');
 
-        // Facts DOM
         const factBiggestWin = document.getElementById('factBiggestWin');
         const factBiggestWinName = document.getElementById('factBiggestWinName');
         const factWorstLoss = document.getElementById('factWorstLoss');
@@ -330,19 +343,16 @@
         const factWinStreak = document.getElementById('factWinStreak');
         const factWinStreakName = document.getElementById('factWinStreakName');
 
-        // Venue & Timeline DOM
         const venuesList = document.getElementById('venuesList');
         const timelineFirstMatch = document.getElementById('timelineFirstMatch');
         const timelineLastMatch = document.getElementById('timelineLastMatch');
         const timelinePace = document.getElementById('timelinePace');
 
-        // Tables DOM
         const masterLeaderboardBody = document.getElementById('masterLeaderboardBody');
         const overviewTableBody = document.getElementById('overviewTableBody');
         const playerTableSearch = document.getElementById('playerTableSearch');
         const matchRecordsCount = document.getElementById('matchRecordsCount');
 
-        // Automatically set current Month and Year
         const now = new Date();
         const currentYearStr = String(now.getFullYear());
         const currentMonthStr = String(now.getMonth() + 1).padStart(2, '0');
@@ -356,17 +366,13 @@
         yearSelect.value = currentYearStr;
         monthSelect.value = currentMonthStr;
 
-        debugLog("Default date set:", { currentYearStr, currentMonthStr });
-
         tfButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
                 tfButtons.forEach(b => {
-                    b.className = "tf-btn px-3 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition";
+                    b.className = "tf-btn px-3 py-1.5 text-xs font-bold rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
                 });
-                e.target.className = "tf-btn px-3 py-1.5 text-xs font-bold rounded-lg bg-sky-500 text-slate-950 transition";
+                e.target.className = "tf-btn px-3 py-1.5 text-xs font-bold rounded-xl bg-sky-500 text-white transition shadow-sm";
                 activeTimeframe = e.target.dataset.tf;
-                debugLog("Active timeframe toggled to:", activeTimeframe);
-
                 if (activeTimeframe === 'lifetime') {
                     filterBar.style.display = 'none';
                 } else {
@@ -389,14 +395,10 @@
         }
 
         async function loadOverviewData() {
-            debugLog("Loading overview datasets for timeframe:", activeTimeframe);
             masterLeaderboardBody.innerHTML = `<tr><td colspan="12" class="py-8 text-center text-slate-500 font-sans">Computing matrix analytics...</td></tr>`;
             overviewTableBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 font-sans">Loading games...</td></tr>`;
-
             try {
                 const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
-                debugLog("Loaded raw match sessions count:", matchesSnap.size);
-
                 let allGamesCount = 0;
                 let rankedGamesCount = 0;
                 let practiceGamesCount = 0;
@@ -405,14 +407,12 @@
                 let sumCities = 0;
                 let sumStations = 0;
                 let totalPlayersSeatCount = 0;
-
                 const playerMap = {};
                 const venueCounts = {};
                 matchingMatchesList = [];
 
                 const nowTime = new Date().getTime();
                 const twentyEightDaysAgo = nowTime - (28 * 24 * 60 * 60 * 1000);
-
                 let biggestSingleWin = -Infinity, biggestSingleWinName = "None";
                 let worstSingleLoss = Infinity, worstSingleLossName = "None";
                 let maxVictoryMargin = -Infinity, maxVictoryMarginId = "N/A";
@@ -424,7 +424,6 @@
                     const players = game.players || [];
                     const dateStr = game.date || docSnap.id.substring(0, 10);
                     const matchTime = parseDateToTimestamp(dateStr);
-
                     let yr = "", mo = "";
                     if (dateStr.includes('-')) {
                         const parts = dateStr.split('-');
@@ -432,7 +431,6 @@
                         else if (parts[2]?.length === 4) { yr = parts[2]; mo = parts[1]; }
                     }
 
-                    // Timeframe filter logic
                     if (activeTimeframe === 'month') {
                         if (yr !== yearSelect.value || mo !== monthSelect.value) return;
                     } else if (activeTimeframe === 'year') {
@@ -449,22 +447,17 @@
                     const isRanked = memberCount > 2;
                     if (isRanked) rankedGamesCount++;
                     else practiceGamesCount++;
-
                     totalPlayersSeatCount += players.length;
 
-                    // Venue tracking
                     const venue = (game.location || "Living Room").trim();
                     venueCounts[venue] = (venueCounts[venue] || 0) + 1;
 
-                    // Sort players in this session by earnings
                     const sortedInGame = [...players].sort((a, b) => Number(b.earnings ?? b.cash ?? 0) - Number(a.earnings ?? a.cash ?? 0));
                     const winner = sortedInGame[0] || {};
                     const runnerUp = sortedInGame[1] || null;
-
                     const winnerEarnings = Number(winner.earnings ?? winner.cash ?? 0);
                     totalGrossCash += Math.max(0, winnerEarnings);
 
-                    // Win Margins
                     if (runnerUp) {
                         const margin = winnerEarnings - Number(runnerUp.earnings ?? runnerUp.cash ?? 0);
                         if (margin > maxVictoryMargin) {
@@ -477,7 +470,6 @@
                         }
                     }
 
-                    // Loop participants
                     players.forEach(p => {
                         const name = (p.name || 'Player').trim();
                         const key = name.toLowerCase();
@@ -490,10 +482,7 @@
                         sumCities += c;
                         sumStations += s;
 
-                        if (pCash < 0) {
-                            totalDeficitCash += Math.abs(pCash);
-                        }
-
+                        if (pCash < 0) totalDeficitCash += Math.abs(pCash);
                         if (pCash > biggestSingleWin) {
                             biggestSingleWin = pCash;
                             biggestSingleWinName = `${name} ($${pCash.toLocaleString()})`;
@@ -521,15 +510,11 @@
                                 currentStreak: 0
                             };
                         }
-
                         playerMap[key].matches += 1;
                         playerMap[key].cash += pCash;
                         playerMap[key].cities += c;
                         playerMap[key].stations += s;
-                        if (pCash > playerMap[key].bestMatch) {
-                            playerMap[key].bestMatch = pCash;
-                        }
-
+                        if (pCash > playerMap[key].bestMatch) playerMap[key].bestMatch = pCash;
                         if (isWin) {
                             playerMap[key].wins += 1;
                             playerMap[key].currentStreak += 1;
@@ -553,7 +538,6 @@
                     });
                 });
 
-                // Convert map to array with calculated ratios
                 aggregatedPlayers = Object.values(playerMap).map(p => ({
                     ...p,
                     winRate: p.matches > 0 ? (p.wins / p.matches) * 100 : 0,
@@ -562,11 +546,9 @@
                     bestMatch: p.bestMatch === -Infinity ? 0 : p.bestMatch
                 }));
 
-                // Top earner
                 const topEarnerObj = [...aggregatedPlayers].sort((a, b) => b.cash - a.cash)[0] || { name: 'None', cash: 0 };
                 const topStreakObj = [...aggregatedPlayers].sort((a, b) => b.winStreak - a.winStreak)[0] || { name: 'None', winStreak: 0 };
 
-                // Populate Summary Tiles
                 mTotalMatches.textContent = allGamesCount;
                 mRankedSub.textContent = `${rankedGamesCount} Ranked / ${practiceGamesCount} Practice`;
                 mGrossPot.textContent = `$${totalGrossCash.toLocaleString()}`;
@@ -576,13 +558,12 @@
                 mPropsBreakdown.textContent = `${sumCities} Cities / ${sumStations} Stations`;
                 mTopEarner.textContent = topEarnerObj.name;
                 mTopEarnerVal.textContent = `$${topEarnerObj.cash.toLocaleString()}`;
-                
+
                 const memberCountTotal = aggregatedPlayers.filter(p => p.isMember).length;
                 mPlayerCount.textContent = aggregatedPlayers.length;
                 mMemberRatio.textContent = `${memberCountTotal} Members / ${aggregatedPlayers.length - memberCountTotal} Guests`;
                 mAvgGameSize.textContent = allGamesCount > 0 ? (totalPlayersSeatCount / allGamesCount).toFixed(1) : "0.0";
 
-                // Populate Milestone Facts
                 factBiggestWin.textContent = biggestSingleWin === -Infinity ? "$0" : `$${biggestSingleWin.toLocaleString()}`;
                 factBiggestWinName.textContent = biggestSingleWinName;
                 factWorstLoss.textContent = worstSingleLoss === Infinity ? "$0" : `$${worstSingleLoss.toLocaleString()}`;
@@ -596,17 +577,14 @@
                 factWinStreak.textContent = `${topStreakObj.winStreak} In A Row`;
                 factWinStreakName.textContent = topStreakObj.name;
 
-                // Populate Venues
                 renderVenues(venueCounts, allGamesCount);
 
-                // Populate Timelines
                 matchingMatchesList.sort((a, b) => a.timestamp - b.timestamp);
                 if (matchingMatchesList.length > 0) {
                     const firstM = matchingMatchesList[0];
                     const lastM = matchingMatchesList[matchingMatchesList.length - 1];
                     timelineFirstMatch.textContent = `${firstM.date} (${firstM.id})`;
                     timelineLastMatch.textContent = `${lastM.date} (${lastM.id})`;
-
                     const diffDays = Math.max(1, Math.round((lastM.timestamp - firstM.timestamp) / (1000 * 60 * 60 * 24)));
                     timelinePace.textContent = `${(diffDays / matchingMatchesList.length).toFixed(1)} days / session`;
                 } else {
@@ -615,7 +593,6 @@
                     timelinePace.textContent = "No matches";
                 }
 
-                // Subtitle Label
                 if (activeTimeframe === 'month') {
                     const mName = monthSelect.options[monthSelect.selectedIndex]?.text || "Month";
                     dateRangeIndicator.textContent = `Period: ${mName} ${yearSelect.value}`;
@@ -638,8 +615,7 @@
                 renderMasterTable();
                 renderMatchesTable();
             } catch (err) {
-                debugLog("Overview calculation error:", err);
-                masterLeaderboardBody.innerHTML = `<tr><td colspan="12" class="py-8 text-center text-rose-400 font-sans">Failed to load overview data.</td></tr>`;
+                masterLeaderboardBody.innerHTML = `<tr><td colspan="12" class="py-8 text-center text-rose-500 font-sans">Failed to load overview data.</td></tr>`;
             }
         }
 
@@ -652,11 +628,11 @@
             venuesList.innerHTML = entries.map(([venue, count]) => {
                 const pct = total > 0 ? Math.round((count / total) * 100) : 0;
                 return `
-                    <div class="flex items-center justify-between p-2 bg-slate-900 rounded-xl border border-slate-800">
-                        <span class="text-slate-300 truncate max-w-[200px]">${venue}</span>
+                    <div class="flex items-center justify-between p-2 bg-white/40 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                        <span class="text-slate-700 dark:text-slate-300 truncate max-w-[200px] font-medium">${venue}</span>
                         <div class="flex items-center gap-2 font-mono">
-                            <span class="text-amber-400 font-bold">${count} game${count > 1 ? 's' : ''}</span>
-                            <span class="text-[10px] text-slate-500 font-sans">(${pct}%)</span>
+                            <span class="text-amber-600 dark:text-amber-400 font-bold">${count} game${count > 1 ? 's' : ''}</span>
+                            <span class="text-[10px] text-slate-400 font-sans">(${pct}%)</span>
                         </div>
                     </div>
                 `;
@@ -666,7 +642,6 @@
         function renderMasterTable() {
             const query = playerTableSearch.value.toLowerCase().trim();
             let list = aggregatedPlayers.filter(p => p.name.toLowerCase().includes(query));
-
             list.sort((a, b) => {
                 let valA = a[currentSortColumn];
                 let valB = b[currentSortColumn];
@@ -682,33 +657,33 @@
             }
 
             masterLeaderboardBody.innerHTML = list.map((p, idx) => {
-                const rankText = idx === 0 ? '<span class="text-amber-400 font-bold">#1</span>' :
-                                 idx === 1 ? '<span class="text-slate-300 font-bold">#2</span>' :
-                                 idx === 2 ? '<span class="text-amber-600 font-bold">#3</span>' :
-                                 `<span class="text-slate-500">#${idx + 1}</span>`;
+                const rankText = idx === 0 ? '<span class="text-amber-500 font-bold">#1</span>' :
+                                 idx === 1 ? '<span class="text-slate-400 font-bold">#2</span>' :
+                                 idx === 2 ? '<span class="text-amber-700 dark:text-amber-600 font-bold">#3</span>' :
+                                 `<span class="text-slate-400">#${idx + 1}</span>`;
                 return `
-                    <tr class="hover:bg-slate-800/40 border-b border-slate-800/40">
+                    <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 border-b border-slate-200/60 dark:border-slate-800/40 transition">
                         <td class="py-3 px-3">${rankText}</td>
-                        <td class="py-3 px-3 font-semibold text-white font-sans">
-                            <a href="view.html?${p.isMember ? 'player' : 'guest'}=${encodeURIComponent(p.name)}" class="hover:underline text-amber-400 font-bold flex items-center gap-1">
+                        <td class="py-3 px-3 font-semibold text-slate-900 dark:text-white font-sans">
+                            <a href="view.html?${p.isMember ? 'player' : 'guest'}=${encodeURIComponent(p.name)}" class="hover:underline text-amber-600 dark:text-amber-400 font-bold flex items-center gap-1">
                                 <span>${p.name}</span>
-                                <span class="material-icons text-[11px] text-slate-500">open_in_new</span>
+                                <span class="material-icons text-[11px] text-slate-400">open_in_new</span>
                             </a>
                         </td>
                         <td class="py-3 px-3 text-center">
-                            <span class="px-2 py-0.5 rounded text-[9px] font-bold font-sans uppercase ${p.isMember ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+                            <span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-sans uppercase ${p.isMember ? 'bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-500/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700'}">
                                 ${p.isMember ? 'Member' : 'Guest'}
                             </span>
                         </td>
-                        <td class="py-3 px-3 text-center text-slate-300">${p.matches}</td>
-                        <td class="py-3 px-3 text-center text-emerald-400 font-bold">${p.wins}</td>
-                        <td class="py-3 px-3 text-center text-slate-300 font-bold">${p.winRate.toFixed(1)}%</td>
-                        <td class="py-3 px-3 text-center text-slate-400">${p.cities}</td>
-                        <td class="py-3 px-3 text-center text-slate-400">${p.stations}</td>
-                        <td class="py-3 px-3 text-center text-amber-300 font-bold">${p.totalProps}</td>
-                        <td class="py-3 px-3 text-right text-emerald-300">$${p.bestMatch.toLocaleString()}</td>
-                        <td class="py-3 px-3 text-right text-slate-400">$${p.avgCash.toLocaleString()}</td>
-                        <td class="py-3 px-3 text-right font-bold ${p.cash >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
+                        <td class="py-3 px-3 text-center text-slate-600 dark:text-slate-300">${p.matches}</td>
+                        <td class="py-3 px-3 text-center text-emerald-600 dark:text-emerald-400 font-bold">${p.wins}</td>
+                        <td class="py-3 px-3 text-center text-slate-700 dark:text-slate-300 font-bold">${p.winRate.toFixed(1)}%</td>
+                        <td class="py-3 px-3 text-center text-slate-500 dark:text-slate-400">${p.cities}</td>
+                        <td class="py-3 px-3 text-center text-slate-500 dark:text-slate-400">${p.stations}</td>
+                        <td class="py-3 px-3 text-center text-amber-600 dark:text-amber-400 font-bold">${p.totalProps}</td>
+                        <td class="py-3 px-3 text-right text-emerald-600 dark:text-emerald-400">$${p.bestMatch.toLocaleString()}</td>
+                        <td class="py-3 px-3 text-right text-slate-500 dark:text-slate-400">$${p.avgCash.toLocaleString()}</td>
+                        <td class="py-3 px-3 text-right font-bold ${p.cash >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}">
                             $${p.cash.toLocaleString()}
                         </td>
                     </tr>
@@ -722,28 +697,25 @@
                 overviewTableBody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-slate-500 font-sans">No matching game records found.</td></tr>`;
                 return;
             }
-
-            // Descending order by match date
             const descMatches = [...matchingMatchesList].sort((a, b) => b.timestamp - a.timestamp);
-
             overviewTableBody.innerHTML = descMatches.map(m => `
-                <tr class="hover:bg-slate-800/40">
-                    <td class="py-3 px-3 font-bold text-amber-400">
+                <tr class="hover:bg-white/30 dark:hover:bg-slate-800/30 transition">
+                    <td class="py-3 px-3 font-bold text-amber-600 dark:text-amber-400">
                         <a href="view.html?game=${encodeURIComponent(m.id)}" class="hover:underline flex items-center gap-1">
                             <span>${m.id}</span>
                             <span class="material-icons text-xs">open_in_new</span>
                         </a>
                     </td>
-                    <td class="py-3 px-3 text-slate-300">${m.date}</td>
-                    <td class="py-3 px-3 text-slate-300 font-sans">${m.location}</td>
-                    <td class="py-3 px-3 text-center text-slate-400">${m.playersCount}</td>
-                    <td class="py-3 px-3 text-emerald-400 font-sans font-bold">${m.winner}</td>
+                    <td class="py-3 px-3 text-slate-600 dark:text-slate-300 font-mono">${m.date}</td>
+                    <td class="py-3 px-3 text-slate-700 dark:text-slate-300 font-sans">${m.location}</td>
+                    <td class="py-3 px-3 text-center text-slate-500">${m.playersCount}</td>
+                    <td class="py-3 px-3 text-emerald-600 dark:text-emerald-400 font-sans font-bold">${m.winner}</td>
                     <td class="py-3 px-3 text-center">
-                        <span class="px-2 py-0.5 rounded text-[9px] font-bold font-sans uppercase ${m.isRanked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">
+                        <span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-sans uppercase ${m.isRanked ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' : 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30'}">
                             ${m.isRanked ? 'Ranked' : 'Practice'}
                         </span>
                     </td>
-                    <td class="py-3 px-3 text-right text-emerald-400 font-bold">$${m.earnings.toLocaleString()}</td>
+                    <td class="py-3 px-3 text-right text-emerald-600 dark:text-emerald-400 font-bold">$${m.earnings.toLocaleString()}</td>
                 </tr>
             `).join('');
         }
@@ -761,23 +733,19 @@
         playerTableSearch.addEventListener('input', renderMasterTable);
         monthSelect.addEventListener('change', loadOverviewData);
         yearSelect.addEventListener('change', loadOverviewData);
-
         loadOverviewData();
     </script>
-
-    <!-- Offline Service Worker & Redirect Bootstrap -->
+    
+    <!-- Offline Service Worker Bootstrap -->
     <script>
-        (function() {
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js', { scope: '/' })
-                        .catch(() => {});
-                });
-            }
-            window.addEventListener('offline', () => {
-                window.location.href = '/offline.html';
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
             });
-        })();
+        }
+        window.addEventListener('offline', () => {
+            window.location.href = '/offline.html';
+        });
     </script>
 </body>
 </html>

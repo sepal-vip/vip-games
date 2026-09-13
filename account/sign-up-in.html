@@ -1,59 +1,155 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Account Access - Sign In / Up</title>
-    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/vip-icon.png">
+    <title>VIP Gamers - Authentication Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style> 
-        body { font-family: 'Google Sans', sans-serif; } 
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/vip-icon.png">
+    
+    <!-- Global Liquid Glass Stylesheet & Theme Controller -->
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex items-center justify-center p-4 selection:bg-blue-500 selection:text-white">
-    <div class="max-w-md w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
-        
-        <!-- Header -->
-        <div class="text-center space-y-2">
-            <a href="../index.html" class="inline-flex items-center text-xs text-slate-400 hover:text-slate-200 mb-2 gap-1 transition">
-                <span class="material-icons text-sm">arrow_back</span> Back to Gateway
-                <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4"></span>
+<body id="pageBody" class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-blue-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden">
+    
+    <!-- Liquid Background Elements -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="glass-panel sticky top-0 z-50 transition-colors duration-500">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="../index.html" class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-white text-sm font-medium transition">
+                <span class="material-icons text-base">arrow_back</span> Gateway
+                <img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4">
             </a>
-            <h1 class="text-2xl font-black text-white tracking-tight">Portal Account Access</h1>
-            <p class="text-xs text-slate-400">Sign in to your account or create a new user profile</p>
-        </div>
-
-        <!-- Mode Toggle Tabs -->
-        <div class="flex rounded-2xl bg-slate-950 p-1 border border-slate-800">
-            <button id="tabSignIn" class="flex-1 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition shadow">Sign In</button>
-            <button id="tabSignUp" class="flex-1 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-slate-200 transition">Sign Up</button>
-        </div>
-
-        <!-- Alert Notification -->
-        <div id="statusMsg" class="hidden text-xs p-3 rounded-xl border"></div>
-
-        <!-- Form -->
-        <form id="authForm" class="space-y-4">
-            <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
-                <input type="email" id="emailInput" required placeholder="user@example.com" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
+            <div class="flex items-center gap-3">
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-blue-500 transition-colors" title="Toggle Theme">
+                    <span class="material-icons" id="themeIcon">light_mode</span>
+                </button>
+                <span id="navBadge" class="text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 transition-colors duration-300">
+                    <span class="material-icons text-sm">lock</span> VIP Authentication
+                </span>
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Password</label>
-                <input type="password" id="passwordInput" required placeholder="••••••••" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500">
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-md w-full mx-auto px-4 py-10 flex flex-col justify-center relative z-10">
+        
+        <!-- Auth Container Glass Card -->
+        <div id="authCard" class="glass-panel rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl ring-1 ring-blue-500/20 transition-all duration-300">
+            
+            <!-- Auth Header -->
+            <div class="text-center space-y-2">
+                <div id="iconBadge" class="w-14 h-14 rounded-2xl bg-blue-500/15 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 flex items-center justify-center mx-auto shadow-md shadow-blue-500/10 transition-all duration-300">
+                    <span class="material-icons text-3xl" id="headerIcon">sports_esports</span>
+                </div>
+                <h1 id="authTitle" class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Sign In to Portal</h1>
+                <p id="authSubtitle" class="text-xs text-slate-500 dark:text-slate-400">Access your telemetry records, leaderboard rankings, and saved drafts.</p>
             </div>
-            <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-xl text-xs transition shadow-lg shadow-blue-600/20">
-                Sign In
+
+            <!-- Tab Switcher -->
+            <div class="flex rounded-2xl bg-white/40 dark:bg-slate-950/70 p-1 border border-slate-200 dark:border-slate-800">
+                <button id="signInTabBtn" type="button" class="flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 bg-blue-600 text-white shadow-md shadow-blue-600/20">
+                    Sign In
+                </button>
+                <button id="signUpTabBtn" type="button" class="flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white">
+                    Register
+                </button>
+            </div>
+
+            <!-- Notification Feedback Box -->
+            <div id="authStatus" class="hidden text-xs p-3 rounded-2xl border transition-all"></div>
+
+            <!-- Google OAuth Action Button -->
+            <button type="button" id="googleSignInBtn" class="w-full py-2.5 px-4 bg-white/70 dark:bg-slate-900/60 hover:bg-white dark:hover:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-2xl text-xs font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-3 transition shadow-sm hover:shadow group">
+                <svg class="w-4 h-4 shrink-0 transition group-hover:scale-105" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.66-5.17 3.66-9.17z"/>
+                    <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24z"/>
+                    <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.99 0 12s.45 3.82 1.25 5.42l4.03-3.15z"/>
+                    <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98z"/>
+                </svg>
+                <span id="googleBtnText">Continue with Google</span>
             </button>
-        </form>
-    </div>
 
+            <!-- Separator -->
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+                <span class="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Or with email</span>
+                <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+            </div>
+
+            <!-- Authentication Form -->
+            <form id="authForm" class="space-y-4">
+                
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Email Address</label>
+                    <div class="relative">
+                        <span class="material-icons absolute left-3 top-2.5 text-slate-400 text-sm">mail_outline</span>
+                        <input type="email" id="emailInput" required placeholder="player@vip-games.com" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 font-sans shadow-inner transition-colors duration-300">
+                    </div>
+                </div>
+
+                <div class="space-y-1">
+                    <div class="flex justify-between items-center">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Password</label>
+                        <button type="button" id="forgotPasswordBtn" class="text-[10px] text-blue-600 dark:text-blue-400 hover:underline font-bold transition-colors duration-300">Forgot password?</button>
+                    </div>
+                    <div class="relative">
+                        <span class="material-icons absolute left-3 top-2.5 text-slate-400 text-sm">lock_outline</span>
+                        <input type="password" id="passwordInput" required placeholder="••••••••" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 font-sans shadow-inner transition-colors duration-300">
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" id="submitBtn" class="w-full py-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black text-xs rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/25 border border-blue-400/30 flex items-center justify-center gap-1.5">
+                    <span id="submitText">Sign In to Account</span>
+                    <span class="material-icons text-sm" id="submitIcon">arrow_forward</span>
+                </button>
+            </form>
+
+            <div class="relative flex py-1 items-center">
+                <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+                <span class="flex-shrink mx-3 text-[10px] uppercase font-bold text-slate-400 tracking-wider">Gateway Rules</span>
+                <div class="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
+            </div>
+
+            <!-- Informational Footnote -->
+            <div class="bg-white/30 dark:bg-slate-950/60 p-3.5 rounded-2xl border border-slate-200/70 dark:border-slate-800/80 text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
+                <p class="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
+                    <span id="footnoteIcon" class="material-icons text-xs text-blue-500 transition-colors duration-300">info</span> Account Binding
+                </p>
+                <p class="leading-relaxed">After sign in, an administrator can bind your UID to your official Monopoly roster profile in the Master Admin panel.</p>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Firebase Auth Operations Module -->
     <script type="module">
-        import { auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged } from "../web-info/firebase.js";
+        import { 
+            auth, 
+            googleProvider,
+            signInWithPopup,
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword, 
+            onAuthStateChanged 
+        } from "../web-info/firebase.js";
+        import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // Global Debug Logger Engine
         if (localStorage.getItem('debugging') === null) {
             localStorage.setItem('debugging', '0');
         }
@@ -62,73 +158,159 @@
                 console.log("[DEBUG:sign-up-in.html]", ...args);
             }
         }
-        debugLog("Initializing Authentication Portal...");
 
         let isSignUpMode = false;
-        const tabSignIn = document.getElementById('tabSignIn');
-        const tabSignUp = document.getElementById('tabSignUp');
-        const submitBtn = document.getElementById('submitBtn');
+
+        const pageBody = document.getElementById('pageBody');
+        const authCard = document.getElementById('authCard');
+        const navBadge = document.getElementById('navBadge');
+        const iconBadge = document.getElementById('iconBadge');
+        const headerIcon = document.getElementById('headerIcon');
+        const authTitle = document.getElementById('authTitle');
+        const authSubtitle = document.getElementById('authSubtitle');
+        const authStatus = document.getElementById('authStatus');
         const authForm = document.getElementById('authForm');
-        const statusMsg = document.getElementById('statusMsg');
         const emailInput = document.getElementById('emailInput');
         const passwordInput = document.getElementById('passwordInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const submitText = document.getElementById('submitText');
+        const submitIcon = document.getElementById('submitIcon');
+        const signInTabBtn = document.getElementById('signInTabBtn');
+        const signUpTabBtn = document.getElementById('signUpTabBtn');
+        const forgotPasswordBtn = document.getElementById('forgotPasswordBtn');
+        const googleBtnText = document.getElementById('googleBtnText');
+        const googleSignInBtn = document.getElementById('googleSignInBtn');
+        const footnoteIcon = document.getElementById('footnoteIcon');
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                debugLog("Already signed in; redirecting to overview:", user.uid);
+                debugLog("Active session confirmed:", user.uid);
                 window.location.href = "overview.html";
             }
         });
 
-        tabSignIn.addEventListener('click', () => {
-            isSignUpMode = false;
-            tabSignIn.className = "flex-1 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition shadow";
-            tabSignUp.className = "flex-1 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-slate-200 transition";
-            submitBtn.textContent = "Sign In";
-            statusMsg.classList.add('hidden');
-        });
+        function setMode(signUp) {
+            isSignUpMode = signUp;
+            authStatus.classList.add('hidden');
 
-        tabSignUp.addEventListener('click', () => {
-            isSignUpMode = true;
-            tabSignUp.className = "flex-1 py-2 text-xs font-bold rounded-xl bg-blue-600 text-white transition shadow";
-            tabSignIn.className = "flex-1 py-2 text-xs font-bold rounded-xl text-slate-400 hover:text-slate-200 transition";
-            submitBtn.textContent = "Create Account";
-            statusMsg.classList.add('hidden');
+            if (isSignUpMode) {
+                // ORANGE THEME FOR SIGN UP
+                pageBody.className = "bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-orange-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden";
+                authCard.className = "glass-panel rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl ring-1 ring-orange-500/20 transition-all duration-300";
+                navBadge.className = "text-xs font-bold text-orange-600 dark:text-orange-400 flex items-center gap-1 transition-colors duration-300";
+                iconBadge.className = "w-14 h-14 rounded-2xl bg-orange-500/15 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 border border-orange-500/30 flex items-center justify-center mx-auto shadow-md shadow-orange-500/10 transition-all duration-300";
+                headerIcon.textContent = "person_add";
+                footnoteIcon.className = "material-icons text-xs text-orange-500 transition-colors duration-300";
+
+                authTitle.textContent = "Create New Account";
+                authSubtitle.textContent = "Register credentials to access player profiles and tournament telemetry.";
+                submitText.textContent = "Complete Registration";
+                submitIcon.textContent = "person_add";
+                googleBtnText.textContent = "Sign up with Google";
+
+                signUpTabBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 bg-orange-500 text-white shadow-md shadow-orange-500/20";
+                signInTabBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white";
+
+                submitBtn.className = "w-full py-3 bg-orange-500/90 backdrop-blur hover:bg-orange-400 text-white font-black text-xs rounded-xl transition-all duration-300 shadow-lg shadow-orange-500/25 border border-orange-400/30 flex items-center justify-center gap-1.5";
+
+                emailInput.className = "w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 font-sans shadow-inner transition-colors duration-300";
+                passwordInput.className = "w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-orange-500 font-sans shadow-inner transition-colors duration-300";
+
+                forgotPasswordBtn.classList.add('hidden');
+            } else {
+                // BLUE THEME FOR SIGN IN
+                pageBody.className = "bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-blue-500 selection:text-white transition-colors duration-500 relative overflow-x-hidden";
+                authCard.className = "glass-panel rounded-3xl p-6 sm:p-8 space-y-5 shadow-2xl ring-1 ring-blue-500/20 transition-all duration-300";
+                navBadge.className = "text-xs font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 transition-colors duration-300";
+                iconBadge.className = "w-14 h-14 rounded-2xl bg-blue-500/15 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 border border-blue-500/30 flex items-center justify-center mx-auto shadow-md shadow-blue-500/10 transition-all duration-300";
+                headerIcon.textContent = "sports_esports";
+                footnoteIcon.className = "material-icons text-xs text-blue-500 transition-colors duration-300";
+
+                authTitle.textContent = "Sign In to Portal";
+                authSubtitle.textContent = "Access your telemetry records, leaderboard rankings, and saved drafts.";
+                submitText.textContent = "Sign In to Account";
+                submitIcon.textContent = "arrow_forward";
+                googleBtnText.textContent = "Continue with Google";
+
+                signInTabBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 bg-blue-600 text-white shadow-md shadow-blue-600/20";
+                signUpTabBtn.className = "flex-1 py-2 text-xs font-bold rounded-xl transition-all duration-300 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white";
+
+                submitBtn.className = "w-full py-3 bg-blue-600/90 backdrop-blur hover:bg-blue-500 text-white font-black text-xs rounded-xl transition-all duration-300 shadow-lg shadow-blue-600/25 border border-blue-400/30 flex items-center justify-center gap-1.5";
+
+                emailInput.className = "w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 font-sans shadow-inner transition-colors duration-300";
+                passwordInput.className = "w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800/80 rounded-xl pl-9 pr-3 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 font-sans shadow-inner transition-colors duration-300";
+
+                forgotPasswordBtn.classList.remove('hidden');
+            }
+        }
+
+        signInTabBtn.addEventListener('click', () => setMode(false));
+        signUpTabBtn.addEventListener('click', () => setMode(true));
+
+        function showMessage(msg, isError = false) {
+            authStatus.classList.remove('hidden');
+            authStatus.textContent = msg;
+            if (isError) {
+                authStatus.className = "text-xs p-3 rounded-2xl border bg-rose-500/10 dark:bg-rose-950/60 border-rose-500/30 text-rose-600 dark:text-rose-300";
+            } else {
+                authStatus.className = "text-xs p-3 rounded-2xl border bg-emerald-500/10 dark:bg-emerald-950/60 border-emerald-500/30 text-emerald-600 dark:text-emerald-300";
+            }
+        }
+
+        googleSignInBtn.addEventListener('click', async () => {
+            googleSignInBtn.disabled = true;
+            try {
+                debugLog("Triggering Google Popup sign-in...");
+                const result = await signInWithPopup(auth, googleProvider);
+                debugLog("Google sign-in successful for user:", result.user.uid);
+                showMessage("Signed in with Google! Redirecting...", false);
+                setTimeout(() => window.location.href = "overview.html", 600);
+            } catch (err) {
+                debugLog("Google sign-in error:", err.code, err.message);
+                if (err.code !== 'auth/popup-closed-by-user') {
+                    showMessage(err.message.replace("Firebase: ", ""), true);
+                }
+                googleSignInBtn.disabled = false;
+            }
         });
 
         authForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = emailInput.value.trim();
             const password = passwordInput.value;
+
             submitBtn.disabled = true;
-            submitBtn.textContent = "Authenticating...";
+            submitText.textContent = isSignUpMode ? "Registering Account..." : "Signing In...";
 
             try {
                 if (isSignUpMode) {
                     await createUserWithEmailAndPassword(auth, email, password);
+                    showMessage("Account registered successfully! Redirecting...", false);
                 } else {
                     await signInWithEmailAndPassword(auth, email, password);
+                    showMessage("Signed in successfully! Redirecting...", false);
                 }
-                debugLog("Auth operation succeeded for:", email);
-                window.location.href = "overview.html";
+                setTimeout(() => window.location.href = "overview.html", 800);
             } catch (err) {
-                debugLog("Auth operation error:", err);
-                statusMsg.classList.remove('hidden');
-                statusMsg.className = "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800";
-                statusMsg.textContent = err.message || "Authentication failed.";
+                debugLog("Auth error encountered:", err.code, err.message);
+                showMessage(err.message.replace("Firebase: ", ""), true);
                 submitBtn.disabled = false;
-                submitBtn.textContent = isSignUpMode ? "Create Account" : "Sign In";
+                submitText.textContent = isSignUpMode ? "Complete Registration" : "Sign In to Account";
             }
         });
 
-        // Offline Service Worker & Redirect Bootstrap
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
-            });
-        }
-        window.addEventListener('offline', () => {
-            window.location.href = '/offline.html';
+        forgotPasswordBtn.addEventListener('click', async () => {
+            const email = emailInput.value.trim();
+            if (!email) {
+                showMessage("Please enter your email above to receive a reset link.", true);
+                return;
+            }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showMessage(`Password reset instructions dispatched to ${email}. Check your inbox!`, false);
+            } catch (err) {
+                showMessage(err.message.replace("Firebase: ", ""), true);
+            }
         });
     </script>
 </body>
