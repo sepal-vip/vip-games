@@ -6,78 +6,136 @@
     <title>Monopoly Auto Leaderboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style> body { font-family: 'Google Sans', sans-serif; } </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
-    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
             <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
                 <span class="material-icons text-base">arrow_back</span> Monopoly Suite
                 <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4"></span>
             </a>
-            <span class="text-xs font-bold text-amber-400 flex items-center gap-1">
-                <span class="material-icons text-sm">emoji_events</span> Standings
-            </span>
+            <div class="flex items-center gap-2">
+                <button id="openShareModalBtn" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1 shadow">
+                    <span class="material-icons text-sm">share</span> Share Standings
+                </button>
+            </div>
         </div>
     </nav>
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
-        <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 shadow-xl space-y-6">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-700/60 pb-6">
-                <div>
-                    <h1 class="text-2xl font-bold text-white flex items-center gap-2">
-                        🏆 Official Leaderboards
-                    </h1>
-                    <p class="text-xs text-slate-400 mt-0.5">Automated standings. Exclusively calculates Ranked matches (>2 registered members).</p>
+        <div id="shareableSnapshotContainer" class="p-3 sm:p-5 bg-slate-950 rounded-[2rem]">
+            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-6">
+                    <div>
+                        <h1 class="text-2xl font-black text-white flex items-center gap-2">
+                            <span class="material-icons text-amber-400">emoji_events</span> Official Leaderboards
+                        </h1>
+                        <p class="text-xs text-slate-400 mt-0.5">Automated standings. Exclusively calculates ranked matches (&gt;2 registered members).</p>
+                    </div>
+                    <div class="flex rounded-xl bg-slate-950 p-1 border border-slate-800" id="timeframeNav">
+                        <button data-tf="month" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition">Monthly</button>
+                        <button data-tf="year" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Yearly</button>
+                        <button data-tf="lifetime" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Lifetime</button>
+                    </div>
                 </div>
-                <!-- Timeframe Selector -->
-                <div class="flex rounded-xl bg-slate-900/80 p-1 border border-slate-700/60" id="timeframeNav">
-                    <button data-tf="month" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg bg-amber-500 text-slate-950 transition">Monthly</button>
-                    <button data-tf="year" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Yearly</button>
-                    <button data-tf="lifetime" class="tf-btn px-4 py-1.5 text-xs font-bold rounded-lg text-slate-400 hover:text-slate-200 transition">Lifetime</button>
+                <div id="filterBar" class="flex flex-wrap gap-4 bg-slate-950/80 p-4 rounded-2xl border border-slate-800/80">
+                    <div id="monthGroup">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Month</label>
+                        <select id="monthSelect" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500">
+                            <option value="01">January</option>
+                            <option value="02">February</option>
+                            <option value="03">March</option>
+                            <option value="04">April</option>
+                            <option value="05">May</option>
+                            <option value="06">June</option>
+                            <option value="07">July</option>
+                            <option value="08" selected>August</option>
+                            <option value="09">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div id="yearGroup">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Year</label>
+                        <select id="yearSelect" class="bg-slate-900 border border-slate-800 text-slate-200 text-xs rounded-xl px-3 py-2 focus:outline-none focus:border-amber-500">
+                            <option value="2027">2027</option>
+                            <option value="2026" selected>2026</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
                 </div>
-            </div>
-            <div id="filterBar" class="flex flex-wrap gap-4 bg-slate-900/80 p-4 rounded-xl border border-slate-700/50">
-                <div id="monthGroup">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Month</label>
-                    <select id="monthSelect" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500">
-                        <option value="08">August</option>
-                        <option value="07">July</option>
-                        <option value="06">June</option>
-                        <option value="05">May</option>
-                    </select>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-sm border-collapse">
+                        <thead>
+                            <tr id="tableHeaders" class="text-slate-400 border-b border-slate-800 text-xs uppercase tracking-wider"></tr>
+                        </thead>
+                        <tbody id="leaderboardBody" class="divide-y divide-slate-800/60 text-xs font-mono">
+                            <tr>
+                                <td colspan="8" class="py-8 text-center text-slate-400 font-sans">Loading leaderboard rankings...</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div id="yearGroup">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Year</label>
-                    <select id="yearSelect" class="bg-slate-800 border border-slate-700 text-slate-200 text-xs rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500">
-                        <option value="2026">2026</option>
-                        <option value="2025">2025</option>
-                    </select>
+                <div class="pt-6 border-t border-slate-800 space-y-3">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                        <span class="material-icons text-sm">equalizer</span> Record Highs & Lows (Most & Least)
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="text-slate-400 border-b border-slate-800 text-[10px] uppercase">
+                                    <th class="py-2.5 px-3">Performance Metric</th>
+                                    <th class="py-2.5 px-3 text-emerald-400">Most (High)</th>
+                                    <th class="py-2.5 px-3 text-rose-400">Least (Low)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="extremesTableBody" class="divide-y divide-slate-800/80 font-mono text-slate-300">
+                                <tr>
+                                    <td colspan="3" class="py-4 text-center text-slate-500 font-sans">Awaiting leaderboard metrics...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="flex items-end text-xs text-amber-400 font-mono">
-                    <span>* Guest players & unranked matches (≤2 members) excluded</span>
-                </div>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-sm border-collapse">
-                    <thead>
-                        <tr id="tableHeaders" class="text-slate-400 border-b border-slate-700 text-xs uppercase tracking-wider">
-                            <!-- Dynamic Headers Injected via JS -->
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboardBody" class="divide-y divide-slate-700/50 text-xs">
-                        <tr>
-                            <td colspan="8" class="py-8 text-center text-slate-400">Loading leaderboard rankings...</td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </main>
+
+    <div id="shareModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-sm w-full p-5 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="material-icons text-amber-400 text-sm">share</span> Share Standings
+                </h3>
+                <button type="button" id="closeShareModalBtn" class="text-slate-400 hover:text-white">
+                    <span class="material-icons text-base">close</span>
+                </button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button id="copyImageBtn" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl text-xs font-bold text-slate-200 flex flex-col items-center gap-1 transition">
+                    <span class="material-icons text-base text-amber-400">image</span>
+                    <span>Copy Image</span>
+                </button>
+                <button id="copyTextBtn" class="p-3 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl text-xs font-bold text-slate-200 flex flex-col items-center gap-1 transition">
+                    <span class="material-icons text-base text-sky-400">content_copy</span>
+                    <span>Copy Text</span>
+                </button>
+            </div>
+            <button id="shareLinkBtn" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5">
+                <span class="material-icons text-sm">link</span> Copy Standings Link
+            </button>
+        </div>
+    </div>
+
     <script type="module">
         import { db, collection, getDocs } from "../web-info/firebase.js";
         let activeTimeframe = "month";
+        let currentSortedList = [];
         const tfButtons = document.querySelectorAll('.tf-btn');
         const monthSelect = document.getElementById('monthSelect');
         const yearSelect = document.getElementById('yearSelect');
@@ -85,6 +143,8 @@
         const monthGroup = document.getElementById('monthGroup');
         const leaderboardBody = document.getElementById('leaderboardBody');
         const tableHeaders = document.getElementById('tableHeaders');
+        const extremesTableBody = document.getElementById('extremesTableBody');
+        const shareModal = document.getElementById('shareModal');
 
         tfButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -105,13 +165,10 @@
 
         function showProperties() {
             if (activeTimeframe === 'lifetime' || activeTimeframe === 'year') return true;
-            // If monthly, check if selected year is 2026 and month is NOT May (05), June (06), or July (07)
             if (activeTimeframe === 'month') {
                 const yr = yearSelect.value;
                 const mo = monthSelect.value;
-                if (yr === '2026' && (mo === '05' || mo === '06' || mo === '07')) {
-                    return false;
-                }
+                if (yr === '2026' && (mo === '05' || mo === '06' || mo === '07')) return false;
                 return true;
             }
             return false;
@@ -119,8 +176,6 @@
 
         async function calculateAndRender() {
             const displayProps = showProperties();
-            
-            // Set dynamic table headers
             tableHeaders.innerHTML = `
                 <th class="py-3 px-3">Rank</th>
                 <th class="py-3 px-3">Player Member</th>
@@ -133,35 +188,25 @@
                 ` : ''}
                 <th class="py-3 px-3 text-right">Net Cash ($)</th>
             `;
-
             const colSpanCount = displayProps ? 8 : 5;
-            leaderboardBody.innerHTML = `<tr><td colspan="${colSpanCount}" class="py-8 text-center text-slate-400">Computing leaderboard...</td></tr>`;
-
+            leaderboardBody.innerHTML = `<tr><td colspan="${colSpanCount}" class="py-8 text-center text-slate-400 font-sans">Computing leaderboard...</td></tr>`;
             try {
-                const matchesRef = collection(db, "games", "Monopoly", "matches");
-                const snapshot = await getDocs(matchesRef);
+                const snapshot = await getDocs(collection(db, "games", "Monopoly", "matches"));
                 const stats = {};
-
                 snapshot.forEach(docSnap => {
                     const game = docSnap.data();
                     const players = game.players || [];
                     const memberCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
                     if (memberCount <= 2) return;
-
                     const dateStr = game.date || docSnap.id;
                     let year = "", month = "";
                     if (dateStr.includes('-')) {
                         const parts = dateStr.split('-');
-                        if (parts[0].length === 4) {
-                            year = parts[0]; month = parts[1];
-                        } else if (parts[2]?.length === 4) {
-                            year = parts[2]; month = parts[1];
-                        }
+                        if (parts[0].length === 4) { year = parts[0]; month = parts[1]; }
+                        else if (parts[2]?.length === 4) { year = parts[2]; month = parts[1]; }
                     }
-
                     if (activeTimeframe === 'month' && (year !== yearSelect.value || month !== monthSelect.value)) return;
                     if (activeTimeframe === 'year' && year !== yearSelect.value) return;
-
                     players.forEach(p => {
                         if (p.isGuest || p.isMember === false) return;
                         const pName = p.name || "Member";
@@ -175,43 +220,111 @@
                         stats[pName].stations += Number(p.stations || 0);
                     });
                 });
-
-                const sorted = Object.values(stats).sort((a, b) => b.cash - a.cash);
-                if (sorted.length === 0) {
-                    leaderboardBody.innerHTML = `<tr><td colspan="${colSpanCount}" class="py-8 text-center text-slate-400">No valid ranked match records (>2 members) found for this timeframe.</td></tr>`;
+                currentSortedList = Object.values(stats).sort((a, b) => b.cash - a.cash);
+                if (currentSortedList.length === 0) {
+                    leaderboardBody.innerHTML = `<tr><td colspan="${colSpanCount}" class="py-8 text-center text-slate-400 font-sans">No valid ranked match records (&gt;2 members) found for this timeframe.</td></tr>`;
+                    extremesTableBody.innerHTML = `<tr><td colspan="3" class="py-4 text-center text-slate-500 font-sans">No records present for this timeframe.</td></tr>`;
                     return;
                 }
-
-                leaderboardBody.innerHTML = sorted.map((p, idx) => {
+                leaderboardBody.innerHTML = currentSortedList.map((p, idx) => {
                     const totalProps = p.cities + p.stations;
                     return `
-                        <tr class="hover:bg-slate-800/40 border-b border-slate-700/40">
-                            <td class="py-3 px-3 font-bold ${idx === 0 ? 'text-amber-400 text-base' : idx === 1 ? 'text-slate-300' : idx === 2 ? 'text-amber-600' : 'text-slate-500'}">
-                                ${idx === 0 ? '🥇 #1' : idx === 1 ? '🥈 #2' : idx === 2 ? '🥉 #3' : `#${idx + 1}`}
+                        <tr class="hover:bg-slate-800/40 border-b border-slate-800/40">
+                            <td class="py-3 px-3 font-bold ${idx === 0 ? 'text-amber-400' : idx === 1 ? 'text-slate-300' : idx === 2 ? 'text-amber-600' : 'text-slate-500'}">
+                                ${idx === 0 ? '#1' : idx === 1 ? '#2' : idx === 2 ? '#3' : `#${idx + 1}`}
                             </td>
-                            <td class="py-3 px-3 font-semibold text-white">
+                            <td class="py-3 px-3 font-semibold text-white font-sans">
                                 <a href="view.html?player=${encodeURIComponent(p.name)}" class="hover:underline text-amber-400 flex items-center gap-1">
                                     <span>${p.name}</span>
                                     <span class="material-icons text-xs">open_in_new</span>
                                 </a>
                             </td>
-                            <td class="py-3 px-3 text-center text-slate-300 font-mono">${p.matches}</td>
-                            <td class="py-3 px-3 text-center text-emerald-400 font-bold font-mono">${p.wins}</td>
+                            <td class="py-3 px-3 text-center text-slate-300">${p.matches}</td>
+                            <td class="py-3 px-3 text-center text-emerald-400 font-bold">${p.wins}</td>
                             ${displayProps ? `
-                                <td class="py-3 px-3 text-center text-slate-300 font-mono">${p.cities}</td>
-                                <td class="py-3 px-3 text-center text-slate-300 font-mono">${p.stations}</td>
-                                <td class="py-3 px-3 text-center text-amber-400 font-bold font-mono">${totalProps}</td>
+                                <td class="py-3 px-3 text-center text-slate-300">${p.cities}</td>
+                                <td class="py-3 px-3 text-center text-slate-300">${p.stations}</td>
+                                <td class="py-3 px-3 text-center text-amber-400 font-bold">${totalProps}</td>
                             ` : ''}
-                            <td class="py-3 px-3 text-right font-mono font-bold ${p.cash >= 0 ? 'text-emerald-400' : 'text-red-400'}">
+                            <td class="py-3 px-3 text-right font-bold ${p.cash >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
                                 $${p.cash.toLocaleString()}
                             </td>
                         </tr>
                     `;
                 }).join('');
+                renderExtremes(currentSortedList);
             } catch (err) {
-                leaderboardBody.innerHTML = `<tr><td colspan="${colSpanCount}" class="py-8 text-center text-red-400">Failed to calculate leaderboard data.</td></tr>`;
+                leaderboardBody.innerHTML = `<tr><td colspan="${colSpanCount}" class="py-8 text-center text-red-400 font-sans">Failed to load leaderboard data.</td></tr>`;
             }
         }
+
+        function renderExtremes(list) {
+            const mostWins = [...list].sort((a,b) => b.wins - a.wins)[0];
+            const leastWins = [...list].sort((a,b) => a.wins - b.wins)[0];
+            const mostMatches = [...list].sort((a,b) => b.matches - a.matches)[0];
+            const leastMatches = [...list].sort((a,b) => a.matches - b.matches)[0];
+            const mostCash = [...list].sort((a,b) => b.cash - a.cash)[0];
+            const leastCash = [...list].sort((a,b) => a.cash - b.cash)[0];
+            const mostCities = [...list].sort((a,b) => b.cities - a.cities)[0];
+            const leastCities = [...list].sort((a,b) => a.cities - b.cities)[0];
+
+            extremesTableBody.innerHTML = `
+                <tr class="hover:bg-slate-800/30">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Total Wins</td>
+                    <td class="py-2 px-3 text-emerald-400">${mostWins.name} (${mostWins.wins} wins)</td>
+                    <td class="py-2 px-3 text-rose-400">${leastWins.name} (${leastWins.wins} wins)</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Matches Played</td>
+                    <td class="py-2 px-3 text-emerald-400">${mostMatches.name} (${mostMatches.matches} matches)</td>
+                    <td class="py-2 px-3 text-rose-400">${leastMatches.name} (${leastMatches.matches} matches)</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Points & Net Cash</td>
+                    <td class="py-2 px-3 text-emerald-400">${mostCash.name} ($${mostCash.cash.toLocaleString()})</td>
+                    <td class="py-2 px-3 text-rose-400">${leastCash.name} ($${leastCash.cash.toLocaleString()})</td>
+                </tr>
+                <tr class="hover:bg-slate-800/30">
+                    <td class="py-2 px-3 font-bold font-sans text-slate-300">Cities Acquired</td>
+                    <td class="py-2 px-3 text-emerald-400">${mostCities.name} (${mostCities.cities} cities)</td>
+                    <td class="py-2 px-3 text-rose-400">${leastCities.name} (${leastCities.cities} cities)</td>
+                </tr>
+            `;
+        }
+
+        document.getElementById('openShareModalBtn').addEventListener('click', () => shareModal.classList.remove('hidden'));
+        document.getElementById('closeShareModalBtn').addEventListener('click', () => shareModal.classList.add('hidden'));
+
+        document.getElementById('copyImageBtn').addEventListener('click', async () => {
+            const container = document.getElementById('shareableSnapshotContainer');
+            const canvas = await html2canvas(container, { backgroundColor: '#020617', scale: 2 });
+            canvas.toBlob(async (blob) => {
+                try {
+                    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                    alert("Leaderboard snapshot copied to clipboard!");
+                } catch (e) {
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = 'monopoly-leaderboard.png';
+                    a.click();
+                }
+                shareModal.classList.add('hidden');
+            });
+        });
+
+        document.getElementById('copyTextBtn').addEventListener('click', () => {
+            if (!currentSortedList.length) return;
+            const textLines = currentSortedList.map((p, i) => `#${i+1} ${p.name} - Wins: ${p.wins} | Cash: $${p.cash.toLocaleString()}`);
+            navigator.clipboard.writeText("Monopoly Standings:\n" + textLines.join("\n"));
+            alert("Leaderboard text copied to clipboard!");
+            shareModal.classList.add('hidden');
+        });
+
+        document.getElementById('shareLinkBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Leaderboard link copied to clipboard!");
+            shareModal.classList.add('hidden');
+        });
 
         monthSelect.addEventListener('change', calculateAndRender);
         yearSelect.addEventListener('change', calculateAndRender);

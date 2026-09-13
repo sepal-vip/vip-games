@@ -20,7 +20,6 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 flex flex-col items-center selection:bg-amber-500 selection:text-slate-950">
   <div class="max-w-2xl w-full space-y-5">
-    
     <!-- Top Bar -->
     <div class="flex items-center justify-between">
       <a href="../index.html" class="p-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition flex items-center">
@@ -53,7 +52,6 @@
             <span class="material-icons text-sm">restart_alt</span> Reset
           </button>
         </div>
-
         <!-- Metric Grid -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
           <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
@@ -185,7 +183,6 @@
           <input type="number" placeholder="Debt 1" class="debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">
         </div>
       </div>
-
       <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-3">
         <div class="flex items-center justify-between">
           <h3 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
@@ -201,7 +198,7 @@
 
     <!-- Actions -->
     <div class="space-y-2 pt-2">
-      <button id="openShareModalBtn" type="button" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-2xl transition-all shadow-lg hover:shadow-amber-500/20 flex items-center justify-center gap-2 text-sm">
+      <button id="openShareModalBtn" type="button" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 text-sm">
         <span class="material-icons text-base">share</span> Share Score Record
       </button>
       <div class="grid grid-cols-2 gap-2">
@@ -235,12 +232,26 @@
           </div>
           <span class="material-icons text-amber-400 text-sm">link</span>
         </button>
+        <button id="copyLinkBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+          <div>
+            <p class="text-xs font-bold text-white">Copy Link</p>
+            <p class="text-[10px] text-slate-400">Copy shareable URL directly to clipboard</p>
+          </div>
+          <span class="material-icons text-sky-400 text-sm">content_copy</span>
+        </button>
         <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
           <div>
             <p class="text-xs font-bold text-white">Share Snapshot Image</p>
             <p class="text-[10px] text-slate-400">Fixed-ratio scorecard image</p>
           </div>
           <span class="material-icons text-emerald-400 text-sm">image</span>
+        </button>
+        <button id="copyImageBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+          <div>
+            <p class="text-xs font-bold text-white">Copy Snapshot Image</p>
+            <p class="text-[10px] text-slate-400">Copy clean scorecard directly to clipboard</p>
+          </div>
+          <span class="material-icons text-emerald-400 text-sm">photo</span>
         </button>
         <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
           <div>
@@ -350,12 +361,10 @@
         ]
       }
     ];
-
     const utilitiesData = [
       { name: "Electric Company", classic: "Electric Co", base: 150, owned: false },
       { name: "Water Works", classic: "Water Works", base: 150, owned: false }
     ];
-
     const stationsData = [
       { name: "Chennai Central", classic: "Reading RR", base: 200, owned: false },
       { name: "Howrah", classic: "Pennsylvania RR", base: 200, owned: false },
@@ -363,7 +372,6 @@
       { name: "Chhatrapati Shivaji Maharaj Terminus", classic: "Short Line RR", base: 200, owned: false }
     ];
 
-    // Flat list of 22 color properties
     const flatProperties = [];
     indianMonopolyData.forEach((set, sIdx) => {
       set.properties.forEach((prop, pIdx) => {
@@ -433,6 +441,7 @@
       document.getElementById('drawerTitle').textContent = `${activeSet.name} Properties`;
       document.getElementById('drawerHouseCost').textContent = `${activeSet.houseCost} / Building`;
       container.innerHTML = '';
+
       activeSet.properties.forEach((prop, idx) => {
         const item = document.createElement('div');
         item.className = 'bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2';
@@ -465,7 +474,24 @@
         });
         container.appendChild(item);
       });
+
+      const currentIdx = indianMonopolyData.findIndex(s => s.id === setId);
+      const nextIdx = (currentIdx + 1) % indianMonopolyData.length;
+      const nextSet = indianMonopolyData[nextIdx];
+
+      const arrowNav = document.createElement('div');
+      arrowNav.className = "pt-3 border-t border-slate-800 flex justify-end";
+      arrowNav.innerHTML = `
+        <button type="button" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-amber-400 flex items-center gap-1 transition">
+          <span>Next: ${nextSet.name}</span>
+          <span class="material-icons text-sm">arrow_forward</span>
+        </button>
+      `;
+      arrowNav.querySelector('button').addEventListener('click', () => openSetDrawer(nextSet.id));
+      container.appendChild(arrowNav);
+
       drawer.classList.remove('hidden');
+      drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     window.setHouses = function(setId, index, val) {
@@ -530,7 +556,6 @@
       let propTotal = 0;
       let propCount = 0;
       let ownedItems = [];
-
       indianMonopolyData.forEach(set => {
         set.properties.forEach(prop => {
           if (prop.owned) {
@@ -538,7 +563,7 @@
             propTotal += val;
             propCount++;
             let struct = prop.houses === 5 ? 'Hotel' : prop.houses === 2.5 ? 'Motel' : prop.houses > 0 ? `${prop.houses} Houses` : 'No Buildings';
-            ownedItems.push({ name: `${prop.name} (${set.name})`, detail: `${struct} - ${val}` });
+            ownedItems.push({ name: prop.name, colorBadge: set.badge, setName: set.name, detail: `${struct} - ${val}` });
           }
         });
       });
@@ -549,14 +574,14 @@
         if (u.owned) {
           specialTotal += u.base;
           specialCount++;
-          ownedItems.push({ name: `${u.name} (Utility)`, detail: `${u.base}` });
+          ownedItems.push({ name: u.name, colorBadge: 'bg-emerald-400', setName: 'Utility', detail: `${u.base}` });
         }
       });
       stationsData.forEach(s => {
         if (s.owned) {
           specialTotal += s.base;
           specialCount++;
-          ownedItems.push({ name: `${s.name} (Station)`, detail: `${s.base}` });
+          ownedItems.push({ name: s.name, colorBadge: 'bg-slate-400', setName: 'Station', detail: `${s.base}` });
         }
       });
 
@@ -581,7 +606,6 @@
       });
 
       const grandTotal = propTotal + specialTotal + cashTotal + loanTotal - debtTotal;
-
       document.getElementById('grandTotalDisplay').textContent = `${grandTotal.toLocaleString()}`;
       document.getElementById('statPropTotal').textContent = `${propTotal.toLocaleString()}`;
       document.getElementById('statPropCount').textContent = `${propCount} Cities`;
@@ -598,7 +622,10 @@
       } else {
         ownedList.innerHTML = ownedItems.map(item => `
           <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">
-            <span class="font-bold text-white">${item.name}</span>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full ${item.colorBadge}"></span>
+              <span class="font-bold text-white">${item.name} <span class="text-slate-500 text-[10px]">(${item.setName})</span></span>
+            </div>
             <span class="text-amber-400 font-mono font-semibold">${item.detail}</span>
           </div>
         `).join('');
@@ -606,12 +633,9 @@
       return { grandTotal, propTotal, propCount, specialTotal, specialCount, cashTotal, debtTotal, loanTotal };
     }
 
-    // Dynamic Parameter URL Generator
     function getDynamicShareLink() {
       const baseUrl = `https://sepal-vip.github.io/vip-games/g-mono/count.html`;
       const params = new URLSearchParams();
-
-      // 1. Props: propIndex,level,propIndex,level
       const propPairs = [];
       let currentFlatIdx = 0;
       indianMonopolyData.forEach(set => {
@@ -625,16 +649,12 @@
       if (propPairs.length > 0) {
         params.set('props', propPairs.join(','));
       }
-
-      // 2. Utilities & Stations: specials=u0,u1,s0,s1
       const specials = [];
       utilitiesData.forEach((u, idx) => { if (u.owned) specials.push(`u${idx}`); });
       stationsData.forEach((s, idx) => { if (s.owned) specials.push(`s${idx}`); });
       if (specials.length > 0) {
         params.set('specials', specials.join(','));
       }
-
-      // 3. Cash Mode
       if (cashMode === 'count') {
         const cashCounts = [];
         document.querySelectorAll('.cash-note-input').forEach(inp => {
@@ -652,8 +672,6 @@
           params.set('cash_total', directVal);
         }
       }
-
-      // 4. Loans & Debts (total out - in / debt - loaned)
       const debtsArr = [];
       document.querySelectorAll('.debt-box').forEach(b => {
         const v = parseFloat(b.value) || 0;
@@ -664,25 +682,19 @@
         const v = parseFloat(b.value) || 0;
         if (v > 0) loansArr.push(v);
       });
-
       const totalDebt = debtsArr.reduce((a, b) => a + b, 0);
       const totalLoan = loansArr.reduce((a, b) => a + b, 0);
       const netLoanDiff = totalDebt - totalLoan;
-
       if (debtsArr.length > 0) params.set('debts', debtsArr.join(','));
       if (loansArr.length > 0) params.set('loans', loansArr.join(','));
       if (totalDebt > 0 || totalLoan > 0) params.set('loan', netLoanDiff);
-
       const qs = params.toString();
       return qs ? `${baseUrl}?${qs}` : baseUrl;
     }
 
-    // Load from URL query parameters
     function loadStateFromUrl() {
       const params = new URLSearchParams(window.location.search);
       if (!params.toString()) return;
-
-      // 1. Restore Props
       if (params.has('props')) {
         const propTokens = params.get('props').split(',').map(Number);
         for (let i = 0; i < propTokens.length; i += 2) {
@@ -696,8 +708,6 @@
           }
         }
       }
-
-      // 2. Restore Specials
       if (params.has('specials')) {
         const specialTokens = params.get('specials').split(',');
         specialTokens.forEach(token => {
@@ -718,8 +728,6 @@
           }
         });
       }
-
-      // 3. Restore Cash
       if (params.has('cash_counted')) {
         document.getElementById('cashModeCount').click();
         const counts = params.get('cash_counted').split(',');
@@ -732,8 +740,6 @@
         document.getElementById('cashModeDirect').click();
         document.getElementById('directCashInput').value = params.get('cash_total');
       }
-
-      // 4. Restore Debts & Loans
       if (params.has('debts')) {
         const debts = params.get('debts').split(',');
         const container = document.getElementById('debtInputsContainer');
@@ -747,7 +753,6 @@
           container.appendChild(inp);
         });
       }
-
       if (params.has('loans')) {
         const loans = params.get('loans').split(',');
         const container = document.getElementById('loanInputsContainer');
@@ -777,12 +782,10 @@
       calculateAll();
     });
 
-    // Modal Control
     const shareModal = document.getElementById('shareModal');
     document.getElementById('openShareModalBtn').addEventListener('click', () => shareModal.classList.remove('hidden'));
     document.getElementById('closeShareModalBtn').addEventListener('click', () => shareModal.classList.add('hidden'));
 
-    // Share Link Only
     document.getElementById('shareLinkOnlyBtn').addEventListener('click', async () => {
       const shareUrl = getDynamicShareLink();
       if (navigator.share) {
@@ -794,26 +797,28 @@
       shareModal.classList.add('hidden');
     });
 
-    // Fixed-Ratio Snapshot Capture Helper
+    document.getElementById('copyLinkBtn').addEventListener('click', () => {
+      const shareUrl = getDynamicShareLink();
+      navigator.clipboard.writeText(shareUrl);
+      alert('Score Link Copied to clipboard: ' + shareUrl);
+      shareModal.classList.add('hidden');
+    });
+
     async function captureSnapshotBlob() {
       const container = document.getElementById('shareableSnapshotContainer');
       const originalStyle = container.getAttribute('style') || '';
-      
       container.style.width = '720px';
       container.style.maxWidth = '720px';
-
       const canvas = await html2canvas(container, {
         backgroundColor: '#020617',
         scale: 2,
         useCORS: true,
         windowWidth: 1024
       });
-
       container.setAttribute('style', originalStyle);
       return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
     }
 
-    // Share Image Only
     document.getElementById('shareImageOnlyBtn').addEventListener('click', async () => {
       try {
         const blob = await captureSnapshotBlob();
@@ -833,12 +838,26 @@
       shareModal.classList.add('hidden');
     });
 
-    // Share Both (WhatsApp link in caption + Image)
+    document.getElementById('copyImageBtn').addEventListener('click', async () => {
+      try {
+        const blob = await captureSnapshotBlob();
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        alert('Scorecard image copied to clipboard!');
+      } catch (err) {
+        const blob = await captureSnapshotBlob();
+        const downloadUrl = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = downloadUrl;
+        a.download = 'monopoly-scorecard.png';
+        a.click();
+      }
+      shareModal.classList.add('hidden');
+    });
+
     document.getElementById('shareBothBtn').addEventListener('click', async () => {
       const data = calculateAll();
       const shareUrl = getDynamicShareLink();
       const captionText = `Monopoly Score Total: ${data.grandTotal.toLocaleString()} (${data.propCount} Cities, ${data.specialCount} Stations/Utilities).\nOpen Audit: ${shareUrl}`;
-
       try {
         const blob = await captureSnapshotBlob();
         const file = new File([blob], 'monopoly-scorecard.png', { type: 'image/png' });

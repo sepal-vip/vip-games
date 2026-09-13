@@ -16,8 +16,8 @@
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
-    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
             <a href="../index.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
                 <span class="material-icons text-base">arrow_back</span> Portal Gateway
@@ -34,19 +34,15 @@
         </div>
     </nav>
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
-        
-        <!-- Account ID & Member Identity Banner -->
-        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700/60 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="flex items-center gap-4">
                 <div class="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-3xl font-extrabold">
                     <span id="userAvatarLetter">U</span>
                 </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h1 class="text-2xl font-black text-white" id="userEmail">Loading User Profile...</h1>
-                        <span id="roleBadge" class="text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-slate-800 text-slate-400 border border-slate-700">Standard</span>
-                    </div>
-                    <p class="text-xs text-slate-400 font-mono mt-0.5">UID: <span id="userUid">...</span></p>
+                <div class="flex flex-col items-start">
+                    <h1 class="text-2xl font-black text-white" id="userEmail">Loading User Profile...</h1>
+                    <span id="roleBadge" class="mt-1 text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-slate-800 text-slate-400 border border-slate-700 inline-block">Standard User</span>
+                    <p class="text-xs text-slate-400 font-mono mt-1">UID: <span id="userUid">...</span></p>
                 </div>
             </div>
             <div class="text-right">
@@ -58,26 +54,25 @@
             </div>
         </div>
 
-        <!-- CAREER FINANCIAL MILESTONES (Most Earned, Most Lost, Most Profit, Smallest Profit, Smallest Loss) -->
         <div class="space-y-3">
             <h2 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <span class="material-icons text-amber-400 text-base">insights</span> Career Highs, Lows & Margins
             </h2>
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 <div class="stat-card p-4 rounded-2xl text-center space-y-1">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Most Earned (Top Win)</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Most Earned</span>
                     <p id="statMostEarned" class="text-xl font-black text-emerald-400 font-mono">0</p>
                     <span id="statMostEarnedDate" class="text-[9px] text-slate-500 truncate block">No wins yet</span>
                 </div>
                 <div class="stat-card p-4 rounded-2xl text-center space-y-1">
-                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Most Lost (Worst Deficit)</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Most Lost</span>
                     <p id="statMostLost" class="text-xl font-black text-rose-400 font-mono">0</p>
                     <span id="statMostLostDate" class="text-[9px] text-slate-500 truncate block">No losses</span>
                 </div>
                 <div class="stat-card p-4 rounded-2xl text-center space-y-1">
                     <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Max Profit Margin</span>
                     <p id="statMaxProfitMargin" class="text-xl font-black text-amber-300 font-mono">0</p>
-                    <span id="statMaxProfitDate" class="text-[9px] text-slate-500 truncate block">Largest single victory</span>
+                    <span id="statMaxProfitDate" class="text-[9px] text-slate-500 truncate block">Largest victory</span>
                 </div>
                 <div class="stat-card p-4 rounded-2xl text-center space-y-1">
                     <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Smallest Profit</span>
@@ -92,9 +87,7 @@
             </div>
         </div>
 
-        <!-- COMPREHENSIVE CAREER FACTS & MILESTONES -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <!-- Game History Facts -->
             <div class="stat-card p-5 rounded-3xl space-y-3">
                 <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
                     <span class="material-icons text-sm">history_edu</span> Session & Streak Facts
@@ -118,8 +111,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Property & Empire Facts -->
             <div class="stat-card p-5 rounded-3xl space-y-3">
                 <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
                     <span class="material-icons text-sm">domain</span> Empire & Asset Facts
@@ -145,9 +136,8 @@
             </div>
         </div>
 
-        <!-- Navigation Links -->
         <div class="pt-2 flex flex-wrap gap-3">
-            <a href="history.html" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-xl border border-slate-700 transition flex items-center gap-1.5">
+            <a href="history.html" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl border border-slate-800 transition flex items-center gap-1.5">
                 <span class="material-icons text-sm">manage_accounts</span> Account Audit Logs
             </a>
             <a href="../g-mono/leaderboard.html" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow">
@@ -158,7 +148,6 @@
 
     <script type="module">
         import { auth, db, doc, getDoc, getDocs, collection, onAuthStateChanged, signOut } from "../web-info/firebase.js";
-        
         const userEmail = document.getElementById('userEmail');
         const userUid = document.getElementById('userUid');
         const roleBadge = document.getElementById('roleBadge');
@@ -166,7 +155,6 @@
         const linkedMemberName = document.getElementById('linkedMemberName');
         const viewLinkedProfileLink = document.getElementById('viewLinkedProfileLink');
 
-        // Milestone Elements
         const statMostEarned = document.getElementById('statMostEarned');
         const statMostEarnedDate = document.getElementById('statMostEarnedDate');
         const statMostLost = document.getElementById('statMostLost');
@@ -178,7 +166,6 @@
         const statSmallestLoss = document.getElementById('statSmallestLoss');
         const statSmallestLossDate = document.getElementById('statSmallestLossDate');
 
-        // Fact Elements
         const factFirstGame = document.getElementById('factFirstGame');
         const factLatestGame = document.getElementById('factLatestGame');
         const factWinStreak = document.getElementById('factWinStreak');
@@ -197,16 +184,14 @@
             userUid.textContent = user.uid;
             userAvatarLetter.textContent = (user.email || 'U').charAt(0).toUpperCase();
 
-            // Admin Authorization Check
             try {
                 const adminDoc = await getDoc(doc(db, "admin", "uuids"));
                 if (adminDoc.exists() && adminDoc.data().allowed_uids?.includes(user.uid)) {
-                    roleBadge.className = "text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800";
-                    roleBadge.textContent = "Admin";
+                    roleBadge.className = "mt-1 text-[10px] px-2.5 py-0.5 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 inline-block";
+                    roleBadge.textContent = "Authorized Administrator";
                 }
             } catch(e) {}
 
-            // Find linked member name
             let profileName = user.email ? user.email.split('@')[0] : user.uid;
             try {
                 const userDocSnap = await getDoc(doc(db, "users", user.uid));
@@ -217,7 +202,6 @@
 
             linkedMemberName.textContent = profileName;
             viewLinkedProfileLink.href = `../g-mono/view.html?player=${encodeURIComponent(profileName)}`;
-
             loadPlayerTelemetry(profileName);
         });
 
@@ -225,7 +209,6 @@
             try {
                 const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
                 const userSessions = [];
-
                 matchesSnap.forEach(d => {
                     const game = d.data();
                     const players = game.players || [];
@@ -244,22 +227,17 @@
                         });
                     }
                 });
-
                 if (userSessions.length === 0) return;
 
-                // Sort chronologically (oldest to newest)
                 userSessions.sort((a, b) => a.date.localeCompare(b.date));
 
-                // 1. First & Latest Game
                 factFirstGame.textContent = `${userSessions[0].date} (${userSessions[0].id})`;
                 factLatestGame.textContent = `${userSessions[userSessions.length - 1].date} (${userSessions[userSessions.length - 1].id})`;
 
-                // 2. Financial Highs, Lows, Margins
                 let mostEarned = -Infinity, mostEarnedSession = null;
                 let mostLost = Infinity, mostLostSession = null;
                 let smallestProfit = Infinity, smallestProfitSession = null;
                 let smallestLoss = -Infinity, smallestLossSession = null;
-
                 let runningStreak = 0, maxStreak = 0;
                 let rankedWins = 0, rankedMatches = 0;
                 let totalCities = 0, totalStations = 0, maxPropsSingle = 0;
@@ -273,19 +251,16 @@
                         if (e < mostLost) { mostLost = e; mostLostSession = s; }
                         if (e > smallestLoss) { smallestLoss = e; smallestLossSession = s; }
                     }
-
                     if (s.isWinner) {
                         runningStreak++;
                         if (runningStreak > maxStreak) maxStreak = runningStreak;
                     } else {
                         runningStreak = 0;
                     }
-
                     if (s.isRanked) {
                         rankedMatches++;
                         if (s.isWinner) rankedWins++;
                     }
-
                     totalCities += s.cities;
                     totalStations += s.stations;
                     if (s.totalProps > maxPropsSingle) maxPropsSingle = s.totalProps;
@@ -316,10 +291,7 @@
                 factTotalCities.textContent = totalCities.toLocaleString();
                 factTotalStations.textContent = totalStations.toLocaleString();
                 factMaxProps.textContent = `${maxPropsSingle} Properties`;
-
-            } catch (err) {
-                console.error("Account telemetry error:", err);
-            }
+            } catch (err) {}
         }
 
         document.getElementById('signOutBtn')?.addEventListener('click', () => {
