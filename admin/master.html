@@ -18,6 +18,7 @@
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+    <!-- Navbar -->
     <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center gap-3">
@@ -43,7 +44,10 @@
             </div>
         </div>
     </nav>
+
+    <!-- Main Workspace -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
+        <!-- Access Restricted View -->
         <div id="accessDenied" class="hidden bg-red-950/80 border border-red-800/80 rounded-3xl p-8 text-center space-y-4 max-w-2xl mx-auto shadow-2xl">
             <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto">
                 <span class="material-icons text-3xl">gpp_bad</span>
@@ -53,20 +57,24 @@
                 Your authenticated Firebase Auth UID (<code id="userUidDisplay" class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">...</code>) is not authorized in <code class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">/admin/uuids</code>.
             </p>
         </div>
+
         <div id="masterPanel" class="hidden space-y-6">
+            <!-- Header Banner -->
             <header class="bg-gradient-to-r from-amber-950/40 via-slate-900 to-slate-900 border border-amber-500/30 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <div class="flex items-center gap-2">
                         <h1 class="text-2xl font-black text-white">Global Platform Operations</h1>
                         <span class="px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">Super Admin</span>
                     </div>
-                    <p class="text-xs text-slate-400 mt-1">Full system authority over Monopoly match records, user member bindings, system problems, and rules.</p>
+                    <p class="text-xs text-slate-400 mt-1">Manage Monopoly match records, user member bindings, admin permissions, and JSON backups.</p>
                 </div>
                 <div class="bg-slate-950 border border-slate-800 px-3.5 py-2 rounded-xl text-xs text-slate-300 font-mono flex items-center gap-2">
                     <span class="material-icons text-sm text-emerald-400">verified_user</span>
                     <span>UID: <strong id="activeUidText" class="text-amber-400">...</strong></span>
                 </div>
             </header>
+
+            <!-- Navigation Tabs (Problems & Rules purged) -->
             <div class="flex flex-wrap gap-2 border-b border-slate-800 pb-2 overflow-x-auto" id="masterTabsNav">
                 <button data-tab="tab-admins" class="tab-btn active px-4 py-2 text-xs font-bold rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1.5 shrink-0">
                     <span class="material-icons text-sm">admin_panel_settings</span> Admin UIDs &amp; Safeguard
@@ -81,8 +89,10 @@
                     <span class="material-icons text-sm">backup</span> Backup &amp; Utilities
                 </button>
             </div>
+
             <div id="masterStatus" class="hidden text-xs p-3 rounded-xl border font-medium"></div>
 
+            <!-- TAB 1: Admin Permissions -->
             <section id="tab-admins" class="tab-content space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="md:col-span-2 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4">
@@ -119,6 +129,7 @@
                 </div>
             </section>
 
+            <!-- TAB 2: Member Linker -->
             <section id="tab-linker" class="tab-content hidden space-y-6">
                 <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-6">
                     <div class="border-b border-slate-800 pb-4">
@@ -153,6 +164,7 @@
                 </div>
             </section>
 
+            <!-- TAB 3: Monopoly Matches -->
             <section id="tab-matches" class="tab-content hidden space-y-6">
                 <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-6">
                     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-800 pb-4">
@@ -193,6 +205,7 @@
                 </div>
             </section>
 
+            <!-- TAB 4: Backup & Data Utilities -->
             <section id="tab-backup" class="tab-content hidden space-y-6">
                 <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-6">
                     <div class="border-b border-slate-800 pb-4">
@@ -205,7 +218,7 @@
                         <div class="p-4 bg-slate-950 border border-slate-800 rounded-2xl space-y-3 flex flex-col justify-between">
                             <div>
                                 <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider">Export System Data</h3>
-                                <p class="text-xs text-slate-400 mt-1">Generates a downloadable JSON file containing all match logs and members.</p>
+                                <p class="text-xs text-slate-400 mt-1">Generates a downloadable JSON file containing all match logs and member records.</p>
                             </div>
                             <button id="downloadBackupBtn" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs rounded-xl transition flex items-center justify-center gap-1 shadow">
                                 <span class="material-icons text-sm">download</span> Download JSON Backup
@@ -241,6 +254,17 @@
     <script type="module">
         import { auth, db, doc, getDoc, getDocs, setDoc, deleteDoc, collection, onAuthStateChanged } from "../web-info/firebase.js";
         import { PERMANENT_MASTER_ADMIN_UID } from "../web-info/p-admin-list.js";
+
+        // Global Debug Logger Engine
+        if (localStorage.getItem('debugging') === null) {
+            localStorage.setItem('debugging', '0');
+        }
+        function debugLog(...args) {
+            if (localStorage.getItem('debugging') === '1') {
+                console.log("[DEBUG:admin/master.html]", ...args);
+            }
+        }
+        debugLog("Initializing Master Admin workspace...");
 
         const authBadge = document.getElementById('authBadge');
         const accessDenied = document.getElementById('accessDenied');
@@ -525,6 +549,16 @@
             masterStatus.textContent = msg;
             masterStatus.className = type === 'success' ? "text-xs p-3 rounded-xl border bg-emerald-950/85 text-emerald-300 border-emerald-800 font-medium" : "text-xs p-3 rounded-xl border bg-red-950/85 text-red-300 border-red-800 font-medium";
         }
+
+        // Offline Service Worker & Redirect Bootstrap
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+            });
+        }
+        window.addEventListener('offline', () => {
+            window.location.href = '/offline.html';
+        });
     </script>
 </body>
 </html>

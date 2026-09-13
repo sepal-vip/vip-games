@@ -5,95 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Gateway - Home</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/vip-icon.png">
-    <style>
-        body { font-family: 'Google Sans', sans-serif; }
+    <style> 
+        body { font-family: 'Google Sans', sans-serif; } 
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
-    <nav class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+    <!-- Navbar -->
+    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-3">
-                <span class="material-icons text-amber-500 text-2xl"><img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-8 h-8"></span>
-                <span class="font-bold text-lg text-white tracking-wide">Portal Hub</span>
+                <img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-8 h-8">
+                <span class="font-black text-lg text-white tracking-wide">Portal Hub</span>
             </div>
             <div id="authNav" class="flex items-center gap-3">
-                <a href="account/sign-up-in.html" class="text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 font-medium transition">Sign In</a>
+                <a href="account/sign-up-in.html" class="text-xs px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition shadow-lg shadow-blue-600/20">
+                    Sign In
+                </a>
             </div>
         </div>
     </nav>
 
+    <!-- Main Content -->
     <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-10 flex flex-col gap-8">
         <header class="text-center max-w-2xl mx-auto space-y-3">
-            <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Central Management Hub</h1>
-            <p class="text-slate-400 text-base sm:text-lg">Access game statistics, board game logs, account management, and problem tracking from one place.</p>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-bold">
+                <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                <span>VIP Gaming &amp; Match Suite</span>
+            </div>
+            <h1 class="text-4xl sm:text-5xl font-black tracking-tight text-white">Central Management Gateway</h1>
+            <p class="text-slate-400 text-xs sm:text-sm">Access match records, monthly standing leaderboards, net worth calculators, and administrative operations.</p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Gateway Modules Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <!-- Monopoly Portal Card -->
-            <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 hover:border-amber-500/50 transition duration-300 flex flex-col justify-between group shadow-xl">
+            <!-- Monopoly Suite Card -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-amber-500/50 transition duration-300 flex flex-col justify-between group shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 transition duration-300">
-                        <span class="material-icons"><img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-8 h-8"></span>
+                    <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center border border-amber-500/20 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-slate-950 transition duration-300">
+                        <img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-7 h-7">
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-white group-hover:text-amber-400 transition">Monopoly Suite</h2>
-                        <p class="text-slate-400 text-sm mt-1">Record matches, view monthly leaderboards, track city & station properties, and review player match history.</p>
+                        <h2 class="text-lg font-black text-white group-hover:text-amber-400 transition">Monopoly Suite</h2>
+                        <p class="text-slate-400 text-xs mt-1">Log match sessions, view monthly standings, track 22 cities &amp; 6 stations, and calculate net worth scores.</p>
                     </div>
                 </div>
-                <div class="pt-6 border-t border-slate-700/50 mt-6 flex flex-col gap-2">
-                    <a href="g-mono/g-mono.html" class="w-full text-center bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold py-2.5 rounded-xl text-sm transition">
+                <div class="pt-6 border-t border-slate-800 mt-6 flex flex-col gap-2.5">
+                    <a href="g-mono/g-mono.html" class="w-full text-center bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-2.5 rounded-xl text-xs transition shadow-lg shadow-amber-500/20">
                         Open Monopoly Suite
                     </a>
-                    <div class="grid grid-cols-2 gap-2 text-xs text-slate-400 pt-2 text-center">
-                        <a href="g-mono/leaderboard.html" class="hover:text-amber-300 underline">Leaderboard</a>
-                        <a href="g-mono/history.html" class="hover:text-amber-300 underline">Match Logs</a>
+                    <div class="grid grid-cols-3 gap-1 text-[11px] text-slate-400 text-center font-medium">
+                        <a href="g-mono/leaderboard.html" class="hover:text-amber-300">Standings</a>
+                        <a href="g-mono/history.html" class="hover:text-amber-300">History</a>
+                        <a href="g-mono/count.html" class="hover:text-amber-300">Calculator</a>
                     </div>
                 </div>
             </div>
 
-            <!-- Account Management Card -->
-            <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 hover:border-blue-500/50 transition duration-300 flex flex-col justify-between group shadow-xl">
+            <!-- Account Profile Card -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-blue-500/50 transition duration-300 flex flex-col justify-between group shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition duration-300">
-                        <span class="material-icons">manage_accounts</span>
+                    <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-400 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 group-hover:bg-blue-500 group-hover:text-slate-950 transition duration-300">
+                        <span class="material-icons text-2xl">manage_accounts</span>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-white group-hover:text-blue-400 transition">Account Profile</h2>
-                        <p class="text-slate-400 text-sm mt-1">Manage user account credentials, review activity history, and verify authorization status.</p>
+                        <h2 class="text-lg font-black text-white group-hover:text-blue-400 transition">Account Profile</h2>
+                        <p class="text-slate-400 text-xs mt-1">Review authenticated credentials, linked member identities, and personal career telemetry facts.</p>
                     </div>
                 </div>
-                <div class="pt-6 border-t border-slate-700/50 mt-6 flex flex-col gap-2">
-                    <a href="account/overview.html" class="w-full text-center bg-slate-700 hover:bg-slate-600 text-white font-bold py-2.5 rounded-xl text-sm transition">
-                        Account Overview
+                <div class="pt-6 border-t border-slate-800 mt-6 flex flex-col gap-2.5">
+                    <a href="account/overview.html" class="w-full text-center bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-xl text-xs transition border border-slate-700">
+                        View Account
                     </a>
-                    <div class="grid grid-cols-2 gap-2 text-xs text-slate-400 pt-2 text-center">
-                        <a href="account/sign-up-in.html" class="hover:text-blue-300 underline">Sign In / Up</a>
-                        <a href="account/history.html" class="hover:text-blue-300 underline">Account Logs</a>
+                    <div class="text-[11px] text-slate-400 text-center font-medium">
+                        <a href="account/sign-up-in.html" class="hover:text-blue-300">Authentication Portal</a>
                     </div>
                 </div>
             </div>
 
-            <!-- System & Admin Portal Card -->
-            <div class="bg-slate-800/80 border border-slate-700/60 rounded-2xl p-6 hover:border-emerald-500/50 transition duration-300 flex flex-col justify-between group shadow-xl">
+            <!-- Master Admin Operations Card -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 hover:border-emerald-500/50 transition duration-300 flex flex-col justify-between group shadow-xl">
                 <div class="space-y-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 transition duration-300">
-                        <span class="material-icons">admin_panel_settings</span>
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center border border-emerald-500/20 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-slate-950 transition duration-300">
+                        <span class="material-icons text-2xl">admin_panel_settings</span>
                     </div>
                     <div>
-                        <h2 class="text-xl font-bold text-white group-hover:text-emerald-400 transition">Admin Controls</h2>
-                        <p class="text-slate-400 text-sm mt-1">Authorized UUID control panel to re-index leaderboards, audit records, and grant administrative access.</p>
+                        <h2 class="text-lg font-black text-white group-hover:text-emerald-400 transition">Master Admin</h2>
+                        <p class="text-slate-400 text-xs mt-1">Authorized UID control hub to manage admin permissions, bind member accounts, and audit match records.</p>
                     </div>
                 </div>
-                <div class="pt-6 border-t border-slate-700/50 mt-6 flex flex-col gap-2">
-                    <a href="admin/master.html" class="w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-sm transition">
+                <div class="pt-6 border-t border-slate-800 mt-6 flex flex-col gap-2.5">
+                    <a href="admin/master.html" class="w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-lg shadow-emerald-600/20">
                         Admin Dashboard
                     </a>
-                    <div class="text-xs text-slate-400 pt-2 text-center">
-                        <span>Restricted to Authorized UUIDs</span>
+                    <div class="grid grid-cols-2 gap-1 text-[11px] text-slate-400 text-center font-medium">
+                        <a href="admin/members.html" class="hover:text-emerald-300">Members</a>
+                        <a href="admin/an.html" class="hover:text-emerald-300">Analytics</a>
                     </div>
                 </div>
             </div>
@@ -101,22 +111,45 @@
         </div>
     </main>
 
+    <!-- Auth Nav State & Offline Service Worker Script -->
     <script type="module">
         import { auth, onAuthStateChanged, signOut } from "./web-info/firebase.js";
 
-        const authNav = document.getElementById("authNav");
+        // Global Debug Logger Engine
+        if (localStorage.getItem('debugging') === null) {
+            localStorage.setItem('debugging', '0');
+        }
+        function debugLog(...args) {
+            if (localStorage.getItem('debugging') === '1') {
+                console.log("[DEBUG:index.html]", ...args);
+            }
+        }
+        debugLog("Initializing Home Gateway...");
 
+        const authNav = document.getElementById("authNav");
         onAuthStateChanged(auth, (user) => {
             if (user) {
+                debugLog("User active session detected:", user.uid);
                 authNav.innerHTML = `
                     <span class="text-xs text-slate-400 font-mono hidden sm:inline">${user.email || user.uid}</span>
-                    <a href="account/overview.html" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700">Profile</a>
-                    <button id="logoutBtn" class="text-xs bg-red-950/80 hover:bg-red-900 text-red-300 px-3 py-1.5 rounded-lg border border-red-800">Sign Out</button>
+                    <a href="account/overview.html" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-200 px-3.5 py-1.5 rounded-xl border border-slate-800 font-bold transition">Profile</a>
+                    <button id="logoutBtn" class="text-xs bg-red-950/80 hover:bg-red-900 text-red-300 px-3.5 py-1.5 rounded-xl border border-red-800 font-bold transition">Sign Out</button>
                 `;
                 document.getElementById("logoutBtn")?.addEventListener("click", () => signOut(auth));
             } else {
-                authNav.innerHTML = `<a href="account/sign-up-in.html" class="text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 font-medium transition">Sign In</a>`;
+                authNav.innerHTML = `<a href="account/sign-up-in.html" class="text-xs px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition shadow-lg shadow-blue-600/20">Sign In</a>`;
             }
+        });
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                    .catch(() => {});
+            });
+        }
+        window.addEventListener('offline', () => {
+            window.location.href = '/offline.html';
         });
     </script>
 </body>

@@ -6,72 +6,97 @@
     <title>Global Member Roster & Management Hub</title>
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/vip-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+    <style> 
+        body { font-family: 'Google Sans', sans-serif; } 
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950">
+    <!-- Top Navigation -->
     <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
             <div class="flex items-center gap-3">
                 <a href="master.html" class="flex items-center gap-1 text-slate-400 hover:text-white text-xs font-semibold transition">
-                    <span class="material-icons text-sm">arrow_back</span> Master Admin
+                    <span class="material-icons text-sm">arrow_back</span> Master Admin Control
                     <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4"></span>
                 </a>
                 <span class="text-slate-700">|</span>
                 <span class="text-emerald-400 font-extrabold text-sm flex items-center gap-1.5 tracking-wide">
-                    <span class="material-icons text-base text-emerald-500">group</span> Global Member Roster
+                    <span class="material-icons text-base text-emerald-500">group</span> Global Member Roster Hub
                 </span>
             </div>
             <div class="flex items-center gap-3">
                 <span id="authBadge" class="text-xs px-3 py-1 rounded-full font-bold bg-amber-950 text-amber-300 border border-amber-800 flex items-center gap-1.5">
-                    <span class="material-icons text-xs animate-spin">sync</span> Verifying...
+                    <span class="material-icons text-xs animate-spin">sync</span> Verifying Security...
                 </span>
-                <button id="refreshMembersBtn" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-800 font-medium transition flex items-center gap-1">
-                    <span class="material-icons text-sm">refresh</span> Refresh
+                <button id="refreshMembersBtn" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-xl border border-slate-800 font-medium transition flex items-center gap-1 shadow">
+                    <span class="material-icons text-sm">refresh</span> Refresh Roster
                 </button>
             </div>
         </div>
     </nav>
+
+    <!-- Main Workspace -->
     <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-8 space-y-6">
-        <div id="accessDenied" class="hidden bg-red-950/80 border border-red-800/80 rounded-3xl p-8 text-center space-y-4 max-w-2xl mx-auto">
-            <h1 class="text-2xl font-bold text-white">Access Restricted</h1>
-            <p class="text-xs text-red-200">Your account UID is not authorized to edit member configurations.</p>
+        <!-- Access Restricted View -->
+        <div id="accessDenied" class="hidden bg-red-950/80 border border-red-800/80 rounded-3xl p-8 text-center space-y-4 max-w-2xl mx-auto shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 flex items-center justify-center mx-auto">
+                <span class="material-icons text-3xl">gpp_bad</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white">Member Management Access Restricted</h1>
+            <p class="text-xs text-red-200 leading-relaxed">
+                Your account UID (<code id="userUidDisplay" class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">...</code>) is not authorized in <code class="bg-slate-900 px-2 py-1 rounded text-amber-400 font-mono">/admin/uuids</code>.
+            </p>
         </div>
+
         <div id="membersWorkspace" class="hidden space-y-6">
-            <header class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <header class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h1 class="text-2xl font-black text-white flex items-center gap-2">Global Member Profiles &amp; Bindings</h1>
-                    <p class="text-xs text-slate-400 mt-1">Official registry utilized by Monopoly rankings and authentication linkers.</p>
+                    <h1 class="text-2xl font-black text-white flex items-center gap-2">
+                        Global Member Directory &amp; Profile Registry
+                    </h1>
+                    <p class="text-xs text-slate-400 mt-1">Unified member roster used across Monopoly Suite, leaderboards, and user account bindings.</p>
                 </div>
-                <div class="bg-slate-950 border border-slate-800 px-3.5 py-2 rounded-xl text-xs font-mono text-slate-300">
-                    Total Members: <strong id="totalMembersCount" class="text-emerald-400 font-bold">0</strong>
+                <div class="bg-slate-950 border border-slate-800 px-3.5 py-2 rounded-xl text-xs text-slate-300 font-mono flex items-center gap-2">
+                    <span class="material-icons text-sm text-emerald-400">group</span>
+                    <span>Total Members: <strong id="totalMembersCount" class="text-emerald-400">0</strong></span>
                 </div>
             </header>
+
             <div id="statusAlert" class="hidden text-xs p-3 rounded-xl border font-medium"></div>
+
+            <!-- Two Column Actions: Add Member & Link Account -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4">
-                    <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-3">
-                        <span class="material-icons text-sm">person_add</span> Register New Member Profile
-                    </h2>
+                <!-- Register Profile Card -->
+                <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-icons text-sm">person_add</span> Register New Member Profile
+                        </h2>
+                    </div>
                     <form id="addMemberForm" class="space-y-4">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Full Member Name</label>
-                            <input type="text" id="newMemberName" required placeholder="Enter name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                            <input type="text" id="newMemberName" required placeholder="Enter Full Name..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Optional Role / Description</label>
-                            <input type="text" id="newMemberNote" placeholder="e.g. Club Veteran" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Role / Note (Optional)</label>
+                            <input type="text" id="newMemberNote" placeholder="e.g. Club Founder..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-emerald-500">
                         </div>
-                        <button type="submit" id="saveMemberBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition">
-                            Register Member
+                        <button type="submit" id="saveMemberBtn" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20">
+                            <span class="material-icons text-sm">save</span> Register Member
                         </button>
                     </form>
                 </div>
-                <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4">
-                    <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-3">
-                        <span class="material-icons text-sm">link</span> Bind User Auth UID to Member
-                    </h2>
+
+                <!-- Link Account Card -->
+                <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4 shadow-xl">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                        <h2 class="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-icons text-sm">link</span> Bind User Auth UID to Member
+                        </h2>
+                    </div>
                     <form id="linkAccountForm" class="space-y-4">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Firebase Auth UID</label>
@@ -83,71 +108,97 @@
                                 <option value="">-- Choose Member Profile --</option>
                             </select>
                         </div>
-                        <button type="submit" id="saveLinkBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition">
-                            Save Binding
+                        <button type="submit" id="saveLinkBtn" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20">
+                            <span class="material-icons text-sm">link</span> Save Binding
                         </button>
                     </form>
                 </div>
             </div>
-            <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4">
+
+            <!-- Active Members Grid -->
+            <div class="bg-slate-900/90 border border-slate-800 p-6 rounded-3xl space-y-4 shadow-xl">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-800 pb-4">
-                    <h2 class="text-xs font-bold text-white uppercase tracking-wider">Active System Members (/players)</h2>
-                    <input type="text" id="memberSearchInput" placeholder="Filter members..." class="bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-white w-full sm:w-64 focus:outline-none focus:border-emerald-500">
+                    <div>
+                        <h2 class="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-icons text-sm text-amber-400">badge</span> Active Global System Members
+                        </h2>
+                    </div>
+                    <input type="text" id="memberSearchInput" placeholder="Filter member name..." class="w-full sm:w-72 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
                 </div>
                 <div id="membersGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <p class="text-xs text-slate-500 col-span-full py-8 text-center">Loading member roster...</p>
+                    <p class="text-xs text-slate-500 col-span-full py-6 text-center">Loading global member roster...</p>
                 </div>
             </div>
         </div>
     </main>
+
     <script type="module" src="../web-info/p-admin-list.js"></script>
     <script type="module">
         import { auth, db, doc, getDoc, getDocs, setDoc, deleteDoc, collection, onAuthStateChanged } from "../web-info/firebase.js";
         import { PERMANENT_MASTER_ADMIN_UID, isPermanentAdmin } from "../web-info/p-admin-list.js";
 
+        // Global Debug Logger Engine
+        if (localStorage.getItem('debugging') === null) {
+            localStorage.setItem('debugging', '0');
+        }
+        function debugLog(...args) {
+            if (localStorage.getItem('debugging') === '1') {
+                console.log("[DEBUG:admin/members.html]", ...args);
+            }
+        }
+        debugLog("Initializing Member Directory admin hub...");
+
         const authBadge = document.getElementById('authBadge');
         const accessDenied = document.getElementById('accessDenied');
+        const userUidDisplay = document.getElementById('userUidDisplay');
         const membersWorkspace = document.getElementById('membersWorkspace');
         const statusAlert = document.getElementById('statusAlert');
+        const refreshMembersBtn = document.getElementById('refreshMembersBtn');
         const totalMembersCount = document.getElementById('totalMembersCount');
         const addMemberForm = document.getElementById('addMemberForm');
         const newMemberName = document.getElementById('newMemberName');
         const newMemberNote = document.getElementById('newMemberNote');
+        const saveMemberBtn = document.getElementById('saveMemberBtn');
         const linkAccountForm = document.getElementById('linkAccountForm');
         const targetUidInput = document.getElementById('targetUidInput');
         const memberSelectDropdown = document.getElementById('memberSelectDropdown');
+        const saveLinkBtn = document.getElementById('saveLinkBtn');
         const memberSearchInput = document.getElementById('memberSearchInput');
         const membersGrid = document.getElementById('membersGrid');
+
         let rawMembersList = [];
 
         onAuthStateChanged(auth, async (user) => {
             if (!user) {
-                showAccessDenied();
+                showAccessDenied("Not Authenticated");
                 return;
             }
+            userUidDisplay.textContent = user.uid;
             try {
                 const adminDoc = await getDoc(doc(db, "admin", "uuids"));
                 let allowedUids = adminDoc.exists() ? (adminDoc.data().allowed_uids || []) : [];
-                if (!allowedUids.includes(PERMANENT_MASTER_ADMIN_UID)) {
+                if (PERMANENT_MASTER_ADMIN_UID && !allowedUids.includes(PERMANENT_MASTER_ADMIN_UID)) {
                     allowedUids.unshift(PERMANENT_MASTER_ADMIN_UID);
                 }
-                if (allowedUids.includes(user.uid) || isPermanentAdmin(user.uid)) {
-                    authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800";
-                    authBadge.textContent = "Authorized Admin";
+                const isAuthorized = allowedUids.includes(user.uid) || isPermanentAdmin(user.uid);
+                if (isAuthorized) {
+                    authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-emerald-950 text-emerald-300 border border-emerald-800 flex items-center gap-1.5";
+                    authBadge.textContent = "Authorized Master Admin";
                     accessDenied.classList.add('hidden');
                     membersWorkspace.classList.remove('hidden');
                     loadAllMemberData();
                 } else {
-                    showAccessDenied();
+                    showAccessDenied(user.uid);
                 }
             } catch (err) {
-                showAccessDenied();
+                showAccessDenied(user.uid);
             }
         });
 
-        function showAccessDenied() {
+        function showAccessDenied(uid) {
             authBadge.className = "text-xs px-3 py-1 rounded-full font-bold bg-red-950 text-red-300 border border-red-800";
-            authBadge.textContent = "Restricted";
+            authBadge.textContent = "Access Restricted";
+            userUidDisplay.textContent = uid || "Unknown UID";
             accessDenied.classList.remove('hidden');
             membersWorkspace.classList.add('hidden');
         }
@@ -159,34 +210,48 @@
                 membersSnap.forEach(d => {
                     const data = d.data() || {};
                     const name = data.name || d.id;
-                    if (name) memberMap.set(name, { id: d.id, name, note: data.note || "Registered Member" });
+                    if (name) {
+                        memberMap.set(name, { id: d.id, name: name, note: data.note || "Registered Member" });
+                    }
                 });
                 rawMembersList = Array.from(memberMap.values()).sort((a, b) => a.name.localeCompare(b.name));
                 totalMembersCount.textContent = rawMembersList.length;
+
                 memberSelectDropdown.innerHTML = `<option value="">-- Choose Member Profile --</option>` +
                     rawMembersList.map(m => `<option value="${m.name}">${m.name}</option>`).join('');
                 renderMembersGrid();
             } catch (err) {
-                showAlert("Failed to load members.", "error");
+                showAlert("Failed to load member roster from Firestore.", "error");
             }
         }
 
         function renderMembersGrid() {
-            const query = memberSearchInput.value.toLowerCase().trim();
-            const filtered = rawMembersList.filter(m => m.name.toLowerCase().includes(query) || m.note.toLowerCase().includes(query));
+            const queryVal = memberSearchInput.value.toLowerCase().trim();
+            const filtered = rawMembersList.filter(m => m.name.toLowerCase().includes(queryVal));
             if (filtered.length === 0) {
-                membersGrid.innerHTML = `<p class="text-xs text-slate-500 col-span-full py-6 text-center">No members found.</p>`;
+                membersGrid.innerHTML = `<p class="text-xs text-slate-500 col-span-full py-6 text-center">No member profiles match search query.</p>`;
                 return;
             }
             membersGrid.innerHTML = filtered.map(m => `
-                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex justify-between items-center">
-                    <div>
-                        <h3 class="text-sm font-bold text-white">${m.name}</h3>
-                        <p class="text-[10px] text-slate-400">${m.note}</p>
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-3">
+                    <div class="flex justify-between items-start gap-2">
+                        <div>
+                            <h3 class="text-sm font-bold text-white flex items-center gap-1.5">
+                                <span class="material-icons text-emerald-400 text-sm">person</span>
+                                <span>${m.name}</span>
+                            </h3>
+                            <p class="text-[10px] text-slate-400">${m.note || 'Registered Member'}</p>
+                        </div>
+                        <button onclick="deleteMemberProfile('${m.name}')" class="p-1 text-slate-500 hover:text-red-400 transition" title="Delete Member">
+                            <span class="material-icons text-sm">delete</span>
+                        </button>
                     </div>
-                    <button onclick="deleteMemberProfile('${m.name}')" class="p-1.5 text-slate-500 hover:text-red-400 transition">
-                        <span class="material-icons text-base">delete</span>
-                    </button>
+                    <div class="pt-2 border-t border-slate-900 flex justify-between items-center text-[10px]">
+                        <a href="../g-mono/view.html?player=${encodeURIComponent(m.name)}" class="text-emerald-400 font-semibold hover:underline">
+                            Inspect Career
+                        </a>
+                        <span class="text-slate-500 font-mono">Global Profile</span>
+                    </div>
                 </div>
             `).join('');
         }
@@ -196,18 +261,24 @@
             const nameVal = newMemberName.value.trim();
             const noteVal = newMemberNote.value.trim();
             if (!nameVal) return;
+            saveMemberBtn.disabled = true;
+            saveMemberBtn.textContent = "Registering...";
             try {
                 await setDoc(doc(db, "players", nameVal), {
                     name: nameVal,
-                    note: noteVal || "Registered Member",
+                    note: noteVal || "Registered Global Member",
                     createdAt: new Date().toISOString()
                 }, { merge: true });
-                showAlert(`Member "${nameVal}" registered!`, "success");
+                showAlert(`Member profile "${nameVal}" registered!`, "success");
                 newMemberName.value = '';
                 newMemberNote.value = '';
+                saveMemberBtn.disabled = false;
+                saveMemberBtn.textContent = "Register Member Profile";
                 loadAllMemberData();
             } catch (err) {
-                showAlert("Registration failed.", "error");
+                showAlert(err.message || "Failed to register member.", "error");
+                saveMemberBtn.disabled = false;
+                saveMemberBtn.textContent = "Register Member Profile";
             }
         });
 
@@ -216,38 +287,55 @@
             const uidVal = targetUidInput.value.trim();
             const memberVal = memberSelectDropdown.value;
             if (!uidVal || !memberVal) return;
+            saveLinkBtn.disabled = true;
+            saveLinkBtn.textContent = "Binding...";
             try {
                 await setDoc(doc(db, "users", uidVal), {
                     linkedMemberName: memberVal,
-                    linkedAt: new Date().toISOString()
+                    linkedAt: new Date().toISOString(),
+                    linkedBy: auth.currentUser?.uid || 'admin'
                 }, { merge: true });
-                showAlert(`Account UID bound to "${memberVal}"!`, "success");
+                showAlert(`Bound Auth UID to Member Profile "${memberVal}"!`, "success");
                 targetUidInput.value = '';
                 memberSelectDropdown.value = '';
+                saveLinkBtn.disabled = false;
+                saveLinkBtn.textContent = "Save Member Binding";
             } catch (err) {
-                showAlert("Binding failed.", "error");
+                showAlert(err.message || "Failed to bind UID.", "error");
+                saveLinkBtn.disabled = false;
+                saveLinkBtn.textContent = "Save Member Binding";
             }
         });
 
-        window.deleteMemberProfile = async (name) => {
-            if (!confirm(`Delete profile for "${name}"?`)) return;
+        window.deleteMemberProfile = async (memberName) => {
+            if (!confirm(`Delete global member profile "${memberName}"?`)) return;
             try {
-                await deleteDoc(doc(db, "players", name));
-                showAlert(`Member "${name}" removed.`, "success");
+                await deleteDoc(doc(db, "players", memberName));
+                showAlert(`Member profile "${memberName}" removed.`, "success");
                 loadAllMemberData();
             } catch (err) {
-                showAlert("Failed to delete member.", "error");
+                showAlert(err.message || "Failed to delete member profile.", "error");
             }
         };
 
         function showAlert(msg, type) {
             statusAlert.classList.remove('hidden');
             statusAlert.textContent = msg;
-            statusAlert.className = type === 'success' ? "text-xs p-3 rounded-xl border bg-emerald-950/80 text-emerald-300 border-emerald-800" : "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800";
+            statusAlert.className = type === 'success' ? "text-xs p-3 rounded-xl border bg-emerald-950/80 text-emerald-300 border-emerald-800 font-medium" : "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800 font-medium";
         }
 
         memberSearchInput.addEventListener('input', renderMembersGrid);
-        document.getElementById('refreshMembersBtn').addEventListener('click', loadAllMemberData);
+        refreshMembersBtn.addEventListener('click', loadAllMemberData);
+
+        // Offline Service Worker Bootstrap
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+            });
+        }
+        window.addEventListener('offline', () => {
+            window.location.href = '/offline.html';
+        });
     </script>
 </body>
 </html>

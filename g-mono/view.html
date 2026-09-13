@@ -9,82 +9,91 @@
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+    <style> 
+        body { font-family: 'Google Sans', sans-serif; } 
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+    <!-- Top Navigation -->
     <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
-                <span class="material-icons text-base">arrow_back</span> Monopoly Hub
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium transition">
+                <span class="material-icons text-base">arrow_back</span> Monopoly Suite
                 <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4"></span>
             </a>
             <div class="flex items-center gap-3">
                 <button id="openShareModalBtn" class="hidden px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1 shadow">
                     <span class="material-icons text-sm">share</span> Share Record
                 </button>
-                <a href="history.html" class="text-xs text-slate-400 hover:text-slate-200 flex items-center gap-1">
-                    <span class="material-icons text-sm">history</span> Match History
+                <a href="history.html" class="text-xs bg-slate-900 hover:bg-slate-800 text-slate-300 px-3.5 py-1.5 rounded-xl border border-slate-800 font-medium transition flex items-center gap-1">
+                    <span class="material-icons text-sm">history</span> History
                 </a>
             </div>
         </div>
     </nav>
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-        <div id="shareableSnapshotContainer" class="p-3 sm:p-5 bg-slate-950 rounded-[2rem]">
-            <div id="inspectorCard" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
-                <div id="loadingState" class="py-12 text-center text-slate-400 space-y-3">
+
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
+        <div id="shareableSnapshotContainer" class="p-3 sm:p-5 bg-slate-950 rounded-[2.5rem]">
+            <div id="inspectorCard" class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+                
+                <!-- Loading Skeleton -->
+                <div id="loadingState" class="py-16 text-center text-slate-400 space-y-3">
                     <span class="material-icons text-4xl animate-spin text-amber-500">sync</span>
-                    <p class="text-sm font-mono">Fetching record details from Firestore...</p>
+                    <p class="text-xs font-mono">Fetching record telemetry from Firestore...</p>
                 </div>
+
+                <!-- Dynamic Content Destination -->
                 <div id="inspectorContent" class="hidden space-y-6"></div>
             </div>
         </div>
     </main>
 
-    <!-- Share Modal -->
+    <!-- Share Custom Modal -->
     <div id="shareModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-                    <span class="material-icons text-amber-400 text-base">ios_share</span> Share Match / Profile Record
+                    <span class="material-icons text-amber-400 text-base">ios_share</span> Share Match / Player Record
                 </h3>
                 <button type="button" id="closeShareModalBtn" class="text-slate-400 hover:text-white">
                     <span class="material-icons text-lg">close</span>
                 </button>
             </div>
-            <p class="text-xs text-slate-400">Choose your preferred sharing option:</p>
+            <p class="text-xs text-slate-400">Choose your preferred export format:</p>
             <div class="space-y-2.5">
                 <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-white">Share Link Only</p>
-                        <p class="text-[10px] text-slate-400">Direct URL to record overview</p>
+                        <p class="text-[10px] text-slate-400">Direct URL to this record overview</p>
                     </div>
                     <span class="material-icons text-amber-400 text-sm">link</span>
                 </button>
                 <button id="copyLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-white">Copy Link</p>
-                        <p class="text-[10px] text-slate-400">Copy URL to clipboard</p>
+                        <p class="text-[10px] text-slate-400">Copy URL directly to clipboard</p>
                     </div>
                     <span class="material-icons text-sky-400 text-sm">content_copy</span>
                 </button>
                 <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-white">Share Snapshot Image</p>
-                        <p class="text-[10px] text-slate-400">Fixed-ratio scorecard without buttons</p>
+                        <p class="text-[10px] text-slate-400">Clean scorecard card without edit buttons</p>
                     </div>
                     <span class="material-icons text-emerald-400 text-sm">image</span>
                 </button>
                 <button id="copyImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-white">Copy Snapshot Image</p>
-                        <p class="text-[10px] text-slate-400">Copy scorecard directly to clipboard</p>
+                        <p class="text-[10px] text-slate-400">Copy image directly to clipboard</p>
                     </div>
                     <span class="material-icons text-emerald-400 text-sm">photo</span>
                 </button>
                 <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
                     <div>
                         <p class="text-xs font-bold text-amber-300">Share Image + Link Caption (WhatsApp)</p>
-                        <p class="text-[10px] text-amber-200/70">Scorecard image with record link in text</p>
+                        <p class="text-[10px] text-amber-200/70">Card image with link appended in caption</p>
                     </div>
                     <span class="material-icons text-amber-400 text-sm">send</span>
                 </button>
@@ -94,61 +103,84 @@
 
     <script type="module">
         import { db, doc, getDoc, collection, getDocs } from "../web-info/firebase.js";
+
+        // Global Debug Logger Engine
+        if (localStorage.getItem('debugging') === null) {
+            localStorage.setItem('debugging', '0');
+        }
+        function debugLog(...args) {
+            if (localStorage.getItem('debugging') === '1') {
+                console.log("[DEBUG:view.html]", ...args);
+            }
+        }
+        debugLog("Initializing View page script...");
+
         const urlParams = new URLSearchParams(window.location.search);
         const gameId = urlParams.get('game');
         const playerName = urlParams.get('player');
         const guestName = urlParams.get('guest');
+
         const loadingState = document.getElementById('loadingState');
         const inspectorContent = document.getElementById('inspectorContent');
         const openShareModalBtn = document.getElementById('openShareModalBtn');
         const shareModal = document.getElementById('shareModal');
         const closeShareModalBtn = document.getElementById('closeShareModalBtn');
+
         let currentShareDetails = {
             title: "VIP Gamers Monopoly Record",
             caption: "",
-            url: ""
+            url: window.location.href
         };
 
         async function initInspector() {
             try {
                 if (gameId) {
+                    debugLog("Loading game record:", gameId);
                     await renderGameView(gameId);
                     setupGameShare(gameId);
                 } else if (playerName) {
+                    debugLog("Loading player record:", playerName);
                     await renderPlayerView(playerName, false);
                     setupPlayerShare(playerName, false);
                 } else if (guestName) {
+                    debugLog("Loading guest record:", guestName);
                     await renderPlayerView(guestName, true);
                     setupPlayerShare(guestName, true);
                 } else {
                     renderEmptyView();
                 }
             } catch (error) {
+                debugLog("Initialization error:", error);
                 loadingState.innerHTML = `
-                    <div class="text-red-400 space-y-2">
+                    <div class="text-rose-400 space-y-2">
                         <span class="material-icons text-4xl">error_outline</span>
-                        <p class="text-sm">Failed to load record details.</p>
+                        <p class="text-xs font-mono">Failed to load record details. Please check the network or game identifier.</p>
                     </div>
                 `;
             }
         }
 
+        // 1. GAME SESSION DETAIL VIEW
         async function renderGameView(id) {
             const cleanId = id.trim().replace('_', '-');
             const docRef = doc(db, "games", "Monopoly", "matches", cleanId);
             const docSnap = await getDoc(docRef);
+
             loadingState.classList.add('hidden');
             inspectorContent.classList.remove('hidden');
+
             if (!docSnap.exists()) {
                 inspectorContent.innerHTML = `
-                    <div class="text-center py-8 space-y-3">
+                    <div class="text-center py-12 space-y-3">
                         <span class="material-icons text-amber-500 text-5xl">manage_search</span>
                         <h2 class="text-xl font-bold text-white">Match Not Found</h2>
                         <p class="text-xs text-slate-400 font-mono">No record matching ID "${cleanId}".</p>
+                        <a href="history.html" class="inline-block px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-xl transition">Return to History</a>
                     </div>
                 `;
                 return;
             }
+
             const game = docSnap.data();
             const players = game.players || [];
             const sortedPlayers = [...players].sort((a, b) => {
@@ -156,64 +188,139 @@
                 const cashB = Number(b.earnings ?? b.cash ?? 0);
                 return cashB - cashA;
             });
+
             const registeredCount = players.filter(p => p.isMember !== false && !p.isGuest).length;
             const isRanked = registeredCount > 2;
             const dateStr = game.date || cleanId.substring(0, 10);
 
+            let totalSessionCash = 0;
+            let totalSessionCities = 0;
+            let totalSessionStations = 0;
+            sortedPlayers.forEach(p => {
+                totalSessionCash += Math.max(0, Number(p.earnings ?? p.cash ?? 0));
+                totalSessionCities += Number(p.cities || 0);
+                totalSessionStations += Number(p.stations || 0);
+            });
+
             inspectorContent.innerHTML = `
+                <!-- Match Header -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-6 gap-4">
                     <div>
                         <div class="flex items-center gap-2">
-                            <h1 class="text-2xl font-black text-white">Match: ${cleanId}</h1>
+                            <h1 class="text-2xl font-black text-white font-mono">${cleanId}</h1>
                             <span class="px-2.5 py-0.5 text-[10px] font-bold uppercase rounded-full ${isRanked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-amber-950 text-amber-400 border border-amber-800'}">
-                                ${isRanked ? 'Ranked Match' : 'Practice / Unranked'}
+                                ${isRanked ? 'Ranked Match' : 'Practice / Casual'}
                             </span>
                         </div>
-                        <p class="text-xs text-slate-400 mt-1 flex items-center gap-3">
+                        <p class="text-xs text-slate-400 mt-1 flex flex-wrap items-center gap-3">
                             <span>Date: <strong class="text-slate-200 font-mono">${dateStr}</strong></span>
+                            <span>•</span>
                             <span>Location: <strong class="text-slate-200">${game.location || 'N/A'}</strong></span>
+                            <span>•</span>
+                            <span>Participants: <strong class="text-slate-200 font-mono">${players.length} Players</strong></span>
                         </p>
                     </div>
-                    <a id="editMatchBtn" href="edit.html?game=${encodeURIComponent(cleanId)}" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-xl transition flex items-center gap-1">
+                    <a id="editMatchBtn" href="edit.html?game=${encodeURIComponent(cleanId)}" class="px-3.5 py-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-white rounded-xl transition flex items-center gap-1 shadow">
                         <span class="material-icons text-sm">edit</span> Edit Record
                     </a>
                 </div>
-                <div class="space-y-4">
-                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Player Standings & Breakdown</h2>
+
+                <!-- Session Metrics Overview Bar -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-0.5">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Winner</span>
+                        <div class="text-sm font-bold text-amber-400 truncate">${sortedPlayers[0]?.name || 'N/A'}</div>
+                        <span class="text-[10px] font-mono ${Number(sortedPlayers[0]?.earnings ?? sortedPlayers[0]?.cash ?? 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'} font-bold block">
+                            ${Number(sortedPlayers[0]?.earnings ?? sortedPlayers[0]?.cash ?? 0) >= 0 ? '+' : ''}$${Number(sortedPlayers[0]?.earnings ?? sortedPlayers[0]?.cash ?? 0).toLocaleString()}
+                        </span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-0.5">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Total Pot Value</span>
+                        <div class="text-sm font-bold text-white font-mono">$${totalSessionCash.toLocaleString()}</div>
+                        <span class="text-[10px] text-slate-500 font-sans block">Gross earnings</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-0.5">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Total Cities</span>
+                        <div class="text-sm font-bold text-sky-400 font-mono">${totalSessionCities} / 22</div>
+                        <span class="text-[10px] text-slate-500 font-sans block">Claimed on board</span>
+                    </div>
+                    <div class="bg-slate-950 p-3.5 rounded-2xl border border-slate-800 text-center space-y-0.5">
+                        <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Stations & Utils</span>
+                        <div class="text-sm font-bold text-amber-300 font-mono">${totalSessionStations} / 6</div>
+                        <span class="text-[10px] text-slate-500 font-sans block">Claimed on board</span>
+                    </div>
+                </div>
+
+                <!-- Standings & Breakdown Table with Cities (22 max), Stations (6 max) & Total Props (28 max) -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-icons text-amber-400 text-sm">format_list_numbered</span> Final Standings &amp; Asset Breakdown
+                        </h2>
+                        <span class="text-[10px] text-slate-500 font-mono">Tip: Click Net Earnings to open linked scorecard</span>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-sm border-collapse">
                             <thead>
                                 <tr class="text-slate-400 border-b border-slate-800 text-xs uppercase tracking-wider">
-                                    <th class="py-2.5 px-3">Rank</th>
-                                    <th class="py-2.5 px-3">Player</th>
-                                    <th class="py-2.5 px-3 text-center">Status</th>
-                                    <th class="py-2.5 px-3 text-right">Net Earnings</th>
-                                    <th class="py-2.5 px-3 text-center">Cities</th>
-                                    <th class="py-2.5 px-3 text-center">Stations</th>
+                                    <th class="py-3 px-3">Rank</th>
+                                    <th class="py-3 px-3">Player</th>
+                                    <th class="py-3 px-3 text-center">Membership</th>
+                                    <th class="py-3 px-3 text-center">Cities</th>
+                                    <th class="py-3 px-3 text-center">Stations/Util</th>
+                                    <th class="py-3 px-3 text-center">Total Props</th>
+                                    <th class="py-3 px-3 text-right">Net Cash ($)</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-800/60 text-xs font-mono">
                                 ${sortedPlayers.map((p, index) => {
+                                    const rank = index + 1;
+                                    let rankBadge = `<span class="font-mono font-bold text-slate-500">#${rank}</span>`;
+                                    if (rank === 1) rankBadge = `<span class="text-amber-400 font-bold flex items-center gap-0.5">1st</span>`;
+                                    else if (rank === 2) rankBadge = `<span class="text-slate-300 font-bold flex items-center gap-0.5">2nd</span>`;
+                                    else if (rank === 3) rankBadge = `<span class="text-amber-600 font-bold flex items-center gap-0.5">3rd</span>`;
+
+                                    const cities = Number(p.cities || 0);
+                                    const stations = Number(p.stations || 0);
+                                    const totalProps = cities + stations;
                                     const isMember = p.isMember !== false && !p.isGuest;
                                     const netVal = Number(p.earnings ?? p.cash ?? 0);
+                                    const moneyColorClass = netVal >= 0 ? 'text-emerald-400' : 'text-rose-400';
+
+                                    // Build Score URL with auto-appended return link: back-view={gameId}
+                                    let scoreLinkHtml = `<span class="${moneyColorClass} font-bold">$${netVal.toLocaleString()}</span>`;
+                                    if (p.scoreUrl) {
+                                        const sep = p.scoreUrl.includes('?') ? '&' : '?';
+                                        const returnUrl = `${p.scoreUrl}${sep}back-view=${encodeURIComponent(cleanId)}`;
+                                        scoreLinkHtml = `
+                                            <a href="${returnUrl}" class="hover:underline flex items-center justify-end gap-1 ${moneyColorClass} font-bold" title="View original score calculation">
+                                                <span>$${netVal.toLocaleString()}</span>
+                                                <span class="material-icons text-[11px] text-sky-400">launch</span>
+                                            </a>
+                                        `;
+                                    }
+
                                     return `
-                                        <tr class="hover:bg-slate-800/40">
-                                            <td class="py-3 px-3 font-bold ${index === 0 ? 'text-amber-400' : 'text-slate-400'}">#${index + 1}</td>
+                                        <tr class="hover:bg-slate-800/30">
+                                            <td class="py-3 px-3 font-bold">${rankBadge}</td>
                                             <td class="py-3 px-3 font-semibold text-white font-sans">
-                                                <a href="view.html?${isMember ? 'player' : 'guest'}=${encodeURIComponent(p.name)}" class="hover:underline text-amber-400">
-                                                    ${p.name}
+                                                <a href="view.html?${isMember ? 'player' : 'guest'}=${encodeURIComponent(p.name)}" class="hover:underline text-amber-400 flex items-center gap-1 font-bold">
+                                                    <span>${p.name}</span>
+                                                    <span class="material-icons text-[10px] text-slate-500">open_in_new</span>
                                                 </a>
                                             </td>
-                                            <td class="py-3 px-3 text-center">
-                                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isMember ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-slate-800 text-slate-400'}">
+                                            <td class="py-3 px-3 text-center font-sans">
+                                                <span class="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase ${isMember ? 'bg-blue-950 text-blue-300 border border-blue-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
                                                     ${isMember ? 'Member' : 'Guest'}
                                                 </span>
                                             </td>
-                                            <td class="py-3 px-3 text-right font-bold ${netVal >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                                                $${netVal.toLocaleString()}
+                                            <td class="py-3 px-3 text-center text-slate-300">${cities}</td>
+                                            <td class="py-3 px-3 text-center text-slate-300">${stations}</td>
+                                            <td class="py-3 px-3 text-center font-bold text-amber-400">${totalProps} / 28</td>
+                                            <td class="py-3 px-3 text-right">
+                                                ${scoreLinkHtml}
                                             </td>
-                                            <td class="py-3 px-3 text-center text-slate-300">${p.cities || 0}</td>
-                                            <td class="py-3 px-3 text-center text-slate-300">${p.stations || 0}</td>
                                         </tr>
                                     `;
                                 }).join('')}
@@ -221,23 +328,41 @@
                         </table>
                     </div>
                 </div>
+
+                <!-- Unranked notice if <= 2 members -->
+                ${!isRanked ? `
+                    <div class="p-3.5 bg-amber-950/40 border border-amber-800/60 rounded-2xl text-xs text-amber-300 flex items-center gap-2">
+                        <span class="material-icons text-base text-amber-400">info</span>
+                        <span>This match session is archived as a practice game because it contains 2 or fewer official registered members.</span>
+                    </div>
+                ` : ''}
             `;
+
             openShareModalBtn.classList.remove('hidden');
         }
 
+        // 2. PLAYER & GUEST TELEMETRY INSPECTOR VIEW
         async function renderPlayerView(name, isGuestView) {
             const matchesRef = collection(db, "games", "Monopoly", "matches");
             const snapshot = await getDocs(matchesRef);
+
             let playedMatches = [];
             let totalWins = 0;
+            let rankedWins = 0;
+            let rankedMatches = 0;
             let totalEarnings = 0;
+            let bestEarnings = -Infinity, bestSession = null;
+            let worstEarnings = Infinity, worstSession = null;
             let totalCities = 0;
             let totalStations = 0;
+            let maxPropsSingle = 0;
+            let runningStreak = 0, longestStreak = 0;
 
             snapshot.forEach(docSnap => {
                 const game = docSnap.data();
                 const players = game.players || [];
-                const pData = players.find(p => p.name?.toLowerCase() === name.toLowerCase());
+                const pData = players.find(p => (p.name || '').toLowerCase() === name.toLowerCase());
+
                 if (pData) {
                     const memberCount = players.filter(pl => pl.isMember !== false && !pl.isGuest).length;
                     const isRanked = memberCount > 2;
@@ -245,10 +370,29 @@
                     const cash = Number(pData.earnings ?? pData.cash ?? 0);
                     const c = Number(pData.cities || 0);
                     const s = Number(pData.stations || 0);
-                    if (isWinner) totalWins++;
+                    const matchProps = c + s;
+
                     totalEarnings += cash;
                     totalCities += c;
                     totalStations += s;
+
+                    if (isWinner) totalWins++;
+                    if (isRanked) {
+                        rankedMatches++;
+                        if (isWinner) rankedWins++;
+                    }
+
+                    if (cash > bestEarnings) { bestEarnings = cash; bestSession = docSnap.id; }
+                    if (cash < worstEarnings) { worstEarnings = cash; worstSession = docSnap.id; }
+                    if (matchProps > maxPropsSingle) maxPropsSingle = matchProps;
+
+                    if (isWinner) {
+                        runningStreak++;
+                        if (runningStreak > longestStreak) longestStreak = runningStreak;
+                    } else {
+                        runningStreak = 0;
+                    }
+
                     playedMatches.push({
                         id: docSnap.id,
                         date: game.date || docSnap.id.substring(0, 10),
@@ -258,94 +402,171 @@
                         isRanked: isRanked,
                         cities: c,
                         stations: s,
-                        totalProps: c + s
+                        totalProps: matchProps,
+                        scoreUrl: pData.scoreUrl || null
                     });
                 }
             });
 
             loadingState.classList.add('hidden');
             inspectorContent.classList.remove('hidden');
+
             const matchCount = playedMatches.length;
             const winRate = matchCount > 0 ? ((totalWins / matchCount) * 100).toFixed(1) : "0.0";
+            const avgEarnings = matchCount > 0 ? Math.round(totalEarnings / matchCount) : 0;
+            const totalProps = totalCities + totalStations;
+
+            if (bestEarnings === -Infinity) bestEarnings = 0;
+            if (worstEarnings === Infinity) worstEarnings = 0;
+
+            // Sort matches descending by ID/Date
             playedMatches.sort((a, b) => b.id.localeCompare(a.id));
 
             inspectorContent.innerHTML = `
+                <!-- Player Header -->
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-6 gap-4">
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center text-3xl font-black">
+                        <div class="w-16 h-16 rounded-2xl ${isGuestView ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' : 'bg-blue-500/10 border-blue-500/20 text-blue-400'} border flex items-center justify-center text-3xl font-black">
                             ${name.charAt(0).toUpperCase()}
                         </div>
                         <div>
                             <div class="flex items-center gap-2">
                                 <h1 class="text-2xl font-black text-white">${name}</h1>
-                                <span class="text-[10px] font-bold px-2 py-0.5 rounded ${isGuestView ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-blue-950 text-blue-300 border border-blue-800'} uppercase">
-                                    ${isGuestView ? 'Guest Player' : 'Member Profile'}
+                                <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${isGuestView ? 'bg-amber-950 text-amber-300 border border-amber-800' : 'bg-blue-950 text-blue-300 border border-blue-800'} uppercase">
+                                    ${isGuestView ? 'Guest Player' : 'Official Member'}
                                 </span>
                             </div>
-                            <p class="text-xs text-slate-400 mt-1">Player Career Overview</p>
+                            <p class="text-xs text-slate-400 mt-1">Player Career Telemetry &amp; Historical Performance</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Metric Tiles -->
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Total Sessions</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Sessions</span>
                         <p class="text-2xl font-black text-white font-mono">${matchCount}</p>
+                        <span class="text-[9px] text-emerald-400 font-medium block">${rankedMatches} Ranked / ${matchCount - rankedMatches} Practice</span>
                     </div>
                     <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Career Wins</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Wins & Win Rate</span>
                         <p class="text-2xl font-black text-emerald-400 font-mono">${totalWins}</p>
-                        <span class="text-[9px] text-slate-500 font-medium block">${winRate}% Win Rate</span>
+                        <span class="text-[9px] text-slate-400 font-medium block">${winRate}% Career Win Rate</span>
                     </div>
                     <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Net Total Cash</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Net Career Cash</span>
                         <p class="text-2xl font-black font-mono ${totalEarnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
                             $${totalEarnings.toLocaleString()}
                         </p>
+                        <span class="text-[9px] text-slate-400 font-medium block">Avg $${avgEarnings.toLocaleString()} / session</span>
                     </div>
                     <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 text-center space-y-1">
-                        <span class="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Properties</span>
-                        <p class="text-2xl font-black text-amber-400 font-mono">${totalCities + totalStations}</p>
-                        <span class="text-[9px] text-slate-500 font-medium block">${totalCities} Cities, ${totalStations} Stations</span>
+                        <span class="text-[10px] text-slate-500 uppercase font-bold tracking-wider block">Total Properties</span>
+                        <p class="text-2xl font-black text-amber-400 font-mono">${totalProps}</p>
+                        <span class="text-[9px] text-slate-400 font-medium block">${totalCities} Cities, ${totalStations} Stations</span>
                     </div>
                 </div>
 
-                <div class="space-y-3 pt-4 border-t border-slate-800">
-                    <h2 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Historical Match Archive</h2>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm border-collapse">
-                            <thead>
-                                <tr class="text-slate-400 border-b border-slate-800 text-xs uppercase tracking-wider">
-                                    <th class="py-2.5 px-3">Game ID</th>
-                                    <th class="py-2.5 px-3">Date</th>
-                                    <th class="py-2.5 px-3">Location</th>
-                                    <th class="py-2.5 px-3 text-center">Result</th>
-                                    <th class="py-2.5 px-3 text-right">Net Cash</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-slate-800/60 text-xs font-mono">
-                                ${playedMatches.map(m => `
-                                    <tr class="hover:bg-slate-800/30">
-                                        <td class="py-3 px-3 font-bold text-amber-400">
-                                            <a href="view.html?game=${encodeURIComponent(m.id)}" class="hover:underline">
-                                                ${m.id}
-                                            </a>
-                                        </td>
-                                        <td class="py-3 px-3 text-slate-300">${m.date}</td>
-                                        <td class="py-3 px-3 text-slate-200 font-sans">${m.location}</td>
-                                        <td class="py-3 px-3 text-center font-bold font-sans ${m.isWinner ? 'text-emerald-400' : 'text-slate-500'}">
-                                            ${m.isWinner ? 'Winner' : 'Participant'}
-                                        </td>
-                                        <td class="py-3 px-3 text-right font-bold ${m.earnings >= 0 ? 'text-emerald-400' : 'text-rose-400'}">
-                                            $${m.earnings.toLocaleString()}
-                                        </td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
+                <!-- Financial Highs, Lows and Streak Records -->
+                <div class="space-y-3 pt-2">
+                    <h2 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                        <span class="material-icons text-amber-400 text-sm">military_tech</span> Record Margins &amp; Streaks
+                    </h2>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center font-mono">
+                        <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800">
+                            <span class="text-[9px] text-slate-500 font-sans uppercase font-bold block">Best Victory</span>
+                            <span class="text-base font-bold text-emerald-400">$${bestEarnings.toLocaleString()}</span>
+                            <span class="text-[9px] text-slate-500 font-sans block truncate">${bestSession ? 'Match ' + bestSession : 'N/A'}</span>
+                        </div>
+                        <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800">
+                            <span class="text-[9px] text-slate-500 font-sans uppercase font-bold block">Worst Deficit</span>
+                            <span class="text-base font-bold text-rose-400">$${worstEarnings.toLocaleString()}</span>
+                            <span class="text-[9px] text-slate-500 font-sans block truncate">${worstSession ? 'Match ' + worstSession : 'N/A'}</span>
+                        </div>
+                        <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800">
+                            <span class="text-[9px] text-slate-500 font-sans uppercase font-bold block">Longest Win Streak</span>
+                            <span class="text-base font-bold text-amber-400">${longestStreak} In A Row</span>
+                            <span class="text-[9px] text-slate-500 font-sans block">Consecutive wins</span>
+                        </div>
+                        <div class="p-3.5 bg-slate-950 rounded-2xl border border-slate-800">
+                            <span class="text-[9px] text-slate-500 font-sans uppercase font-bold block">Max Single Game Props</span>
+                            <span class="text-base font-bold text-purple-400">${maxPropsSingle} Props</span>
+                            <span class="text-[9px] text-slate-500 font-sans block">Most held in 1 session</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Historical Match Archive Table with 28 Total Max Props and Dynamic Colors -->
+                <div class="space-y-3 pt-4 border-t border-slate-800">
+                    <h2 class="text-xs font-black text-slate-300 uppercase tracking-wider">Historical Game Sessions (${playedMatches.length})</h2>
+                    ${matchCount === 0 ? `
+                        <p class="text-xs text-slate-500 py-6 text-center">No game session records found for "${name}".</p>
+                    ` : `
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm border-collapse">
+                                <thead>
+                                    <tr class="text-slate-400 border-b border-slate-800 text-xs uppercase tracking-wider">
+                                        <th class="py-2.5 px-3">Game Path ID</th>
+                                        <th class="py-2.5 px-3">Date</th>
+                                        <th class="py-2.5 px-3">Venue</th>
+                                        <th class="py-2.5 px-3 text-center">Status</th>
+                                        <th class="py-2.5 px-3 text-center">Outcome</th>
+                                        <th class="py-2.5 px-3 text-center">Cities</th>
+                                        <th class="py-2.5 px-3 text-center">Stations</th>
+                                        <th class="py-2.5 px-3 text-center">Total Props</th>
+                                        <th class="py-2.5 px-3 text-right">Net Cash ($)</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-800/60 text-xs font-mono">
+                                    ${playedMatches.map(m => {
+                                        const cashColor = m.earnings >= 0 ? 'text-emerald-400' : 'text-rose-400';
+                                        let cashDisplay = `<span class="${cashColor} font-bold">$${m.earnings.toLocaleString()}</span>`;
+                                        
+                                        if (m.scoreUrl) {
+                                            const sep = m.scoreUrl.includes('?') ? '&' : '?';
+                                            const returnUrl = `${m.scoreUrl}${sep}back-view=${encodeURIComponent(m.id)}`;
+                                            cashDisplay = `
+                                                <a href="${returnUrl}" class="hover:underline flex items-center justify-end gap-1 ${cashColor} font-bold" title="Open calculator score breakdown">
+                                                    <span>$${m.earnings.toLocaleString()}</span>
+                                                    <span class="material-icons text-[11px] text-sky-400">launch</span>
+                                                </a>
+                                            `;
+                                        }
+
+                                        return `
+                                            <tr class="hover:bg-slate-800/30">
+                                                <td class="py-3 px-3 font-bold text-amber-400">
+                                                    <a href="view.html?game=${encodeURIComponent(m.id)}" class="hover:underline flex items-center gap-1">
+                                                        <span>${m.id}</span>
+                                                        <span class="material-icons text-[10px]">open_in_new</span>
+                                                    </a>
+                                                </td>
+                                                <td class="py-3 px-3 text-slate-300">${m.date}</td>
+                                                <td class="py-3 px-3 text-slate-300 font-sans">${m.location}</td>
+                                                <td class="py-3 px-3 text-center">
+                                                    <span class="px-2 py-0.5 rounded-full text-[9px] font-bold font-sans uppercase ${m.isRanked ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : 'bg-slate-800 text-slate-400 border border-slate-700'}">
+                                                        ${m.isRanked ? 'Ranked' : 'Practice'}
+                                                    </span>
+                                                </td>
+                                                <td class="py-3 px-3 text-center font-bold font-sans ${m.isWinner ? 'text-emerald-400' : 'text-slate-500'}">
+                                                    ${m.isWinner ? 'Winner' : 'Participant'}
+                                                </td>
+                                                <td class="py-3 px-3 text-center text-slate-300">${m.cities}</td>
+                                                <td class="py-3 px-3 text-center text-slate-300">${m.stations}</td>
+                                                <td class="py-3 px-3 text-center font-bold text-amber-400">${m.totalProps} / 28</td>
+                                                <td class="py-3 px-3 text-right font-bold">
+                                                    ${cashDisplay}
+                                                </td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `}
+                </div>
             `;
+
             openShareModalBtn.classList.remove('hidden');
         }
 
@@ -353,10 +574,11 @@
             loadingState.classList.add('hidden');
             inspectorContent.classList.remove('hidden');
             inspectorContent.innerHTML = `
-                <div class="text-center py-8 space-y-3">
+                <div class="text-center py-16 space-y-3">
                     <span class="material-icons text-amber-500 text-5xl">help_outline</span>
-                    <h2 class="text-xl font-bold text-white">Missing Query Parameters</h2>
-                    <p class="text-xs text-slate-400">Specify ?game=ID, ?player=Name, or ?guest=Name</p>
+                    <h2 class="text-xl font-bold text-white">Missing Target Parameters</h2>
+                    <p class="text-xs text-slate-400">Please provide a valid query parameter (e.g., <code class="bg-slate-950 px-1.5 py-0.5 rounded text-amber-400">?game=01-08-2026-01</code> or <code class="bg-slate-950 px-1.5 py-0.5 rounded text-amber-400">?player=Mitansh</code>).</p>
+                    <a href="history.html" class="inline-block px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white rounded-xl transition">Browse History</a>
                 </div>
             `;
         }
@@ -369,10 +591,11 @@
 
         function setupPlayerShare(name, isGuest) {
             currentShareDetails.url = window.location.href;
-            currentShareDetails.title = `Monopoly ${isGuest ? 'Guest' : 'Player'} Profile: ${name}`;
-            currentShareDetails.caption = `${name}'s Monopoly Standings & Stats: ${window.location.href}`;
+            currentShareDetails.title = `Monopoly ${isGuest ? 'Guest' : 'Member'} Profile: ${name}`;
+            currentShareDetails.caption = `${name}'s Monopoly Standings & Telemetry: ${window.location.href}`;
         }
 
+        // Modal Controls
         openShareModalBtn.addEventListener('click', () => shareModal.classList.remove('hidden'));
         closeShareModalBtn.addEventListener('click', () => shareModal.classList.add('hidden'));
 
@@ -395,18 +618,22 @@
         async function captureSnapshotBlob() {
             const editBtn = document.getElementById('editMatchBtn');
             if (editBtn) editBtn.style.display = 'none';
+
             const container = document.getElementById('shareableSnapshotContainer');
             const originalStyle = container.getAttribute('style') || '';
             container.style.width = '720px';
             container.style.maxWidth = '720px';
+
             const canvas = await html2canvas(container, {
                 backgroundColor: '#020617',
                 scale: 2,
                 useCORS: true,
                 windowWidth: 1024
             });
+
             container.setAttribute('style', originalStyle);
             if (editBtn) editBtn.style.display = '';
+
             return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
         }
 
@@ -423,7 +650,9 @@
                     a.download = 'monopoly-record.png';
                     a.click();
                 }
-            } catch (err) {}
+            } catch (err) {
+                debugLog("shareImageOnlyBtn error:", err);
+            }
             shareModal.classList.add('hidden');
         });
 
@@ -433,6 +662,7 @@
                 await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
                 alert('Snapshot image copied to clipboard!');
             } catch (err) {
+                debugLog("copyImageOnlyBtn write failed, fallback downloading:", err);
                 const blob = await captureSnapshotBlob();
                 const downloadUrl = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -465,6 +695,21 @@
         });
 
         initInspector();
+    </script>
+
+    <!-- Offline Service Worker & Redirect Bootstrap -->
+    <script>
+        (function() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                        .catch(() => {});
+                });
+            }
+            window.addEventListener('offline', () => {
+                window.location.href = '/offline.html';
+            });
+        })();
     </script>
 </body>
 </html>

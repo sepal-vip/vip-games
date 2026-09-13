@@ -1,899 +1,978 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VIP Gamers - Monopoly Score Calculator</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <style>
-    body { font-family: 'Google Sans', sans-serif; }
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    input[type=number] { -moz-appearance: textfield; appearance: textfield; }
-    .custom-scroll::-webkit-scrollbar { width: 4px; }
-    .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly Suite - Score Calculator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style> 
+        body { font-family: 'Google Sans', sans-serif; } 
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen p-3 sm:p-6 flex flex-col items-center selection:bg-amber-500 selection:text-slate-950">
-  <div class="max-w-2xl w-full space-y-5">
-    <!-- Top Bar -->
-    <div class="flex items-center justify-between">
-      <a href="../index.html" class="p-2.5 rounded-2xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition flex items-center">
-        <span class="material-icons">arrow_back</span>
-        <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4"></span>
-      </a>
-      <div class="text-center">
-        <h1 class="text-lg font-black tracking-tight text-white flex items-center justify-center gap-1.5">
-          <span class="material-icons text-amber-500 text-base">calculate</span> Score Calculator
-        </h1>
-        <p class="text-[11px] text-slate-400">Indian Edition Audit Suite</p>
-      </div>
-      <a href="g-mono.html" class="p-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 hover:bg-amber-500 hover:text-slate-950 transition flex items-center gap-1 text-xs font-bold">
-        <span class="material-icons text-sm">casino</span> Hub
-      </a>
-    </div>
-
-    <!-- Fixed-Ratio Snapshot Capture Wrapper Area -->
-    <div id="shareableSnapshotContainer" class="p-3 sm:p-4 bg-slate-950 rounded-[2.5rem]">
-      <div id="finalScoreCard" class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-4">
-        <div class="flex items-center justify-between border-b border-slate-800/80 pb-4">
-          <div>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+    <!-- Top Navigation -->
+    <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium transition">
+                <span class="material-icons text-base">arrow_back</span> Monopoly Suite
+                <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4"></span>
+            </a>
             <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
-              <span class="text-[10px] font-extrabold text-amber-400 tracking-wider uppercase">Monopoly Total Net Worth</span>
+                <button id="openShareModalBtn" type="button" class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1 shadow">
+                    <span class="material-icons text-sm">share</span> Share Score
+                </button>
             </div>
-            <h2 id="grandTotalDisplay" class="text-3xl sm:text-4xl font-black text-white tracking-tight mt-0.5">0</h2>
-          </div>
-          <button id="resetAllBtn" type="button" class="p-2 px-3.5 bg-slate-800/80 hover:bg-rose-950/60 hover:text-rose-300 hover:border-rose-800 border border-slate-700 text-slate-300 rounded-2xl text-xs font-bold transition flex items-center gap-1.5">
-            <span class="material-icons text-sm">restart_alt</span> Reset
-          </button>
         </div>
-        <!-- Metric Grid -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
-          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Properties</p>
-            <p id="statPropTotal" class="text-base font-black text-emerald-400 font-mono mt-0.5">0</p>
-            <span id="statPropCount" class="text-[10px] text-slate-500 font-medium">0 Cities</span>
-          </div>
-          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stations & Utils</p>
-            <p id="statSpecialTotal" class="text-base font-black text-sky-400 font-mono mt-0.5">0</p>
-            <span id="statSpecialCount" class="text-[10px] text-slate-500 font-medium">0 Items</span>
-          </div>
-          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Cash in Hand</p>
-            <p id="statCashTotal" class="text-base font-black text-amber-400 font-mono mt-0.5">0</p>
-            <span class="text-[10px] text-slate-500 font-medium">Liquid</span>
-          </div>
-          <div class="bg-slate-950/70 p-3 rounded-2xl border border-slate-800/80">
-            <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Net Loans/Debt</p>
-            <p id="statLoanNet" class="text-base font-black text-slate-200 font-mono mt-0.5">0</p>
-            <span class="text-[10px] text-slate-500 font-medium">Balance</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    </nav>
 
-    <!-- Section 1: Color Sets & Properties -->
-    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 1. City Color Sets & Houses
-        </h3>
-        <span class="text-[9px] text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">Custom Motel/Hotel Allowed</span>
-      </div>
-      <div id="colorSetsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2"></div>
-      
-      <div id="propsDrawer" class="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3 hidden">
-        <div class="flex items-center justify-between pb-2 border-b border-slate-800">
-          <span id="drawerTitle" class="text-xs font-black text-white"></span>
-          <span id="drawerHouseCost" class="text-[10px] text-slate-400 font-mono font-bold"></span>
-        </div>
-        <div id="drawerProperties" class="space-y-3"></div>
-      </div>
-    </div>
-
-    <!-- Section 2: Utilities & Stations -->
-    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
-      <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> 2. Utilities & Stations
-      </h3>
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div class="space-y-2">
-          <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Utilities (150 each)</span>
-          <div id="utilitiesContainer" class="space-y-2"></div>
-        </div>
-        <div class="space-y-2">
-          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Stations (200 each)</span>
-          <div id="stationsContainer" class="space-y-2"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 3: Owned Assets -->
-    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-3">
-      <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
-        <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 3. Owned Assets Breakdown
-      </h3>
-      <div id="ownedItemsList" class="space-y-2 max-h-48 overflow-y-auto pr-1 text-xs custom-scroll">
-        <p class="text-slate-500 text-center py-4">No properties, stations, or utilities selected yet.</p>
-      </div>
-    </div>
-
-    <!-- Section 4: Cash in Hand -->
-    <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-4">
-      <div class="flex items-center justify-between">
-        <h3 class="text-xs font-black uppercase tracking-wider text-slate-200 flex items-center gap-2">
-          <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> 4. Cash in Hand
-        </h3>
-        <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
-          <button id="cashModeDirect" type="button" class="px-3 py-1 rounded-lg font-bold bg-amber-500 text-slate-950">Direct Value</button>
-          <button id="cashModeCount" type="button" class="px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white">Count Notes</button>
-        </div>
-      </div>
-      <div id="cashDirectSection">
-        <input type="number" id="directCashInput" placeholder="Enter Total Cash Value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
-      </div>
-      <div id="cashCountSection" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2">
-        <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 font-mono">1</span>
-          <input type="number" data-note="1" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 font-mono">5</span>
-          <input type="number" data-note="5" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 font-mono">10</span>
-          <input type="number" data-note="10" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 font-mono">20</span>
-          <input type="number" data-note="20" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 font-mono">50</span>
-          <input type="number" data-note="50" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-400 font-mono">100</span>
-          <input type="number" data-note="100" class="cash-note-input w-12 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
-        </div>
-        <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between sm:col-span-2">
-          <span class="text-xs font-bold text-slate-400 font-mono">500</span>
-          <input type="number" data-note="500" class="cash-note-input w-16 bg-slate-900 border border-slate-700 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
-        </div>
-      </div>
-    </div>
-
-    <!-- Section 5: Debts & Loans -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-black text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-            <span class="material-icons text-sm">remove_circle</span> Debts Owed (-)
-          </h3>
-          <span id="debtTotalLabel" class="text-xs font-mono font-bold text-rose-400">0</span>
-        </div>
-        <div id="debtInputsContainer" class="space-y-2">
-          <input type="number" placeholder="Debt 1" class="debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">
-        </div>
-      </div>
-      <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-5 space-y-3">
-        <div class="flex items-center justify-between">
-          <h3 class="text-xs font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-            <span class="material-icons text-sm">add_circle</span> Loaned Out (+)
-          </h3>
-          <span id="loanTotalLabel" class="text-xs font-mono font-bold text-emerald-400">0</span>
-        </div>
-        <div id="loanInputsContainer" class="space-y-2">
-          <input type="number" placeholder="Loaned 1" class="loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">
-        </div>
-      </div>
-    </div>
-
-    <!-- Actions -->
-    <div class="space-y-2 pt-2">
-      <button id="openShareModalBtn" type="button" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 text-sm">
-        <span class="material-icons text-base">share</span> Share Score Record
-      </button>
-      <div class="grid grid-cols-2 gap-2">
-        <button id="copyPlainBtn" type="button" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5">
-          <span class="material-icons text-sm">content_paste</span> Copy Plain
-        </button>
-        <button id="copyFormatBtn" type="button" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5">
-          <span class="material-icons text-sm">format_align_left</span> Copy Formatted
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Share Custom Modal -->
-  <div id="shareModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-        <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-          <span class="material-icons text-amber-400 text-base">ios_share</span> Share Monopoly Score
-        </h3>
-        <button type="button" id="closeShareModalBtn" class="text-slate-400 hover:text-white">
-          <span class="material-icons text-lg">close</span>
-        </button>
-      </div>
-      <p class="text-xs text-slate-400">Choose your preferred sharing mode:</p>
-      <div class="space-y-2.5">
-        <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
-          <div>
-            <p class="text-xs font-bold text-white">Share Link Only</p>
-            <p class="text-[10px] text-slate-400">Generates URL state query that restores counts</p>
-          </div>
-          <span class="material-icons text-amber-400 text-sm">link</span>
-        </button>
-        <button id="copyLinkBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
-          <div>
-            <p class="text-xs font-bold text-white">Copy Link</p>
-            <p class="text-[10px] text-slate-400">Copy shareable URL directly to clipboard</p>
-          </div>
-          <span class="material-icons text-sky-400 text-sm">content_copy</span>
-        </button>
-        <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
-          <div>
-            <p class="text-xs font-bold text-white">Share Snapshot Image</p>
-            <p class="text-[10px] text-slate-400">Fixed-ratio scorecard image</p>
-          </div>
-          <span class="material-icons text-emerald-400 text-sm">image</span>
-        </button>
-        <button id="copyImageBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
-          <div>
-            <p class="text-xs font-bold text-white">Copy Snapshot Image</p>
-            <p class="text-[10px] text-slate-400">Copy clean scorecard directly to clipboard</p>
-          </div>
-          <span class="material-icons text-emerald-400 text-sm">photo</span>
-        </button>
-        <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
-          <div>
-            <p class="text-xs font-bold text-amber-300">Share Image + Link Caption (WhatsApp)</p>
-            <p class="text-[10px] text-amber-200/70">Card snapshot with active link in caption</p>
-          </div>
-          <span class="material-icons text-amber-400 text-sm">send</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const indianMonopolyData = [
-      {
-        id: "brown",
-        name: "Brown",
-        colorClass: "bg-amber-950/60 border-amber-800 text-amber-400",
-        badge: "bg-amber-900",
-        houseCost: 50,
-        properties: [
-          { name: "Guwahati", classic: "Mediterranean Ave", base: 60, owned: false, houses: 0 },
-          { name: "Bhubaneswar", classic: "Baltic Ave", base: 60, owned: false, houses: 0 }
-        ]
-      },
-      {
-        id: "light-blue",
-        name: "Light Blue",
-        colorClass: "bg-sky-500/10 border-sky-500/40 text-sky-400",
-        badge: "bg-sky-400",
-        houseCost: 50,
-        properties: [
-          { name: "Panaji", classic: "Oriental Ave", base: 100, owned: false, houses: 0 },
-          { name: "Agra", classic: "Vermont Ave", base: 100, owned: false, houses: 0 },
-          { name: "Vadodara", classic: "Connecticut Ave", base: 120, owned: false, houses: 0 }
-        ]
-      },
-      {
-        id: "pink",
-        name: "Pink",
-        colorClass: "bg-pink-500/10 border-pink-500/40 text-pink-400",
-        badge: "bg-pink-500",
-        houseCost: 100,
-        properties: [
-          { name: "Ludhiana", classic: "St. Charles Pl", base: 140, owned: false, houses: 0 },
-          { name: "Patna", classic: "States Ave", base: 140, owned: false, houses: 0 },
-          { name: "Bhopal", classic: "Virginia Ave", base: 160, owned: false, houses: 0 }
-        ]
-      },
-      {
-        id: "orange",
-        name: "Orange",
-        colorClass: "bg-orange-500/10 border-orange-500/40 text-orange-400",
-        badge: "bg-orange-500",
-        houseCost: 100,
-        properties: [
-          { name: "Indore", classic: "St. James Pl", base: 180, owned: false, houses: 0 },
-          { name: "Nagpur", classic: "Tennessee Ave", base: 180, owned: false, houses: 0 },
-          { name: "Kochi", classic: "New York Ave", base: 200, owned: false, houses: 0 }
-        ]
-      },
-      {
-        id: "red",
-        name: "Red",
-        colorClass: "bg-red-500/10 border-red-500/40 text-red-400",
-        badge: "bg-red-500",
-        houseCost: 150,
-        properties: [
-          { name: "Lucknow", classic: "Kentucky Ave", base: 220, owned: false, houses: 0 },
-          { name: "Chandigarh", classic: "Indiana Ave", base: 220, owned: false, houses: 0 },
-          { name: "Jaipur", classic: "Illinois Ave", base: 240, owned: false, houses: 0 }
-        ]
-      },
-      {
-        id: "yellow",
-        name: "Yellow",
-        colorClass: "bg-yellow-500/10 border-yellow-500/40 text-yellow-400",
-        badge: "bg-yellow-400",
-        houseCost: 150,
-        properties: [
-          { name: "Pune", classic: "Atlantic Ave", base: 260, owned: false, houses: 0 },
-          { name: "Hyderabad", classic: "Ventnor Ave", base: 260, owned: false, houses: 0 },
-          { name: "Ahmedabad", classic: "Marvin Gardens", base: 280, owned: false, houses: 0 }
-        ]
-      },
-      {
-        id: "green",
-        name: "Green",
-        colorClass: "bg-emerald-500/10 border-emerald-500/40 text-emerald-400",
-        badge: "bg-emerald-500",
-        houseCost: 200,
-        properties: [
-          { name: "Kolkata", classic: "Pacific Ave", base: 300, owned: false, houses: 0 },
-          { name: "Chennai", classic: "North Carolina Ave", base: 300, owned: false, houses: 0 },
-          { name: "Bengaluru", classic: "Pennsylvania Ave", base: 320, owned: false, houses: 0 }
-        ]
-      },
-      {
-        id: "dark-blue",
-        name: "Dark Blue",
-        colorClass: "bg-blue-600/10 border-blue-600/40 text-blue-400",
-        badge: "bg-blue-600",
-        houseCost: 200,
-        properties: [
-          { name: "Delhi", classic: "Park Place", base: 350, owned: false, houses: 0 },
-          { name: "Mumbai", classic: "Boardwalk", base: 400, owned: false, houses: 0 }
-        ]
-      }
-    ];
-    const utilitiesData = [
-      { name: "Electric Company", classic: "Electric Co", base: 150, owned: false },
-      { name: "Water Works", classic: "Water Works", base: 150, owned: false }
-    ];
-    const stationsData = [
-      { name: "Chennai Central", classic: "Reading RR", base: 200, owned: false },
-      { name: "Howrah", classic: "Pennsylvania RR", base: 200, owned: false },
-      { name: "New Delhi", classic: "B&O RR", base: 200, owned: false },
-      { name: "Chhatrapati Shivaji Maharaj Terminus", classic: "Short Line RR", base: 200, owned: false }
-    ];
-
-    const flatProperties = [];
-    indianMonopolyData.forEach((set, sIdx) => {
-      set.properties.forEach((prop, pIdx) => {
-        flatProperties.push({ ...prop, setId: set.id, setIndex: sIdx, propIndex: pIdx });
-      });
-    });
-
-    let activeSet = null;
-    let cashMode = 'direct';
-
-    const setsGrid = document.getElementById('colorSetsGrid');
-    indianMonopolyData.forEach(set => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = `p-3 rounded-2xl border text-left flex flex-col justify-between transition hover:scale-[1.02] ${set.colorClass}`;
-      btn.innerHTML = `
-        <div class="flex items-center justify-between">
-          <span class="w-2.5 h-2.5 rounded-full ${set.badge}"></span>
-          <span class="text-[10px] text-slate-400 font-bold">${set.properties.length} Cities</span>
-        </div>
-        <span class="text-xs font-black text-white mt-2">${set.name}</span>
-      `;
-      btn.addEventListener('click', () => openSetDrawer(set.id));
-      setsGrid.appendChild(btn);
-    });
-
-    const utilsContainer = document.getElementById('utilitiesContainer');
-    utilitiesData.forEach((util, idx) => {
-      const el = document.createElement('div');
-      el.className = 'bg-emerald-950/20 border border-emerald-500/30 rounded-2xl p-3 flex items-center justify-between';
-      el.innerHTML = `
-        <div>
-          <p class="text-xs font-bold text-white">${util.name}</p>
-          <p class="text-[10px] text-emerald-400/80 font-mono">${util.classic} - ${util.base}</p>
-        </div>
-        <input type="checkbox" id="util-${idx}" class="w-5 h-5 rounded-lg accent-emerald-500 bg-slate-900 border-slate-700 cursor-pointer">
-      `;
-      el.querySelector('input').addEventListener('change', (e) => {
-        util.owned = e.target.checked;
-        calculateAll();
-      });
-      utilsContainer.appendChild(el);
-    });
-
-    const stationsContainer = document.getElementById('stationsContainer');
-    stationsData.forEach((station, idx) => {
-      const el = document.createElement('div');
-      el.className = 'bg-slate-950/80 border border-slate-800 rounded-2xl p-3 flex items-center justify-between';
-      el.innerHTML = `
-        <div>
-          <p class="text-xs font-bold text-white">${station.name}</p>
-          <p class="text-[10px] text-slate-400 font-mono">${station.classic} - ${station.base}</p>
-        </div>
-        <input type="checkbox" id="station-${idx}" class="w-5 h-5 rounded-lg accent-amber-500 bg-slate-900 border-slate-700 cursor-pointer">
-      `;
-      el.querySelector('input').addEventListener('change', (e) => {
-        station.owned = e.target.checked;
-        calculateAll();
-      });
-      stationsContainer.appendChild(el);
-    });
-
-    function openSetDrawer(setId) {
-      activeSet = indianMonopolyData.find(s => s.id === setId);
-      const drawer = document.getElementById('propsDrawer');
-      const container = document.getElementById('drawerProperties');
-      document.getElementById('drawerTitle').textContent = `${activeSet.name} Properties`;
-      document.getElementById('drawerHouseCost').textContent = `${activeSet.houseCost} / Building`;
-      container.innerHTML = '';
-
-      activeSet.properties.forEach((prop, idx) => {
-        const item = document.createElement('div');
-        item.className = 'bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2';
-        item.innerHTML = `
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <input type="checkbox" id="propCheck-${setId}-${idx}" ${prop.owned ? 'checked' : ''} class="w-4 h-4 rounded accent-amber-500">
-              <div>
-                <span class="text-xs font-bold text-white">${prop.name}</span>
-                <span class="text-[10px] text-slate-500 block font-mono">${prop.classic} | Base ${prop.base}</span>
-              </div>
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
+        
+        <!-- TARGETED SNAPSHOT SCORECARD (Only this card is exported to image) -->
+        <div id="finalScoreCard" class="bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-slate-800 rounded-3xl p-6 sm:p-7 shadow-2xl space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-800/80 pb-5">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        <span class="text-[10px] font-black uppercase tracking-wider text-amber-400">Total Player Net Worth</span>
+                    </div>
+                    <h1 id="grandTotalDisplay" class="text-3xl sm:text-5xl font-black text-white tracking-tight mt-1 font-mono">0</h1>
+                </div>
+                <button id="resetAllBtn" type="button" class="px-4 py-2 bg-slate-950 hover:bg-rose-950/60 hover:text-rose-300 hover:border-rose-800 border border-slate-800 text-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow">
+                    <span class="material-icons text-sm">restart_alt</span> Reset
+                </button>
             </div>
-            <span class="text-xs font-black text-amber-400 font-mono">${getPropTotal(prop, activeSet.houseCost)}</span>
-          </div>
-          <div class="flex flex-wrap gap-1 pt-1 ${prop.owned ? '' : 'opacity-40 pointer-events-none'}">
-            <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 0 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 0)">None</button>
-            <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 1 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 1)">1H</button>
-            <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 2 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 2)">2H</button>
-            <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 2.5 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 2.5)">Motel (2.5)</button>
-            <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 3 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 3)">3H</button>
-            <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 4 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 4)">4H</button>
-            <button type="button" class="px-2 py-1 text-[10px] font-bold rounded ${prop.houses === 5 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 5)">Hotel (5H)</button>
-          </div>
-        `;
-        item.querySelector(`#propCheck-${setId}-${idx}`).addEventListener('change', (e) => {
-          prop.owned = e.target.checked;
-          if (!prop.owned) prop.houses = 0;
-          openSetDrawer(setId);
-          calculateAll();
-        });
-        container.appendChild(item);
-      });
 
-      const currentIdx = indianMonopolyData.findIndex(s => s.id === setId);
-      const nextIdx = (currentIdx + 1) % indianMonopolyData.length;
-      const nextSet = indianMonopolyData[nextIdx];
-
-      const arrowNav = document.createElement('div');
-      arrowNav.className = "pt-3 border-t border-slate-800 flex justify-end";
-      arrowNav.innerHTML = `
-        <button type="button" class="px-3 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded-xl text-xs font-bold text-amber-400 flex items-center gap-1 transition">
-          <span>Next: ${nextSet.name}</span>
-          <span class="material-icons text-sm">arrow_forward</span>
-        </button>
-      `;
-      arrowNav.querySelector('button').addEventListener('click', () => openSetDrawer(nextSet.id));
-      container.appendChild(arrowNav);
-
-      drawer.classList.remove('hidden');
-      drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    window.setHouses = function(setId, index, val) {
-      const set = indianMonopolyData.find(s => s.id === setId);
-      set.properties[index].houses = val;
-      openSetDrawer(setId);
-      calculateAll();
-    };
-
-    function getPropTotal(prop, houseCost) {
-      if (!prop.owned) return 0;
-      return prop.base + (prop.houses * houseCost);
-    }
-
-    document.getElementById('cashModeDirect').addEventListener('click', () => {
-      cashMode = 'direct';
-      document.getElementById('cashDirectSection').classList.remove('hidden');
-      document.getElementById('cashCountSection').classList.add('hidden');
-      document.getElementById('cashModeDirect').className = 'px-3 py-1 rounded-lg font-bold bg-amber-500 text-slate-950';
-      document.getElementById('cashModeCount').className = 'px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white';
-      calculateAll();
-    });
-
-    document.getElementById('cashModeCount').addEventListener('click', () => {
-      cashMode = 'count';
-      document.getElementById('cashDirectSection').classList.add('hidden');
-      document.getElementById('cashCountSection').classList.remove('hidden');
-      document.getElementById('cashModeCount').className = 'px-3 py-1 rounded-lg font-bold bg-amber-500 text-slate-950';
-      document.getElementById('cashModeDirect').className = 'px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white';
-      calculateAll();
-    });
-
-    document.getElementById('directCashInput').addEventListener('input', calculateAll);
-    document.querySelectorAll('.cash-note-input').forEach(inp => inp.addEventListener('input', calculateAll));
-
-    function setupDynamicInputs(containerId, inputClass, placeholderPrefix) {
-      const container = document.getElementById(containerId);
-      container.addEventListener('input', (e) => {
-        if (!e.target.classList.contains(inputClass)) return;
-        const allInputs = container.querySelectorAll(`.${inputClass}`);
-        const lastInput = allInputs[allInputs.length - 1];
-        if (lastInput.value.trim() !== "") {
-          const nextIndex = allInputs.length + 1;
-          const newInput = document.createElement('input');
-          newInput.type = "number";
-          newInput.placeholder = `${placeholderPrefix} ${nextIndex}`;
-          newInput.className = lastInput.className;
-          container.appendChild(newInput);
-        }
-        for (let i = allInputs.length - 2; i >= 0; i--) {
-          if (allInputs[i].value.trim() === "" && allInputs[i + 1].value.trim() === "") {
-            allInputs[i + 1].remove();
-          }
-        }
-        calculateAll();
-      });
-    }
-    setupDynamicInputs('debtInputsContainer', 'debt-box', 'Debt');
-    setupDynamicInputs('loanInputsContainer', 'loan-box', 'Loaned');
-
-    function calculateAll() {
-      let propTotal = 0;
-      let propCount = 0;
-      let ownedItems = [];
-      indianMonopolyData.forEach(set => {
-        set.properties.forEach(prop => {
-          if (prop.owned) {
-            const val = getPropTotal(prop, set.houseCost);
-            propTotal += val;
-            propCount++;
-            let struct = prop.houses === 5 ? 'Hotel' : prop.houses === 2.5 ? 'Motel' : prop.houses > 0 ? `${prop.houses} Houses` : 'No Buildings';
-            ownedItems.push({ name: prop.name, colorBadge: set.badge, setName: set.name, detail: `${struct} - ${val}` });
-          }
-        });
-      });
-
-      let specialTotal = 0;
-      let specialCount = 0;
-      utilitiesData.forEach(u => {
-        if (u.owned) {
-          specialTotal += u.base;
-          specialCount++;
-          ownedItems.push({ name: u.name, colorBadge: 'bg-emerald-400', setName: 'Utility', detail: `${u.base}` });
-        }
-      });
-      stationsData.forEach(s => {
-        if (s.owned) {
-          specialTotal += s.base;
-          specialCount++;
-          ownedItems.push({ name: s.name, colorBadge: 'bg-slate-400', setName: 'Station', detail: `${s.base}` });
-        }
-      });
-
-      let cashTotal = 0;
-      if (cashMode === 'direct') {
-        cashTotal = parseFloat(document.getElementById('directCashInput').value) || 0;
-      } else {
-        document.querySelectorAll('.cash-note-input').forEach(inp => {
-          const noteVal = parseFloat(inp.dataset.note);
-          const count = parseFloat(inp.value) || 0;
-          cashTotal += noteVal * count;
-        });
-      }
-
-      let debtTotal = 0;
-      document.querySelectorAll('.debt-box').forEach(box => {
-        debtTotal += parseFloat(box.value) || 0;
-      });
-      let loanTotal = 0;
-      document.querySelectorAll('.loan-box').forEach(box => {
-        loanTotal += parseFloat(box.value) || 0;
-      });
-
-      const grandTotal = propTotal + specialTotal + cashTotal + loanTotal - debtTotal;
-      document.getElementById('grandTotalDisplay').textContent = `${grandTotal.toLocaleString()}`;
-      document.getElementById('statPropTotal').textContent = `${propTotal.toLocaleString()}`;
-      document.getElementById('statPropCount').textContent = `${propCount} Cities`;
-      document.getElementById('statSpecialTotal').textContent = `${specialTotal.toLocaleString()}`;
-      document.getElementById('statSpecialCount').textContent = `${specialCount} Items`;
-      document.getElementById('statCashTotal').textContent = `${cashTotal.toLocaleString()}`;
-      document.getElementById('statLoanNet').textContent = `${(loanTotal - debtTotal).toLocaleString()}`;
-      document.getElementById('debtTotalLabel').textContent = `-${debtTotal.toLocaleString()}`;
-      document.getElementById('loanTotalLabel').textContent = `+${loanTotal.toLocaleString()}`;
-
-      const ownedList = document.getElementById('ownedItemsList');
-      if (ownedItems.length === 0) {
-        ownedList.innerHTML = `<p class="text-slate-500 text-center py-4">No properties, stations, or utilities selected yet.</p>`;
-      } else {
-        ownedList.innerHTML = ownedItems.map(item => `
-          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <span class="w-2.5 h-2.5 rounded-full ${item.colorBadge}"></span>
-              <span class="font-bold text-white">${item.name} <span class="text-slate-500 text-[10px]">(${item.setName})</span></span>
+            <!-- Metric Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-slate-950/90 p-4 rounded-2xl border border-slate-800/80 text-center space-y-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Properties</span>
+                    <p id="statPropTotal" class="text-xl font-black text-emerald-400 font-mono">0</p>
+                    <span id="statPropCount" class="text-[10px] text-slate-500 font-medium block">0 Cities</span>
+                </div>
+                <div class="bg-slate-950/90 p-4 rounded-2xl border border-slate-800/80 text-center space-y-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Stations &amp; Utils</span>
+                    <p id="statSpecialTotal" class="text-xl font-black text-sky-400 font-mono">0</p>
+                    <span id="statSpecialCount" class="text-[10px] text-slate-500 font-medium block">0 Items</span>
+                </div>
+                <div class="bg-slate-950/90 p-4 rounded-2xl border border-slate-800/80 text-center space-y-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Liquid Cash</span>
+                    <p id="statCashTotal" class="text-xl font-black text-amber-400 font-mono">0</p>
+                    <span class="text-[10px] text-slate-500 font-medium block">Cash in Hand</span>
+                </div>
+                <div class="bg-slate-950/90 p-4 rounded-2xl border border-slate-800/80 text-center space-y-1">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Net Loans/Debt</span>
+                    <p id="statLoanNet" class="text-xl font-black text-slate-200 font-mono">0</p>
+                    <span class="text-[10px] text-slate-500 font-medium block">Balance</span>
+                </div>
             </div>
-            <span class="text-amber-400 font-mono font-semibold">${item.detail}</span>
-          </div>
-        `).join('');
-      }
-      return { grandTotal, propTotal, propCount, specialTotal, specialCount, cashTotal, debtTotal, loanTotal };
-    }
+        </div>
 
-    function getDynamicShareLink() {
-      const baseUrl = `https://sepal-vip.github.io/vip-games/g-mono/count.html`;
-      const params = new URLSearchParams();
-      const propPairs = [];
-      let currentFlatIdx = 0;
-      indianMonopolyData.forEach(set => {
-        set.properties.forEach(prop => {
-          if (prop.owned) {
-            propPairs.push(currentFlatIdx, prop.houses);
-          }
-          currentFlatIdx++;
-        });
-      });
-      if (propPairs.length > 0) {
-        params.set('props', propPairs.join(','));
-      }
-      const specials = [];
-      utilitiesData.forEach((u, idx) => { if (u.owned) specials.push(`u${idx}`); });
-      stationsData.forEach((s, idx) => { if (s.owned) specials.push(`s${idx}`); });
-      if (specials.length > 0) {
-        params.set('specials', specials.join(','));
-      }
-      if (cashMode === 'count') {
-        const cashCounts = [];
-        document.querySelectorAll('.cash-note-input').forEach(inp => {
-          const count = parseFloat(inp.value) || 0;
-          if (count > 0) {
-            cashCounts.push(`${inp.dataset.note}:${count}`);
-          }
-        });
-        if (cashCounts.length > 0) {
-          params.set('cash_counted', cashCounts.join(','));
-        }
-      } else {
-        const directVal = parseFloat(document.getElementById('directCashInput').value) || 0;
-        if (directVal > 0) {
-          params.set('cash_total', directVal);
-        }
-      }
-      const debtsArr = [];
-      document.querySelectorAll('.debt-box').forEach(b => {
-        const v = parseFloat(b.value) || 0;
-        if (v > 0) debtsArr.push(v);
-      });
-      const loansArr = [];
-      document.querySelectorAll('.loan-box').forEach(b => {
-        const v = parseFloat(b.value) || 0;
-        if (v > 0) loansArr.push(v);
-      });
-      const totalDebt = debtsArr.reduce((a, b) => a + b, 0);
-      const totalLoan = loansArr.reduce((a, b) => a + b, 0);
-      const netLoanDiff = totalDebt - totalLoan;
-      if (debtsArr.length > 0) params.set('debts', debtsArr.join(','));
-      if (loansArr.length > 0) params.set('loans', loansArr.join(','));
-      if (totalDebt > 0 || totalLoan > 0) params.set('loan', netLoanDiff);
-      const qs = params.toString();
-      return qs ? `${baseUrl}?${qs}` : baseUrl;
-    }
+        <!-- Section 1: City Color Sets & Buildings -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 1. City Color Sets &amp; Buildings
+                </h2>
+                <span class="text-[9px] text-amber-400 font-bold bg-amber-500/10 px-2.5 py-1 rounded-full border border-amber-500/20">Indian Edition</span>
+            </div>
 
-    function loadStateFromUrl() {
-      const params = new URLSearchParams(window.location.search);
-      if (!params.toString()) return;
-      if (params.has('props')) {
-        const propTokens = params.get('props').split(',').map(Number);
-        for (let i = 0; i < propTokens.length; i += 2) {
-          const fIdx = propTokens[i];
-          const level = propTokens[i + 1] !== undefined ? propTokens[i + 1] : 0;
-          if (flatProperties[fIdx]) {
-            const setObj = indianMonopolyData[flatProperties[fIdx].setIndex];
-            const propObj = setObj.properties[flatProperties[fIdx].propIndex];
-            propObj.owned = true;
-            propObj.houses = level;
-          }
+            <div id="colorSetsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-2.5"></div>
+
+            <!-- Single Slide-Down Drawer for Active Set -->
+            <div id="propsDrawer" class="bg-slate-950 border border-slate-800 rounded-3xl p-5 space-y-4 hidden shadow-xl">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800">
+                    <div>
+                        <span id="drawerTitle" class="text-sm font-black text-white block"></span>
+                        <span id="drawerHouseCost" class="text-[10px] text-slate-400 font-mono font-bold"></span>
+                    </div>
+                    <button type="button" onclick="document.getElementById('propsDrawer').classList.add('hidden')" class="text-slate-500 hover:text-white transition">
+                        <span class="material-icons text-base">close</span>
+                    </button>
+                </div>
+                <div id="drawerProperties" class="space-y-3"></div>
+            </div>
+        </div>
+
+        <!-- Section 2: Utilities & Stations -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div class="border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> 2. Utilities &amp; Stations
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5">
+                    <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block">Utilities (150 each)</span>
+                    <div id="utilitiesContainer" class="space-y-2"></div>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-2.5">
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Stations (200 each)</span>
+                    <div id="stationsContainer" class="space-y-2"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Owned Assets Breakdown -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-3 shadow-xl">
+            <div class="border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> 3. Owned Assets Breakdown
+                </h2>
+            </div>
+            <div id="ownedItemsList" class="space-y-2 max-h-52 overflow-y-auto pr-1 text-xs custom-scroll">
+                <p class="text-slate-500 text-center py-6">No properties, stations, or utilities selected yet.</p>
+            </div>
+        </div>
+
+        <!-- Section 4: Cash in Hand -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> 4. Liquid Cash
+                </h2>
+                <div class="flex bg-slate-950 p-1 rounded-xl border border-slate-800 text-xs">
+                    <button id="cashModeDirect" type="button" class="px-3 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 transition">Direct Value</button>
+                    <button id="cashModeCount" type="button" class="px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition">Count Notes</button>
+                </div>
+            </div>
+            <div id="cashDirectSection">
+                <input type="number" id="directCashInput" placeholder="Enter Total Cash Value" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+            </div>
+            <div id="cashCountSection" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-400 font-mono">1</span>
+                    <input type="number" data-note="1" class="cash-note-input w-12 bg-slate-900 border border-slate-800 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-400 font-mono">5</span>
+                    <input type="number" data-note="5" class="cash-note-input w-12 bg-slate-900 border border-slate-800 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-400 font-mono">10</span>
+                    <input type="number" data-note="10" class="cash-note-input w-12 bg-slate-900 border border-slate-800 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-400 font-mono">20</span>
+                    <input type="number" data-note="20" class="cash-note-input w-12 bg-slate-900 border border-slate-800 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-400 font-mono">50</span>
+                    <input type="number" data-note="50" class="cash-note-input w-12 bg-slate-900 border border-slate-800 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-400 font-mono">100</span>
+                    <input type="number" data-note="100" class="cash-note-input w-12 bg-slate-900 border border-slate-800 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+                </div>
+                <div class="bg-slate-950 border border-slate-800 p-2.5 rounded-xl flex items-center justify-between sm:col-span-2">
+                    <span class="text-xs font-bold text-slate-400 font-mono">500</span>
+                    <input type="number" data-note="500" class="cash-note-input w-16 bg-slate-900 border border-slate-800 text-center rounded-lg py-1 text-xs font-bold text-white focus:border-amber-500 focus:outline-none" value="0">
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 5: Debts & Loans -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+            <div class="border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> 5. Loans &amp; Debts
+                </h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-icons text-sm">remove_circle</span> Debts Owed (-)
+                        </h3>
+                        <span id="debtTotalLabel" class="text-xs font-mono font-bold text-rose-400">0</span>
+                    </div>
+                    <div id="debtInputsContainer" class="space-y-2">
+                        <input type="number" placeholder="Debt 1" class="debt-box w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">
+                    </div>
+                </div>
+                <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            <span class="material-icons text-sm">add_circle</span> Loaned Out (+)
+                        </h3>
+                        <span id="loanTotalLabel" class="text-xs font-mono font-bold text-emerald-400">0</span>
+                    </div>
+                    <div id="loanInputsContainer" class="space-y-2">
+                        <input type="number" placeholder="Loaned 1" class="loan-box w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Action Buttons -->
+        <div class="space-y-2 pt-2">
+            <button id="openShareModalBtnBottom" type="button" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-black py-3.5 rounded-2xl transition shadow-lg flex items-center justify-center gap-2 text-sm">
+                <span class="material-icons text-base">share</span> Share Score Record
+            </button>
+            <div class="grid grid-cols-2 gap-2">
+                <button id="copyPlainBtn" type="button" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                    <span class="material-icons text-sm">content_paste</span> Copy Plain
+                </button>
+                <button id="copyFormatBtn" type="button" class="p-3 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-300 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 transition">
+                    <span class="material-icons text-sm">format_align_left</span> Copy Formatted
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Share Modal -->
+    <div id="shareModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+                    <span class="material-icons text-amber-400 text-base">ios_share</span> Share Monopoly Score
+                </h3>
+                <button type="button" id="closeShareModalBtn" class="text-slate-400 hover:text-white">
+                    <span class="material-icons text-lg">close</span>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400">Choose your preferred sharing mode:</p>
+            <div class="space-y-2.5">
+                <button id="shareLinkOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                    <div>
+                        <p class="text-xs font-bold text-white">Share Link Only</p>
+                        <p class="text-[10px] text-slate-400">URL with full dynamic calculation state</p>
+                    </div>
+                    <span class="material-icons text-amber-400 text-sm">link</span>
+                </button>
+                <button id="copyLinkBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                    <div>
+                        <p class="text-xs font-bold text-white">Copy Link (With Full State)</p>
+                        <p class="text-[10px] text-slate-400">Copy shareable URL directly to clipboard</p>
+                    </div>
+                    <span class="material-icons text-sky-400 text-sm">content_copy</span>
+                </button>
+                <button id="shareImageOnlyBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                    <div>
+                        <p class="text-xs font-bold text-white">Share Snapshot Image</p>
+                        <p class="text-[10px] text-slate-400">Top scorecard only, without reset button</p>
+                    </div>
+                    <span class="material-icons text-emerald-400 text-sm">image</span>
+                </button>
+                <button id="copyImageBtn" class="w-full p-3.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-2xl flex items-center justify-between text-left transition">
+                    <div>
+                        <p class="text-xs font-bold text-white">Copy Snapshot Image</p>
+                        <p class="text-[10px] text-slate-400">Copy top scorecard directly to clipboard</p>
+                    </div>
+                    <span class="material-icons text-emerald-400 text-sm">photo</span>
+                </button>
+                <button id="shareBothBtn" class="w-full p-3.5 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 rounded-2xl flex items-center justify-between text-left transition">
+                    <div>
+                        <p class="text-xs font-bold text-amber-300">Share Image + Caption (WhatsApp)</p>
+                        <p class="text-[10px] text-amber-200/70">Scorecard image with state link in text</p>
+                    </div>
+                    <span class="material-icons text-amber-400 text-sm">send</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global Debug Logger Engine
+        if (localStorage.getItem('debugging') === null) {
+            localStorage.setItem('debugging', '0');
         }
-      }
-      if (params.has('specials')) {
-        const specialTokens = params.get('specials').split(',');
-        specialTokens.forEach(token => {
-          if (token.startsWith('u')) {
-            const uIdx = Number(token.substring(1));
-            if (utilitiesData[uIdx]) {
-              utilitiesData[uIdx].owned = true;
-              const inp = document.getElementById(`util-${uIdx}`);
-              if (inp) inp.checked = true;
+        function debugLog(...args) {
+            if (localStorage.getItem('debugging') === '1') {
+                console.log("[DEBUG:count.html]", ...args);
             }
-          } else if (token.startsWith('s')) {
-            const sIdx = Number(token.substring(1));
-            if (stationsData[sIdx]) {
-              stationsData[sIdx].owned = true;
-              const inp = document.getElementById(`station-${sIdx}`);
-              if (inp) inp.checked = true;
+        }
+        debugLog("Initializing Rebuilt Count Calculator page...");
+
+        const indianMonopolyData = [
+            {
+                id: "brown",
+                name: "Brown",
+                colorClass: "bg-amber-950/40 border-amber-800 text-amber-300 hover:border-amber-600",
+                badge: "bg-amber-900",
+                houseCost: 50,
+                properties: [
+                    { name: "Guwahati", classic: "Mediterranean Ave", base: 60, owned: false, houses: 0 },
+                    { name: "Bhubaneswar", classic: "Baltic Ave", base: 60, owned: false, houses: 0 }
+                ]
+            },
+            {
+                id: "light-blue",
+                name: "Light Blue",
+                colorClass: "bg-sky-500/10 border-sky-500/40 text-sky-300 hover:border-sky-400",
+                badge: "bg-sky-400",
+                houseCost: 50,
+                properties: [
+                    { name: "Panaji", classic: "Oriental Ave", base: 100, owned: false, houses: 0 },
+                    { name: "Agra", classic: "Vermont Ave", base: 100, owned: false, houses: 0 },
+                    { name: "Vadodara", classic: "Connecticut Ave", base: 120, owned: false, houses: 0 }
+                ]
+            },
+            {
+                id: "pink",
+                name: "Pink",
+                colorClass: "bg-pink-500/10 border-pink-500/40 text-pink-300 hover:border-pink-400",
+                badge: "bg-pink-500",
+                houseCost: 100,
+                properties: [
+                    { name: "Ludhiana", classic: "St. Charles Pl", base: 140, owned: false, houses: 0 },
+                    { name: "Patna", classic: "States Ave", base: 140, owned: false, houses: 0 },
+                    { name: "Bhopal", classic: "Virginia Ave", base: 160, owned: false, houses: 0 }
+                ]
+            },
+            {
+                id: "orange",
+                name: "Orange",
+                colorClass: "bg-orange-500/10 border-orange-500/40 text-orange-300 hover:border-orange-400",
+                badge: "bg-orange-500",
+                houseCost: 100,
+                properties: [
+                    { name: "Indore", classic: "St. James Pl", base: 180, owned: false, houses: 0 },
+                    { name: "Nagpur", classic: "Tennessee Ave", base: 180, owned: false, houses: 0 },
+                    { name: "Kochi", classic: "New York Ave", base: 200, owned: false, houses: 0 }
+                ]
+            },
+            {
+                id: "red",
+                name: "Red",
+                colorClass: "bg-red-500/10 border-red-500/40 text-red-300 hover:border-red-400",
+                badge: "bg-red-500",
+                houseCost: 150,
+                properties: [
+                    { name: "Lucknow", classic: "Kentucky Ave", base: 220, owned: false, houses: 0 },
+                    { name: "Chandigarh", classic: "Indiana Ave", base: 220, owned: false, houses: 0 },
+                    { name: "Jaipur", classic: "Illinois Ave", base: 240, owned: false, houses: 0 }
+                ]
+            },
+            {
+                id: "yellow",
+                name: "Yellow",
+                colorClass: "bg-yellow-500/10 border-yellow-500/40 text-yellow-300 hover:border-yellow-400",
+                badge: "bg-yellow-400",
+                houseCost: 150,
+                properties: [
+                    { name: "Pune", classic: "Atlantic Ave", base: 260, owned: false, houses: 0 },
+                    { name: "Hyderabad", classic: "Ventnor Ave", base: 260, owned: false, houses: 0 },
+                    { name: "Ahmedabad", classic: "Marvin Gardens", base: 280, owned: false, houses: 0 }
+                ]
+            },
+            {
+                id: "green",
+                name: "Green",
+                colorClass: "bg-emerald-500/10 border-emerald-500/40 text-emerald-300 hover:border-emerald-400",
+                badge: "bg-emerald-500",
+                houseCost: 200,
+                properties: [
+                    { name: "Kolkata", classic: "Pacific Ave", base: 300, owned: false, houses: 0 },
+                    { name: "Chennai", classic: "North Carolina Ave", base: 300, owned: false, houses: 0 },
+                    { name: "Bengaluru", classic: "Pennsylvania Ave", base: 320, owned: false, houses: 0 }
+                ]
+            },
+            {
+                id: "dark-blue",
+                name: "Dark Blue",
+                colorClass: "bg-blue-600/10 border-blue-600/40 text-blue-300 hover:border-blue-400",
+                badge: "bg-blue-600",
+                houseCost: 200,
+                properties: [
+                    { name: "Delhi", classic: "Park Place", base: 350, owned: false, houses: 0 },
+                    { name: "Mumbai", classic: "Boardwalk", base: 400, owned: false, houses: 0 }
+                ]
             }
-          }
+        ];
+
+        const utilitiesData = [
+            { name: "Electric Company", classic: "Electric Co", base: 150, owned: false },
+            { name: "Water Works", classic: "Water Works", base: 150, owned: false }
+        ];
+
+        const stationsData = [
+            { name: "Chennai Central", classic: "Reading RR", base: 200, owned: false },
+            { name: "Howrah", classic: "Pennsylvania RR", base: 200, owned: false },
+            { name: "New Delhi", classic: "B&O RR", base: 200, owned: false },
+            { name: "Chhatrapati Shivaji Maharaj Terminus", classic: "Short Line RR", base: 200, owned: false }
+        ];
+
+        const flatProperties = [];
+        indianMonopolyData.forEach((set, sIdx) => {
+            set.properties.forEach((prop, pIdx) => {
+                flatProperties.push({ ...prop, setId: set.id, setIndex: sIdx, propIndex: pIdx });
+            });
         });
-      }
-      if (params.has('cash_counted')) {
-        document.getElementById('cashModeCount').click();
-        const counts = params.get('cash_counted').split(',');
-        counts.forEach(pair => {
-          const [note, count] = pair.split(':');
-          const inp = document.querySelector(`.cash-note-input[data-note="${note}"]`);
-          if (inp) inp.value = count;
+
+        let activeSet = null;
+        let cashMode = 'direct';
+
+        // Render Color Sets Grid
+        const setsGrid = document.getElementById('colorSetsGrid');
+        indianMonopolyData.forEach(set => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = `p-3 rounded-2xl border text-left flex flex-col justify-between transition hover:scale-[1.02] ${set.colorClass} shadow-lg`;
+            btn.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="w-2.5 h-2.5 rounded-full ${set.badge}"></span>
+                    <span class="text-[10px] text-slate-400 font-bold">${set.properties.length} Cities</span>
+                </div>
+                <span class="text-xs font-black text-white mt-2">${set.name}</span>
+            `;
+            btn.addEventListener('click', () => openSetDrawer(set.id));
+            setsGrid.appendChild(btn);
         });
-      } else if (params.has('cash_total')) {
-        document.getElementById('cashModeDirect').click();
-        document.getElementById('directCashInput').value = params.get('cash_total');
-      }
-      if (params.has('debts')) {
-        const debts = params.get('debts').split(',');
-        const container = document.getElementById('debtInputsContainer');
-        container.innerHTML = '';
-        debts.forEach((d, idx) => {
-          const inp = document.createElement('input');
-          inp.type = "number";
-          inp.placeholder = `Debt ${idx + 1}`;
-          inp.className = "debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none";
-          inp.value = d;
-          container.appendChild(inp);
+
+        // Render Utilities Checkboxes
+        const utilsContainer = document.getElementById('utilitiesContainer');
+        utilitiesData.forEach((util, idx) => {
+            const el = document.createElement('div');
+            el.className = 'bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between';
+            el.innerHTML = `
+                <div>
+                    <p class="text-xs font-bold text-white">${util.name}</p>
+                    <p class="text-[10px] text-emerald-400/80 font-mono">Base: ${util.base}</p>
+                </div>
+                <input type="checkbox" id="util-${idx}" class="w-4 h-4 rounded accent-emerald-500 bg-slate-950 border-slate-700 cursor-pointer">
+            `;
+            el.querySelector('input').addEventListener('change', (e) => {
+                util.owned = e.target.checked;
+                debugLog(`Toggled utility ${util.name}:`, util.owned);
+                calculateAll();
+            });
+            utilsContainer.appendChild(el);
         });
-      }
-      if (params.has('loans')) {
-        const loans = params.get('loans').split(',');
-        const container = document.getElementById('loanInputsContainer');
-        container.innerHTML = '';
-        loans.forEach((l, idx) => {
-          const inp = document.createElement('input');
-          inp.type = "number";
-          inp.placeholder = `Loaned ${idx + 1}`;
-          inp.className = "loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none";
-          inp.value = l;
-          container.appendChild(inp);
+
+        // Render Stations Checkboxes
+        const stationsContainer = document.getElementById('stationsContainer');
+        stationsData.forEach((station, idx) => {
+            const el = document.createElement('div');
+            el.className = 'bg-slate-900 border border-slate-800 rounded-xl p-3 flex items-center justify-between';
+            el.innerHTML = `
+                <div>
+                    <p class="text-xs font-bold text-white">${station.name}</p>
+                    <p class="text-[10px] text-slate-400 font-mono">Base: ${station.base}</p>
+                </div>
+                <input type="checkbox" id="station-${idx}" class="w-4 h-4 rounded accent-amber-500 bg-slate-950 border-slate-700 cursor-pointer">
+            `;
+            el.querySelector('input').addEventListener('change', (e) => {
+                station.owned = e.target.checked;
+                debugLog(`Toggled station ${station.name}:`, station.owned);
+                calculateAll();
+            });
+            stationsContainer.appendChild(el);
         });
-      }
-    }
 
-    document.getElementById('resetAllBtn').addEventListener('click', () => {
-      indianMonopolyData.forEach(set => set.properties.forEach(p => { p.owned = false; p.houses = 0; }));
-      utilitiesData.forEach(u => u.owned = false);
-      stationsData.forEach(s => s.owned = false);
-      document.querySelectorAll('#utilitiesContainer input, #stationsContainer input').forEach(i => i.checked = false);
-      document.getElementById('directCashInput').value = 0;
-      document.querySelectorAll('.cash-note-input').forEach(i => i.value = 0);
-      document.getElementById('debtInputsContainer').innerHTML = `<input type="number" placeholder="Debt 1" class="debt-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">`;
-      document.getElementById('loanInputsContainer').innerHTML = `<input type="number" placeholder="Loaned 1" class="loan-box w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">`;
-      if (activeSet) openSetDrawer(activeSet.id);
-      window.history.replaceState({}, '', window.location.pathname);
-      calculateAll();
-    });
+        function openSetDrawer(setId) {
+            debugLog("Opening Color Set drawer for:", setId);
+            activeSet = indianMonopolyData.find(s => s.id === setId);
+            const drawer = document.getElementById('propsDrawer');
+            const container = document.getElementById('drawerProperties');
+            document.getElementById('drawerTitle').textContent = `${activeSet.name} Properties`;
+            document.getElementById('drawerHouseCost').textContent = `${activeSet.houseCost} / Building`;
+            container.innerHTML = '';
 
-    const shareModal = document.getElementById('shareModal');
-    document.getElementById('openShareModalBtn').addEventListener('click', () => shareModal.classList.remove('hidden'));
-    document.getElementById('closeShareModalBtn').addEventListener('click', () => shareModal.classList.add('hidden'));
+            activeSet.properties.forEach((prop, idx) => {
+                const item = document.createElement('div');
+                item.className = 'bg-slate-900 border border-slate-800 rounded-2xl p-3.5 space-y-2.5';
+                item.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2.5">
+                            <input type="checkbox" id="propCheck-${setId}-${idx}" ${prop.owned ? 'checked' : ''} class="w-4 h-4 rounded accent-amber-500 cursor-pointer">
+                            <div>
+                                <span class="text-xs font-bold text-white block">${prop.name}</span>
+                                <span class="text-[10px] text-slate-500 font-mono">${prop.classic} | Base ${prop.base}</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-black text-amber-400 font-mono">${getPropTotal(prop, activeSet.houseCost)}</span>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 pt-1 ${prop.owned ? '' : 'opacity-30 pointer-events-none'}">
+                        <button type="button" class="px-2.5 py-1 text-[10px] font-bold rounded-lg ${prop.houses === 0 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 0)">None</button>
+                        <button type="button" class="px-2.5 py-1 text-[10px] font-bold rounded-lg ${prop.houses === 1 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 1)">1H</button>
+                        <button type="button" class="px-2.5 py-1 text-[10px] font-bold rounded-lg ${prop.houses === 2 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 2)">2H</button>
+                        <button type="button" class="px-2.5 py-1 text-[10px] font-bold rounded-lg ${prop.houses === 2.5 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 2.5)">Motel (2.5)</button>
+                        <button type="button" class="px-2.5 py-1 text-[10px] font-bold rounded-lg ${prop.houses === 3 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 3)">3H</button>
+                        <button type="button" class="px-2.5 py-1 text-[10px] font-bold rounded-lg ${prop.houses === 4 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 4)">4H</button>
+                        <button type="button" class="px-2.5 py-1 text-[10px] font-bold rounded-lg ${prop.houses === 5 ? 'bg-amber-500 text-slate-950' : 'bg-slate-950 text-slate-400 border border-slate-800'}" onclick="setHouses('${setId}', ${idx}, 5)">Hotel (5H)</button>
+                    </div>
+                `;
+                item.querySelector(`#propCheck-${setId}-${idx}`).addEventListener('change', (e) => {
+                    prop.owned = e.target.checked;
+                    if (!prop.owned) prop.houses = 0;
+                    openSetDrawer(setId);
+                    calculateAll();
+                });
+                container.appendChild(item);
+            });
 
-    document.getElementById('shareLinkOnlyBtn').addEventListener('click', async () => {
-      const shareUrl = getDynamicShareLink();
-      if (navigator.share) {
-        await navigator.share({ title: 'Monopoly Score Calculator', url: shareUrl });
-      } else {
-        navigator.clipboard.writeText(shareUrl);
-        alert('Score Link Copied: ' + shareUrl);
-      }
-      shareModal.classList.add('hidden');
-    });
+            const currentIdx = indianMonopolyData.findIndex(s => s.id === setId);
+            const nextIdx = (currentIdx + 1) % indianMonopolyData.length;
+            const nextSet = indianMonopolyData[nextIdx];
 
-    document.getElementById('copyLinkBtn').addEventListener('click', () => {
-      const shareUrl = getDynamicShareLink();
-      navigator.clipboard.writeText(shareUrl);
-      alert('Score Link Copied to clipboard: ' + shareUrl);
-      shareModal.classList.add('hidden');
-    });
+            const arrowNav = document.createElement('div');
+            arrowNav.className = "pt-3 border-t border-slate-800 flex justify-end";
+            arrowNav.innerHTML = `
+                <button type="button" class="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs font-bold text-amber-400 flex items-center gap-1.5 transition">
+                    <span>Next Set: ${nextSet.name}</span>
+                    <span class="material-icons text-sm">arrow_forward</span>
+                </button>
+            `;
+            arrowNav.querySelector('button').addEventListener('click', () => openSetDrawer(nextSet.id));
+            container.appendChild(arrowNav);
 
-    async function captureSnapshotBlob() {
-      const container = document.getElementById('shareableSnapshotContainer');
-      const originalStyle = container.getAttribute('style') || '';
-      container.style.width = '720px';
-      container.style.maxWidth = '720px';
-      const canvas = await html2canvas(container, {
-        backgroundColor: '#020617',
-        scale: 2,
-        useCORS: true,
-        windowWidth: 1024
-      });
-      container.setAttribute('style', originalStyle);
-      return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    }
-
-    document.getElementById('shareImageOnlyBtn').addEventListener('click', async () => {
-      try {
-        const blob = await captureSnapshotBlob();
-        const file = new File([blob], 'monopoly-scorecard.png', { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], title: 'VIP Gamers Monopoly Score' });
-        } else {
-          const downloadUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = downloadUrl;
-          a.download = 'monopoly-scorecard.png';
-          a.click();
+            drawer.classList.remove('hidden');
+            drawer.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
-      } catch (err) {
-        console.error(err);
-      }
-      shareModal.classList.add('hidden');
-    });
 
-    document.getElementById('copyImageBtn').addEventListener('click', async () => {
-      try {
-        const blob = await captureSnapshotBlob();
-        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-        alert('Scorecard image copied to clipboard!');
-      } catch (err) {
-        const blob = await captureSnapshotBlob();
-        const downloadUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = 'monopoly-scorecard.png';
-        a.click();
-      }
-      shareModal.classList.add('hidden');
-    });
+        window.setHouses = function(setId, index, val) {
+            const set = indianMonopolyData.find(s => s.id === setId);
+            set.properties[index].houses = val;
+            debugLog(`Set houses for ${set.properties[index].name} to:`, val);
+            openSetDrawer(setId);
+            calculateAll();
+        };
 
-    document.getElementById('shareBothBtn').addEventListener('click', async () => {
-      const data = calculateAll();
-      const shareUrl = getDynamicShareLink();
-      const captionText = `Monopoly Score Total: ${data.grandTotal.toLocaleString()} (${data.propCount} Cities, ${data.specialCount} Stations/Utilities).\nOpen Audit: ${shareUrl}`;
-      try {
-        const blob = await captureSnapshotBlob();
-        const file = new File([blob], 'monopoly-scorecard.png', { type: 'image/png' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: 'VIP Gamers Monopoly Score',
-            text: captionText
-          });
-        } else {
-          const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
-          window.open(waUrl, '_blank');
+        function getPropTotal(prop, houseCost) {
+            if (!prop.owned) return 0;
+            return prop.base + (prop.houses * houseCost);
         }
-      } catch (err) {
-        const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
-        window.open(waUrl, '_blank');
-      }
-      shareModal.classList.add('hidden');
-    });
 
-    document.getElementById('copyPlainBtn').addEventListener('click', () => {
-      const data = calculateAll();
-      const text = `Monopoly Score: ${data.grandTotal} | Cities: ${data.propCount} | Stations/Utils: ${data.specialCount} | Cash: ${data.cashTotal} | Net Loans: ${data.loanTotal - data.debtTotal}`;
-      navigator.clipboard.writeText(text);
-      alert('Plain text copied!');
-    });
+        // Cash Mode Switcher
+        document.getElementById('cashModeDirect').addEventListener('click', () => {
+            cashMode = 'direct';
+            document.getElementById('cashDirectSection').classList.remove('hidden');
+            document.getElementById('cashCountSection').classList.add('hidden');
+            document.getElementById('cashModeDirect').className = 'px-3 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 transition';
+            document.getElementById('cashModeCount').className = 'px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition';
+            calculateAll();
+        });
 
-    document.getElementById('copyFormatBtn').addEventListener('click', () => {
-      const data = calculateAll();
-      const formatted = `*VIP GAMERS - MONOPOLY AUDIT*\n*Total Net Worth:* ${data.grandTotal.toLocaleString()}\n*City Properties:* ${data.propTotal.toLocaleString()} (${data.propCount} Cities)\n*Stations & Utilities:* ${data.specialTotal.toLocaleString()} (${data.specialCount} Items)\n*Liquid Cash:* ${data.cashTotal.toLocaleString()}\n*Loaned Out:* ${data.loanTotal.toLocaleString()}\n*Debts Owed:* ${data.debtTotal.toLocaleString()}\n\nCalculated offline via VIP Gamers Hub`;
-      navigator.clipboard.writeText(formatted);
-      alert('Formatted scorecard copied!');
-    });
+        document.getElementById('cashModeCount').addEventListener('click', () => {
+            cashMode = 'count';
+            document.getElementById('cashDirectSection').classList.add('hidden');
+            document.getElementById('cashCountSection').classList.remove('hidden');
+            document.getElementById('cashModeCount').className = 'px-3 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 transition';
+            document.getElementById('cashModeDirect').className = 'px-3 py-1 rounded-lg font-bold text-slate-400 hover:text-white transition';
+            calculateAll();
+        });
 
-    loadStateFromUrl();
-    calculateAll();
-  </script>
+        document.getElementById('directCashInput').addEventListener('input', calculateAll);
+        document.querySelectorAll('.cash-note-input').forEach(inp => inp.addEventListener('input', calculateAll));
+
+        function setupDynamicInputs(containerId, inputClass, placeholderPrefix) {
+            const container = document.getElementById(containerId);
+            container.addEventListener('input', (e) => {
+                if (!e.target.classList.contains(inputClass)) return;
+                const allInputs = container.querySelectorAll(`.${inputClass}`);
+                const lastInput = allInputs[allInputs.length - 1];
+                if (lastInput.value.trim() !== "") {
+                    const nextIndex = allInputs.length + 1;
+                    const newInput = document.createElement('input');
+                    newInput.type = "number";
+                    newInput.placeholder = `${placeholderPrefix} ${nextIndex}`;
+                    newInput.className = lastInput.className;
+                    container.appendChild(newInput);
+                }
+                for (let i = allInputs.length - 2; i >= 0; i--) {
+                    if (allInputs[i].value.trim() === "" && allInputs[i + 1].value.trim() === "") {
+                        allInputs[i + 1].remove();
+                    }
+                }
+                calculateAll();
+            });
+        }
+        setupDynamicInputs('debtInputsContainer', 'debt-box', 'Debt');
+        setupDynamicInputs('loanInputsContainer', 'loan-box', 'Loaned');
+
+        function calculateAll() {
+            let propTotal = 0;
+            let propCount = 0;
+            let ownedItems = [];
+
+            indianMonopolyData.forEach(set => {
+                set.properties.forEach(prop => {
+                    if (prop.owned) {
+                        const val = getPropTotal(prop, set.houseCost);
+                        propTotal += val;
+                        propCount++;
+                        let struct = prop.houses === 5 ? 'Hotel' : prop.houses === 2.5 ? 'Motel' : prop.houses > 0 ? `${prop.houses} Houses` : 'No Buildings';
+                        ownedItems.push({ name: prop.name, colorBadge: set.badge, setName: set.name, detail: `${struct} - ${val}` });
+                    }
+                });
+            });
+
+            let specialTotal = 0;
+            let specialCount = 0;
+            utilitiesData.forEach(u => {
+                if (u.owned) {
+                    specialTotal += u.base;
+                    specialCount++;
+                    ownedItems.push({ name: `${u.name}`, colorBadge: 'bg-emerald-400', setName: 'Utility', detail: `${u.base}` });
+                }
+            });
+            stationsData.forEach(s => {
+                if (s.owned) {
+                    specialTotal += s.base;
+                    specialCount++;
+                    ownedItems.push({ name: `${s.name}`, colorBadge: 'bg-slate-400', setName: 'Station', detail: `${s.base}` });
+                }
+            });
+
+            let cashTotal = 0;
+            if (cashMode === 'direct') {
+                cashTotal = parseFloat(document.getElementById('directCashInput').value) || 0;
+            } else {
+                document.querySelectorAll('.cash-note-input').forEach(inp => {
+                    const noteVal = parseFloat(inp.dataset.note);
+                    const count = parseFloat(inp.value) || 0;
+                    cashTotal += noteVal * count;
+                });
+            }
+
+            let debtTotal = 0;
+            document.querySelectorAll('.debt-box').forEach(box => {
+                debtTotal += parseFloat(box.value) || 0;
+            });
+            let loanTotal = 0;
+            document.querySelectorAll('.loan-box').forEach(box => {
+                loanTotal += parseFloat(box.value) || 0;
+            });
+
+            const grandTotal = propTotal + specialTotal + cashTotal + loanTotal - debtTotal;
+            debugLog("Calculated Totals:", { grandTotal, propTotal, specialTotal, cashTotal, loanTotal, debtTotal });
+
+            document.getElementById('grandTotalDisplay').textContent = `${grandTotal.toLocaleString()}`;
+            document.getElementById('statPropTotal').textContent = `${propTotal.toLocaleString()}`;
+            document.getElementById('statPropCount').textContent = `${propCount} Cities`;
+            document.getElementById('statSpecialTotal').textContent = `${specialTotal.toLocaleString()}`;
+            document.getElementById('statSpecialCount').textContent = `${specialCount} Items`;
+            document.getElementById('statCashTotal').textContent = `${cashTotal.toLocaleString()}`;
+            document.getElementById('statLoanNet').textContent = `${(loanTotal - debtTotal).toLocaleString()}`;
+            document.getElementById('debtTotalLabel').textContent = `-${debtTotal.toLocaleString()}`;
+            document.getElementById('loanTotalLabel').textContent = `+${loanTotal.toLocaleString()}`;
+
+            const ownedList = document.getElementById('ownedItemsList');
+            if (ownedItems.length === 0) {
+                ownedList.innerHTML = `<p class="text-slate-500 text-center py-6">No properties, stations, or utilities selected yet.</p>`;
+            } else {
+                ownedList.innerHTML = ownedItems.map(item => `
+                    <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800/80 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full ${item.colorBadge}"></span>
+                            <span class="font-bold text-white">${item.name} <span class="text-slate-500 text-[10px]">(${item.setName})</span></span>
+                        </div>
+                        <span class="text-amber-400 font-mono font-semibold">${item.detail}</span>
+                    </div>
+                `).join('');
+            }
+            return { grandTotal, propTotal, propCount, specialTotal, specialCount, cashTotal, debtTotal, loanTotal };
+        }
+
+        // Dynamic State URL Builder
+        function getDynamicShareLink() {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const params = new URLSearchParams();
+
+            const propPairs = [];
+            let currentFlatIdx = 0;
+            indianMonopolyData.forEach(set => {
+                set.properties.forEach(prop => {
+                    if (prop.owned) {
+                        propPairs.push(currentFlatIdx, prop.houses);
+                    }
+                    currentFlatIdx++;
+                });
+            });
+            if (propPairs.length > 0) params.set('props', propPairs.join(','));
+
+            const specials = [];
+            utilitiesData.forEach((u, idx) => { if (u.owned) specials.push(`u${idx}`); });
+            stationsData.forEach((s, idx) => { if (s.owned) specials.push(`s${idx}`); });
+            if (specials.length > 0) params.set('specials', specials.join(','));
+
+            if (cashMode === 'count') {
+                const cashCounts = [];
+                document.querySelectorAll('.cash-note-input').forEach(inp => {
+                    const count = parseFloat(inp.value) || 0;
+                    if (count > 0) cashCounts.push(`${inp.dataset.note}:${count}`);
+                });
+                if (cashCounts.length > 0) params.set('cash_counted', cashCounts.join(','));
+            } else {
+                const directVal = parseFloat(document.getElementById('directCashInput').value) || 0;
+                if (directVal > 0) params.set('cash_total', directVal);
+            }
+
+            const debtsArr = [];
+            document.querySelectorAll('.debt-box').forEach(b => {
+                const v = parseFloat(b.value) || 0;
+                if (v > 0) debtsArr.push(v);
+            });
+            const loansArr = [];
+            document.querySelectorAll('.loan-box').forEach(b => {
+                const v = parseFloat(b.value) || 0;
+                if (v > 0) loansArr.push(v);
+            });
+            if (debtsArr.length > 0) params.set('debts', debtsArr.join(','));
+            if (loansArr.length > 0) params.set('loans', loansArr.join(','));
+
+            const qs = params.toString();
+            const finalUrl = qs ? `${baseUrl}?${qs}` : baseUrl;
+            debugLog("Dynamic Link Generated:", finalUrl);
+            return finalUrl;
+        }
+
+        // Restore State from Query String
+        function loadStateFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            if (!params.toString()) return;
+            debugLog("Restoring state from URL parameters:", params.toString());
+
+            if (params.has('props')) {
+                const propTokens = params.get('props').split(',').map(Number);
+                for (let i = 0; i < propTokens.length; i += 2) {
+                    const fIdx = propTokens[i];
+                    const level = propTokens[i + 1] !== undefined ? propTokens[i + 1] : 0;
+                    if (flatProperties[fIdx]) {
+                        const setObj = indianMonopolyData[flatProperties[fIdx].setIndex];
+                        const propObj = setObj.properties[flatProperties[fIdx].propIndex];
+                        propObj.owned = true;
+                        propObj.houses = level;
+                    }
+                }
+            }
+            if (params.has('specials')) {
+                const specialTokens = params.get('specials').split(',');
+                specialTokens.forEach(token => {
+                    if (token.startsWith('u')) {
+                        const uIdx = Number(token.substring(1));
+                        if (utilitiesData[uIdx]) {
+                            utilitiesData[uIdx].owned = true;
+                            const inp = document.getElementById(`util-${uIdx}`);
+                            if (inp) inp.checked = true;
+                        }
+                    } else if (token.startsWith('s')) {
+                        const sIdx = Number(token.substring(1));
+                        if (stationsData[sIdx]) {
+                            stationsData[sIdx].owned = true;
+                            const inp = document.getElementById(`station-${sIdx}`);
+                            if (inp) inp.checked = true;
+                        }
+                    }
+                });
+            }
+            if (params.has('cash_counted')) {
+                document.getElementById('cashModeCount').click();
+                const counts = params.get('cash_counted').split(',');
+                counts.forEach(pair => {
+                    const [note, count] = pair.split(':');
+                    const inp = document.querySelector(`.cash-note-input[data-note="${note}"]`);
+                    if (inp) inp.value = count;
+                });
+            } else if (params.has('cash_total')) {
+                document.getElementById('cashModeDirect').click();
+                document.getElementById('directCashInput').value = params.get('cash_total');
+            }
+            if (params.has('debts')) {
+                const debts = params.get('debts').split(',');
+                const container = document.getElementById('debtInputsContainer');
+                container.innerHTML = '';
+                debts.forEach((d, idx) => {
+                    const inp = document.createElement('input');
+                    inp.type = "number";
+                    inp.placeholder = `Debt ${idx + 1}`;
+                    inp.className = "debt-box w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none";
+                    inp.value = d;
+                    container.appendChild(inp);
+                });
+            }
+            if (params.has('loans')) {
+                const loans = params.get('loans').split(',');
+                const container = document.getElementById('loanInputsContainer');
+                container.innerHTML = '';
+                loans.forEach((l, idx) => {
+                    const inp = document.createElement('input');
+                    inp.type = "number";
+                    inp.placeholder = `Loaned ${idx + 1}`;
+                    inp.className = "loan-box w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none";
+                    inp.value = l;
+                    container.appendChild(inp);
+                });
+            }
+        }
+
+        // Reset Handler
+        document.getElementById('resetAllBtn').addEventListener('click', () => {
+            debugLog("Resetting all calculator states...");
+            indianMonopolyData.forEach(set => set.properties.forEach(p => { p.owned = false; p.houses = 0; }));
+            utilitiesData.forEach(u => u.owned = false);
+            stationsData.forEach(s => s.owned = false);
+            document.querySelectorAll('#utilitiesContainer input, #stationsContainer input').forEach(i => i.checked = false);
+            document.getElementById('directCashInput').value = 0;
+            document.querySelectorAll('.cash-note-input').forEach(i => i.value = 0);
+            document.getElementById('debtInputsContainer').innerHTML = `<input type="number" placeholder="Debt 1" class="debt-box w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-rose-300 focus:border-rose-500 focus:outline-none">`;
+            document.getElementById('loanInputsContainer').innerHTML = `<input type="number" placeholder="Loaned 1" class="loan-box w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-bold text-emerald-300 focus:border-emerald-500 focus:outline-none">`;
+            if (activeSet) openSetDrawer(activeSet.id);
+            window.history.replaceState({}, '', window.location.pathname);
+            calculateAll();
+        });
+
+        // Modal Controls
+        const shareModal = document.getElementById('shareModal');
+        const openShare = () => shareModal.classList.remove('hidden');
+        const closeShare = () => shareModal.classList.add('hidden');
+        document.getElementById('openShareModalBtn').addEventListener('click', openShare);
+        document.getElementById('openShareModalBtnBottom').addEventListener('click', openShare);
+        document.getElementById('closeShareModalBtn').addEventListener('click', closeShare);
+
+        // Share Link with State
+        document.getElementById('shareLinkOnlyBtn').addEventListener('click', async () => {
+            const shareUrl = getDynamicShareLink();
+            debugLog("Sharing link with state:", shareUrl);
+            if (navigator.share) {
+                await navigator.share({ title: 'Monopoly Score Calculator', url: shareUrl });
+            } else {
+                navigator.clipboard.writeText(shareUrl);
+                alert('State URL copied:\n' + shareUrl);
+            }
+            closeShare();
+        });
+
+        // Copy State Link to Clipboard
+        document.getElementById('copyLinkBtn').addEventListener('click', () => {
+            const shareUrl = getDynamicShareLink();
+            navigator.clipboard.writeText(shareUrl);
+            alert('Scorecard URL with full state copied to clipboard!');
+            closeShare();
+        });
+
+        // ONLY CAPTURE THE TOP SCORECARD ELEMENT (#finalScoreCard), HIDING RESET BUTTON
+        async function captureTopScorecardBlob() {
+            const cardEl = document.getElementById('finalScoreCard');
+            const resetBtn = document.getElementById('resetAllBtn');
+            if (resetBtn) resetBtn.style.display = 'none'; // Hide reset button during capture
+
+            const originalWidth = cardEl.style.width;
+            const originalMaxWidth = cardEl.style.maxWidth;
+            cardEl.style.width = '640px';
+            cardEl.style.maxWidth = '640px';
+
+            const canvas = await html2canvas(cardEl, {
+                backgroundColor: '#020617',
+                scale: 2,
+                useCORS: true,
+                windowWidth: 1024
+            });
+
+            cardEl.style.width = originalWidth;
+            cardEl.style.maxWidth = originalMaxWidth;
+            if (resetBtn) resetBtn.style.display = ''; // Restore reset button
+
+            return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        }
+
+        // Share Image Only
+        document.getElementById('shareImageOnlyBtn').addEventListener('click', async () => {
+            try {
+                const blob = await captureTopScorecardBlob();
+                const file = new File([blob], 'monopoly-scorecard.png', { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({ files: [file], title: 'VIP Gamers Monopoly Score' });
+                } else {
+                    const downloadUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = downloadUrl;
+                    a.download = 'monopoly-scorecard.png';
+                    a.click();
+                }
+            } catch (err) {
+                debugLog("shareImageOnlyBtn error:", err);
+            }
+            closeShare();
+        });
+
+        // Copy Snapshot Image Directly to Clipboard
+        document.getElementById('copyImageBtn').addEventListener('click', async () => {
+            try {
+                const blob = await captureTopScorecardBlob();
+                await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+                alert('Scorecard image copied to clipboard!');
+            } catch (err) {
+                debugLog("copyImageBtn write failed, fallback downloading:", err);
+                const blob = await captureTopScorecardBlob();
+                const downloadUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = 'monopoly-scorecard.png';
+                a.click();
+            }
+            closeShare();
+        });
+
+        // Share Both (WhatsApp Image + Active State Link)
+        document.getElementById('shareBothBtn').addEventListener('click', async () => {
+            const data = calculateAll();
+            const shareUrl = getDynamicShareLink();
+            const captionText = `Monopoly Score Total: ${data.grandTotal.toLocaleString()} (${data.propCount} Cities, ${data.specialCount} Stations/Utilities).\nOpen Audit: ${shareUrl}`;
+            try {
+                const blob = await captureTopScorecardBlob();
+                const file = new File([blob], 'monopoly-scorecard.png', { type: 'image/png' });
+                if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: 'VIP Gamers Monopoly Score',
+                        text: captionText
+                    });
+                } else {
+                    const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
+                    window.open(waUrl, '_blank');
+                }
+            } catch (err) {
+                const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(captionText)}`;
+                window.open(waUrl, '_blank');
+            }
+            closeShare();
+        });
+
+        // Copy Plain
+        document.getElementById('copyPlainBtn').addEventListener('click', () => {
+            const data = calculateAll();
+            const text = `Monopoly Score: ${data.grandTotal} | Cities: ${data.propCount} | Stations/Utils: ${data.specialCount} | Cash: ${data.cashTotal} | Net Loans: ${data.loanTotal - data.debtTotal}`;
+            navigator.clipboard.writeText(text);
+            alert('Plain text summary copied!');
+        });
+
+        // Copy Formatted
+        document.getElementById('copyFormatBtn').addEventListener('click', () => {
+            const data = calculateAll();
+            const formatted = `*VIP GAMERS - MONOPOLY AUDIT*\n*Total Net Worth:* ${data.grandTotal.toLocaleString()}\n*City Properties:* ${data.propTotal.toLocaleString()} (${data.propCount} Cities)\n*Stations & Utilities:* ${data.specialTotal.toLocaleString()} (${data.specialCount} Items)\n*Liquid Cash:* ${data.cashTotal.toLocaleString()}\n*Loaned Out:* ${data.loanTotal.toLocaleString()}\n*Debts Owed:* ${data.debtTotal.toLocaleString()}\n\nCalculated via VIP Gamers Hub: ${getDynamicShareLink()}`;
+            navigator.clipboard.writeText(formatted);
+            alert('Formatted scorecard copied!');
+        });
+
+        // Initialize state
+        loadStateFromUrl();
+        calculateAll();
+    </script>
+
+    <!-- Offline Service Worker & Redirect Bootstrap -->
+    <script>
+        (function() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                        .catch(() => {});
+                });
+            }
+            window.addEventListener('offline', () => {
+                window.location.href = '/offline.html';
+            });
+        })();
+    </script>
 </body>
 </html>

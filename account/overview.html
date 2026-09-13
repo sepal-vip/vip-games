@@ -17,9 +17,10 @@
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950">
+    <!-- Top Navigation -->
     <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="../index.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+            <a href="../index.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium transition">
                 <span class="material-icons text-base">arrow_back</span> Portal Gateway
                 <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/vip-icon.png" alt="Vip Icon" class="w-4 h-4"></span>
             </a>
@@ -27,14 +28,17 @@
                 <a href="../g-mono/g-mono.html" class="text-xs bg-amber-500/10 hover:bg-amber-500 text-amber-300 hover:text-slate-950 px-3 py-1.5 rounded-xl border border-amber-500/30 font-bold transition flex items-center gap-1">
                     <span class="material-icons text-sm">casino</span> Monopoly Suite
                 </a>
-                <button id="signOutBtn" class="text-xs bg-red-950/80 hover:bg-red-900 text-red-300 px-3 py-1.5 rounded-xl border border-red-800 font-medium transition">
+                <button id="signOutBtn" class="text-xs bg-red-950/80 hover:bg-red-900 text-red-300 px-3.5 py-1.5 rounded-xl border border-red-800 font-bold transition">
                     Sign Out
                 </button>
             </div>
         </div>
     </nav>
+
+    <!-- Main Workspace -->
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-8 space-y-6">
-        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <!-- Account Info Header -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div class="flex items-center gap-4">
                 <div class="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center text-3xl font-extrabold">
                     <span id="userAvatarLetter">U</span>
@@ -54,9 +58,10 @@
             </div>
         </div>
 
+        <!-- Career Highs & Lows -->
         <div class="space-y-3">
             <h2 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <span class="material-icons text-amber-400 text-base">insights</span> Career Highs, Lows & Margins
+                <span class="material-icons text-amber-400 text-base">insights</span> Career Highs, Lows &amp; Margins
             </h2>
             <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
                 <div class="stat-card p-4 rounded-2xl text-center space-y-1">
@@ -87,10 +92,11 @@
             </div>
         </div>
 
+        <!-- Career Facts (22 Cities, 6 Stations, 28 Total Props) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="stat-card p-5 rounded-3xl space-y-3">
                 <h3 class="text-xs font-bold text-sky-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                    <span class="material-icons text-sm">history_edu</span> Session & Streak Facts
+                    <span class="material-icons text-sm">history_edu</span> Session &amp; Streak Facts
                 </h3>
                 <div class="space-y-2 text-xs font-mono">
                     <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
@@ -111,9 +117,10 @@
                     </div>
                 </div>
             </div>
+
             <div class="stat-card p-5 rounded-3xl space-y-3">
                 <h3 class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5 border-b border-slate-800 pb-2">
-                    <span class="material-icons text-sm">domain</span> Empire & Asset Facts
+                    <span class="material-icons text-sm">domain</span> Empire &amp; Asset Facts
                 </h3>
                 <div class="space-y-2 text-xs font-mono">
                     <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
@@ -122,25 +129,22 @@
                     </div>
                     <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
                         <span class="text-slate-400 font-sans">Most Props In 1 Match:</span>
-                        <span id="factMaxProps" class="text-amber-400 font-bold">0 Props</span>
+                        <span id="factMaxProps" class="text-amber-400 font-bold">0 / 28 Props</span>
                     </div>
                     <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
                         <span class="text-slate-400 font-sans">Total Cities Claimed:</span>
                         <span id="factTotalCities" class="text-slate-200 font-bold">0</span>
                     </div>
                     <div class="flex justify-between items-center p-2.5 bg-slate-950 rounded-xl border border-slate-800">
-                        <span class="text-slate-400 font-sans">Stations & Utilities Owned:</span>
+                        <span class="text-slate-400 font-sans">Stations &amp; Utilities Owned:</span>
                         <span id="factTotalStations" class="text-blue-300 font-bold">0</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="pt-2 flex flex-wrap gap-3">
-            <a href="history.html" class="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-bold rounded-xl border border-slate-800 transition flex items-center gap-1.5">
-                <span class="material-icons text-sm">manage_accounts</span> Account Audit Logs
-            </a>
-            <a href="../g-mono/leaderboard.html" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow">
+        <div class="pt-2">
+            <a href="../g-mono/leaderboard.html" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-bold rounded-xl transition inline-flex items-center gap-1.5 shadow">
                 <span class="material-icons text-sm">emoji_events</span> Check Standings
             </a>
         </div>
@@ -148,6 +152,18 @@
 
     <script type="module">
         import { auth, db, doc, getDoc, getDocs, collection, onAuthStateChanged, signOut } from "../web-info/firebase.js";
+
+        // Global Debug Logger Engine
+        if (localStorage.getItem('debugging') === null) {
+            localStorage.setItem('debugging', '0');
+        }
+        function debugLog(...args) {
+            if (localStorage.getItem('debugging') === '1') {
+                console.log("[DEBUG:overview.html]", ...args);
+            }
+        }
+        debugLog("Initializing Account Overview page...");
+
         const userEmail = document.getElementById('userEmail');
         const userUid = document.getElementById('userUid');
         const roleBadge = document.getElementById('roleBadge');
@@ -180,6 +196,7 @@
                 window.location.href = "sign-up-in.html";
                 return;
             }
+            debugLog("User authenticated:", user.uid);
             userEmail.textContent = user.email || "Authenticated User";
             userUid.textContent = user.uid;
             userAvatarLetter.textContent = (user.email || 'U').charAt(0).toUpperCase();
@@ -285,17 +302,29 @@
                     statSmallestLossDate.textContent = `on ${smallestLossSession.date}`;
                 }
 
-                factWinStreak.textContent = `${maxStreak} Game(s) In A Row`;
+                factWinStreak.textContent = `${maxStreak} In A Row`;
                 factRankedWinRate.textContent = rankedMatches > 0 ? `${((rankedWins / rankedMatches) * 100).toFixed(1)}% (${rankedWins}/${rankedMatches})` : "0%";
                 factTotalProps.textContent = (totalCities + totalStations).toLocaleString();
                 factTotalCities.textContent = totalCities.toLocaleString();
                 factTotalStations.textContent = totalStations.toLocaleString();
-                factMaxProps.textContent = `${maxPropsSingle} Properties`;
-            } catch (err) {}
+                factMaxProps.textContent = `${maxPropsSingle} / 28 Props`;
+            } catch (err) {
+                debugLog("Telemetry error:", err);
+            }
         }
 
         document.getElementById('signOutBtn')?.addEventListener('click', () => {
             signOut(auth).then(() => window.location.href = "sign-up-in.html");
+        });
+
+        // Offline Service Worker & Redirect Bootstrap
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
+            });
+        }
+        window.addEventListener('offline', () => {
+            window.location.href = '/offline.html';
         });
     </script>
 </body>

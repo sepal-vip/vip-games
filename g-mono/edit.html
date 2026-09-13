@@ -355,5 +355,28 @@
 
         initPage();
     </script>
+    <script>
+  // 1. Register Service Worker
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('../sw.js')
+        .then((reg) => {
+          if (localStorage.getItem('debugging') === '1') {
+            console.log('[DEBUG] Service Worker registered:', reg.scope);
+          }
+        })
+        .catch((err) => {
+          if (localStorage.getItem('debugging') === '1') {
+            console.error('[DEBUG] Service Worker registration failed:', err);
+          }
+        });
+    });
+  }
+
+  // 2. Instant redirect to offline page if connection drops while browsing
+  window.addEventListener('offline', () => {
+    window.location.href = '/offline.html';
+  });
+</script>
 </body>
 </html>

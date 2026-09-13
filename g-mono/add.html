@@ -5,15 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Record Monopoly Match</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
-    <style> body { font-family: 'Google Sans', sans-serif; } </style>
+    <style> 
+        body { font-family: 'Google Sans', sans-serif; } 
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+    </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col selection:bg-purple-500 selection:text-slate-950">
+    <!-- Top Navigation -->
     <nav class="border-b border-slate-800 bg-slate-900/90 backdrop-blur sticky top-0 z-50">
         <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
-            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium">
+            <a href="g-mono.html" class="flex items-center gap-2 text-slate-300 hover:text-white text-sm font-medium transition">
                 <span class="material-icons text-base">arrow_back</span> Monopoly Suite
                 <span class="material-icons text-amber-500 text-base"><img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4"></span>
             </a>
@@ -22,49 +27,69 @@
             </span>
         </div>
     </nav>
+
+    <!-- Main Workspace -->
     <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6">
-        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 shadow-2xl space-y-6">
+        <div class="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
             <div class="border-b border-slate-800 pb-4">
                 <h1 class="text-2xl font-black text-white flex items-center gap-2">
                     Log Game Session Record
                 </h1>
-                <p class="text-xs text-slate-400 mt-1">Record session details, player net earnings, and property collections.</p>
+                <p class="text-xs text-slate-400 mt-1">Select player members, choose past venues, and check off owned cities (22 cities, 6 stations, 28 total properties max).</p>
             </div>
+
             <form id="matchForm" class="space-y-6">
+                <!-- Session Metadata -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Match Date</label>
                         <input type="date" id="matchDate" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Location / Venue</label>
-                        <input type="text" id="location" required placeholder="e.g. Living Room, Club House" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
+                    
+                    <!-- Location Selector & Manual Entry -->
+                    <div class="space-y-1.5">
+                        <div class="flex justify-between items-center">
+                            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Location / Venue</label>
+                            <span id="locCountBadge" class="text-[10px] text-slate-500 font-mono">Loading saved venues...</span>
+                        </div>
+                        
+                        <select id="savedLocSelect" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-300 focus:outline-none focus:border-purple-500">
+                            <option value="">-- Choose From Pre-used Locations --</option>
+                        </select>
+
+                        <input type="text" id="location" required placeholder="Or type new venue (e.g. Living Room, Club House)" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-purple-500">
                     </div>
                 </div>
+
                 <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex items-center justify-between gap-4">
                     <div>
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Generated Game Path ID</span>
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Generated Document ID</span>
                         <code id="gameIdPreview" class="text-sm font-mono text-amber-400 font-bold">Select match date...</code>
                     </div>
                     <span class="material-icons text-slate-600">fingerprint</span>
                 </div>
+
                 <div id="validityAlert" class="p-4 rounded-2xl border bg-amber-950/60 border-amber-800/60 text-amber-300 text-xs flex items-start gap-3">
                     <span class="material-icons text-base text-amber-400 shrink-0 mt-0.5">warning</span>
                     <div>
                         <p class="font-bold">Official Standings Rule</p>
-                        <p class="text-[11px] text-amber-200/80 mt-0.5">Matches must contain more than 2 registered members (&gt;2 members) to update official monthly leaderboards. Casual/guest logs will be preserved in match history.</p>
+                        <p class="text-[11px] text-amber-200/80 mt-0.5">Matches must include more than 2 registered members (&gt;2 members) to update official monthly leaderboards. Casual/guest logs will be preserved in match history.</p>
                     </div>
                 </div>
+
+                <!-- Player Roster -->
                 <div class="space-y-4 pt-2 border-t border-slate-800">
                     <div class="flex justify-between items-center">
                         <h2 class="text-xs font-black text-white uppercase tracking-wider">Participating Player Roster</h2>
-                        <button type="button" id="addPlayerRowBtn" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1">
+                        <button type="button" id="addPlayerRowBtn" class="px-3 py-1.5 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1 shadow-lg shadow-purple-600/20">
                             <span class="material-icons text-sm">add</span> Add Player
                         </button>
                     </div>
-                    <div id="playerRowsContainer" class="space-y-3"></div>
+                    <div id="playerRowsContainer" class="space-y-5"></div>
                 </div>
+
                 <div id="formStatus" class="hidden text-xs p-3 rounded-xl border"></div>
+
                 <button type="submit" id="submitBtn" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-bold py-3.5 rounded-2xl text-sm transition shadow-lg shadow-purple-600/20 flex items-center justify-center gap-2">
                     <span class="material-icons text-base">save</span> Save Match Record
                 </button>
@@ -74,9 +99,38 @@
 
     <script type="module">
         import { db, collection, doc, getDocs, setDoc } from "../web-info/firebase.js";
+
+        // Global Debug Logger Engine
+        if (localStorage.getItem('debugging') === null) {
+            localStorage.setItem('debugging', '0');
+        }
+        function debugLog(...args) {
+            if (localStorage.getItem('debugging') === '1') {
+                console.log("[DEBUG:add.html]", ...args);
+            }
+        }
+        debugLog("Initializing Add Match page (22 Cities, 6 Stations, 28 Max Props)...");
+
+        // Indian Edition Properties (Exact 22 cities across 8 color sets)
+        const COLOR_SETS_DATA = [
+            { id: "brown", name: "Brown", badge: "bg-amber-900", cities: ["Guwahati", "Bhubaneswar"] },
+            { id: "light-blue", name: "Light Blue", badge: "bg-sky-400", cities: ["Panaji", "Agra", "Vadodara"] },
+            { id: "pink", name: "Pink", badge: "bg-pink-500", cities: ["Ludhiana", "Patna", "Bhopal"] },
+            { id: "orange", name: "Orange", badge: "bg-orange-500", cities: ["Indore", "Nagpur", "Kochi"] },
+            { id: "red", name: "Red", badge: "bg-red-500", cities: ["Lucknow", "Chandigarh", "Jaipur"] },
+            { id: "yellow", name: "Yellow", badge: "bg-yellow-400", cities: ["Pune", "Hyderabad", "Ahmedabad"] },
+            { id: "green", name: "Green", badge: "bg-emerald-500", cities: ["Kolkata", "Chennai", "Bengaluru"] },
+            { id: "dark-blue", name: "Dark Blue", badge: "bg-blue-600", cities: ["Delhi", "Mumbai"] }
+        ];
+
         let registeredMembersList = [];
+        let savedLocationsList = [];
+        let playerCardCounter = 0;
+
         const matchDate = document.getElementById('matchDate');
         const locationInput = document.getElementById('location');
+        const savedLocSelect = document.getElementById('savedLocSelect');
+        const locCountBadge = document.getElementById('locCountBadge');
         const gameIdPreview = document.getElementById('gameIdPreview');
         const playerRowsContainer = document.getElementById('playerRowsContainer');
         const formStatus = document.getElementById('formStatus');
@@ -86,20 +140,55 @@
 
         async function initPage() {
             try {
-                const membersSnap = await getDocs(collection(db, "players"));
-                const fetched = [];
+                const [membersSnap, matchesSnap] = await Promise.all([
+                    getDocs(collection(db, "players")),
+                    getDocs(collection(db, "games", "Monopoly", "matches"))
+                ]);
+
+                // 1. Members
+                const fetchedMembers = [];
                 membersSnap.forEach(d => {
                     const data = d.data() || {};
                     const name = data.name || d.id;
-                    if (name) fetched.push(name);
+                    if (name) fetchedMembers.push(name);
                 });
-                registeredMembersList = Array.from(new Set(fetched)).sort();
-            } catch(e) {}
+                registeredMembersList = Array.from(new Set(fetchedMembers)).sort();
+
+                // 2. Pre-used Locations
+                const locSet = new Set();
+                matchesSnap.forEach(d => {
+                    const loc = d.data()?.location;
+                    if (loc && typeof loc === 'string' && loc.trim() !== '') {
+                        locSet.add(loc.trim());
+                    }
+                });
+                savedLocationsList = Array.from(locSet).sort();
+                debugLog("Extracted saved locations:", savedLocationsList);
+
+                populateLocationsDropdown();
+            } catch(e) {
+                debugLog("Failed to load members or locations:", e);
+                locCountBadge.textContent = "Offline/Default venues";
+            }
+
             updateGameIdPreview();
             createPlayerRow();
             createPlayerRow();
             createPlayerRow();
         }
+
+        function populateLocationsDropdown() {
+            locCountBadge.textContent = `${savedLocationsList.length} saved`;
+            savedLocSelect.innerHTML = `<option value="">-- Choose From Pre-used Locations (${savedLocationsList.length}) --</option>` +
+                savedLocationsList.map(loc => `<option value="${loc}">${loc}</option>`).join('');
+        }
+
+        savedLocSelect.addEventListener('change', () => {
+            if (savedLocSelect.value) {
+                locationInput.value = savedLocSelect.value;
+                debugLog("Selected pre-used location:", savedLocSelect.value);
+            }
+        });
 
         async function updateGameIdPreview() {
             if (!matchDate.value) return;
@@ -115,6 +204,7 @@
                 const calculatedId = `${formattedDate}-${indexStr}`;
                 gameIdPreview.textContent = `games/Monopoly/matches/${calculatedId}`;
                 gameIdPreview.dataset.id = calculatedId;
+                debugLog("Generated game ID:", calculatedId);
             } catch (err) {
                 const fallbackId = `${formattedDate}-01`;
                 gameIdPreview.textContent = `games/Monopoly/matches/${fallbackId}`;
@@ -123,12 +213,18 @@
         }
 
         function createPlayerRow(initialEarnings = 0) {
+            playerCardCounter++;
+            const cardId = `pCard_${playerCardCounter}`;
+
             const card = document.createElement('div');
-            card.className = "player-card bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3";
+            card.className = "player-card bg-slate-950 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xl";
+            card.dataset.cardId = cardId;
+
             card.innerHTML = `
+                <!-- Player Name, Dropdown & Cash Input -->
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <div class="flex-1 w-full space-y-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Select Member / Custom Guest</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Select Member / Custom Guest</label>
                         <select class="member-select bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white w-full focus:outline-none focus:border-purple-500">
                             <option value="">-- Choose Registered Member --</option>
                             ${registeredMembersList.map(m => `<option value="${m}">${m}</option>`).join('')}
@@ -136,36 +232,94 @@
                         </select>
                         <input type="text" class="custom-guest-name hidden bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 w-full mt-1" placeholder="Enter Guest Name (Excluded from Leaderboard)">
                     </div>
+
                     <div class="w-full sm:w-44 space-y-1">
                         <div class="flex justify-between items-center">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Net Earnings</label>
+                            <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Net Earnings</label>
                             <button type="button" class="toggle-neg-btn text-[10px] bg-slate-900 hover:bg-slate-800 text-amber-400 px-1.5 py-0.5 rounded border border-slate-800 font-mono transition">Neg</button>
                         </div>
                         <input type="text" inputmode="decimal" class="player-earnings bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-emerald-400 font-mono font-bold w-full" value="${initialEarnings}" placeholder="0" required>
                     </div>
-                    <div class="flex items-center pt-4 sm:pt-3">
-                        <button type="button" class="remove-row-btn p-2 text-slate-500 hover:text-red-400 hover:bg-slate-900 rounded-xl transition">
+
+                    <div class="flex items-center pt-2 sm:pt-4">
+                        <button type="button" class="remove-row-btn p-2 text-slate-500 hover:text-red-400 hover:bg-slate-900 rounded-xl transition" title="Remove Player">
                             <span class="material-icons text-base">delete</span>
                         </button>
                     </div>
                 </div>
-                <div class="property-box pt-3 border-t border-slate-900 space-y-2">
-                    <div class="flex justify-between items-center">
-                        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">August 2026+ Property Collections</span>
-                        <span class="text-[10px] font-mono text-slate-400 font-bold player-prop-counter">0 / 26 Total</span>
+
+                <!-- Optional Score URL -->
+                <div class="space-y-1">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <span class="material-icons text-xs text-sky-400">link</span> Optional Calculator Score Link
+                    </label>
+                    <input type="url" class="player-score-link bg-slate-900 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-sky-300 w-full placeholder-slate-600 focus:outline-none focus:border-sky-500" placeholder="https://.../count.html?props=... (Optional)">
+                </div>
+
+                <!-- Color Groups and Cities Drawer Section (22 Cities, 6 Stations, 28 Total) -->
+                <div class="space-y-3 pt-3 border-t border-slate-900">
+                    <div class="flex items-center justify-between">
+                        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider">Tap Color Group to Select Cities</span>
+                        <span class="text-[10px] font-mono text-slate-400 font-bold player-prop-counter">0 / 28 Total Props</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-3">
+
+                    <!-- 8 Color Group Buttons -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                        ${COLOR_SETS_DATA.map(set => `
+                            <button type="button" data-group-id="${set.id}" class="color-group-btn p-2 rounded-xl border text-left text-[11px] font-bold transition flex items-center justify-between bg-slate-900/60 border-slate-800 hover:border-slate-700">
+                                <div class="flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full ${set.badge}"></span>
+                                    <span class="text-slate-300">${set.name}</span>
+                                </div>
+                                <span class="group-selected-count text-[10px] font-mono text-slate-500 font-bold">0/${set.cities.length}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+
+                    <!-- Single Drawer Container: Accordion -->
+                    <div class="cities-drawers-container space-y-2">
+                        ${COLOR_SETS_DATA.map(set => `
+                            <div id="drawer_${cardId}_${set.id}" class="city-set-drawer hidden bg-slate-900/90 border border-slate-800 rounded-2xl p-3 space-y-2">
+                                <div class="flex items-center justify-between pb-1.5 border-b border-slate-800/80">
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full ${set.badge}"></span>
+                                        <span class="text-xs font-bold text-white">${set.name} Cities</span>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <button type="button" data-select-all-group="${set.id}" class="select-all-btn text-[10px] font-bold text-amber-400 hover:underline">
+                                            Select All
+                                        </button>
+                                        <button type="button" data-close-group="${set.id}" class="close-drawer-btn text-slate-500 hover:text-white" title="Close Drawer">
+                                            <span class="material-icons text-xs">close</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-1">
+                                    ${set.cities.map(cityName => `
+                                        <label class="flex items-center gap-2 bg-slate-950 px-2.5 py-1.5 rounded-xl border border-slate-800/80 cursor-pointer hover:border-slate-700">
+                                            <input type="checkbox" data-city-name="${cityName}" data-set-id="${set.id}" class="city-checkbox w-3.5 h-3.5 rounded accent-amber-500 bg-slate-900 border-slate-700">
+                                            <span class="text-[11px] text-slate-300 font-medium">${cityName}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- Fine-Tuning Number Inputs: 22 Max Cities, 6 Max Stations -->
+                    <div class="grid grid-cols-2 gap-3 pt-1">
                         <div>
-                            <label class="block text-[10px] text-slate-400">Cities (Max 20):</label>
-                            <input type="number" min="0" max="20" class="cities-input bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white w-full" value="0">
+                            <label class="block text-[10px] text-slate-400 uppercase font-bold">Cities Count (Max 22)</label>
+                            <input type="number" min="0" max="22" class="cities-input bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono font-bold w-full" value="0">
                         </div>
                         <div>
-                            <label class="block text-[10px] text-slate-400">Stations & Utils (Max 6):</label>
-                            <input type="number" min="0" max="6" class="stations-input bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white w-full" value="0">
+                            <label class="block text-[10px] text-slate-400 uppercase font-bold">Stations &amp; Utils (Max 6)</label>
+                            <input type="number" min="0" max="6" class="stations-input bg-slate-900 border border-slate-800 rounded-xl px-2.5 py-1.5 text-xs text-white font-mono font-bold w-full" value="0">
                         </div>
                     </div>
                 </div>
             `;
+
             const select = card.querySelector('.member-select');
             const customGuestName = card.querySelector('.custom-guest-name');
             const removeBtn = card.querySelector('.remove-row-btn');
@@ -185,14 +339,91 @@
                 }
             });
 
-            const updateCount = () => {
-                const total = (parseInt(cInput.value) || 0) + (parseInt(sInput.value) || 0);
-                counter.textContent = `${total} / 26 Total`;
-                counter.className = total > 26 ? "text-[10px] font-mono font-bold text-rose-400" : "text-[10px] font-mono font-bold text-amber-400";
+            // Update Total Property Display & Counts: Out of 28 max
+            const updatePropsCounter = () => {
+                const cVal = parseInt(cInput.value) || 0;
+                const sVal = parseInt(sInput.value) || 0;
+                const total = cVal + sVal;
+                counter.textContent = `${total} / 28 Total Props`;
+                counter.className = total > 28 ? "text-[10px] font-mono font-bold text-rose-400" : "text-[10px] font-mono font-bold text-amber-400";
             };
-            cInput.addEventListener('input', updateCount);
-            sInput.addEventListener('input', updateCount);
 
+            // Recalculate cities based on checked boxes
+            const syncCheckedCities = () => {
+                const checkedBoxes = card.querySelectorAll('.city-checkbox:checked');
+                cInput.value = checkedBoxes.length;
+
+                // Update individual group counts
+                COLOR_SETS_DATA.forEach(set => {
+                    const groupChecked = card.querySelectorAll(`.city-checkbox[data-set-id="${set.id}"]:checked`).length;
+                    const groupBtn = card.querySelector(`.color-group-btn[data-group-id="${set.id}"]`);
+                    const countSpan = groupBtn.querySelector('.group-selected-count');
+                    countSpan.textContent = `${groupChecked}/${set.cities.length}`;
+
+                    if (groupChecked > 0) {
+                        groupBtn.classList.add('border-amber-500/60', 'bg-slate-900');
+                        countSpan.classList.add('text-amber-400');
+                        countSpan.classList.remove('text-slate-500');
+                    } else {
+                        groupBtn.classList.remove('border-amber-500/60', 'bg-slate-900');
+                        countSpan.classList.remove('text-amber-400');
+                        countSpan.classList.add('text-slate-500');
+                    }
+                });
+
+                updatePropsCounter();
+            };
+
+            // Accordion Drawer Click Listener
+            card.querySelectorAll('.color-group-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const groupId = btn.dataset.groupId;
+                    const targetDrawer = card.querySelector(`#drawer_${cardId}_${groupId}`);
+                    const isAlreadyOpen = !targetDrawer.classList.contains('hidden');
+
+                    // Close all drawers for this card
+                    card.querySelectorAll('.city-set-drawer').forEach(d => d.classList.add('hidden'));
+                    card.querySelectorAll('.color-group-btn').forEach(b => b.classList.remove('border-slate-500'));
+
+                    if (!isAlreadyOpen) {
+                        targetDrawer.classList.remove('hidden');
+                        btn.classList.add('border-slate-500');
+                    }
+                });
+            });
+
+            // Close button inside individual drawer header
+            card.querySelectorAll('.close-drawer-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const groupId = btn.dataset.closeGroup;
+                    const drawer = card.querySelector(`#drawer_${cardId}_${groupId}`);
+                    drawer.classList.add('hidden');
+                    const groupBtn = card.querySelector(`.color-group-btn[data-group-id="${groupId}"]`);
+                    groupBtn.classList.remove('border-slate-500');
+                });
+            });
+
+            // Checkbox event listeners
+            card.querySelectorAll('.city-checkbox').forEach(cb => {
+                cb.addEventListener('change', syncCheckedCities);
+            });
+
+            // "Select All" button inside a specific color drawer
+            card.querySelectorAll('.select-all-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const groupId = btn.dataset.selectAllGroup;
+                    const groupCheckboxes = card.querySelectorAll(`.city-checkbox[data-set-id="${groupId}"]`);
+                    const allChecked = [...groupCheckboxes].every(c => c.checked);
+                    groupCheckboxes.forEach(c => c.checked = !allChecked);
+                    btn.textContent = allChecked ? "Select All" : "Deselect All";
+                    syncCheckedCities();
+                });
+            });
+
+            cInput.addEventListener('input', updatePropsCounter);
+            sInput.addEventListener('input', updatePropsCounter);
+
+            // Toggle Negative Earnings
             toggleNegBtn.addEventListener('click', () => {
                 let val = earningsInput.value.trim();
                 if (val.startsWith('-')) {
@@ -220,6 +451,7 @@
         matchDate.addEventListener('change', updateGameIdPreview);
         document.getElementById('addPlayerRowBtn').addEventListener('click', () => createPlayerRow(0));
 
+        // Submit Match Handler
         document.getElementById('matchForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const customGameId = gameIdPreview.dataset.id;
@@ -228,24 +460,41 @@
             const playerCards = document.querySelectorAll('.player-card');
             const rawPlayers = [];
             let maxEarnings = -Infinity;
+
             playerCards.forEach(card => {
                 const selectVal = card.querySelector('.member-select').value;
                 const customGuestVal = card.querySelector('.custom-guest-name').value;
                 const earningsVal = Number(card.querySelector('.player-earnings').value || 0);
                 const citiesVal = Number(card.querySelector('.cities-input').value || 0);
                 const stationsVal = Number(card.querySelector('.stations-input').value || 0);
+                const scoreLinkVal = (card.querySelector('.player-score-link').value || '').trim();
+
                 const name = selectVal === 'GUEST_CUSTOM' ? (customGuestVal || 'Guest') : selectVal;
                 const isGuest = selectVal === 'GUEST_CUSTOM';
                 if (earningsVal > maxEarnings) maxEarnings = earningsVal;
-                rawPlayers.push({
+
+                // Capture list of specifically checked city names
+                const checkedCities = [];
+                card.querySelectorAll('.city-checkbox:checked').forEach(cb => {
+                    checkedCities.push(cb.dataset.cityName);
+                });
+
+                const playerObj = {
                     name,
                     isGuest,
                     isMember: !isGuest,
                     cash: earningsVal,
                     earnings: earningsVal,
                     cities: citiesVal,
-                    stations: stationsVal
-                });
+                    stations: stationsVal,
+                    ownedCities: checkedCities
+                };
+
+                if (scoreLinkVal) {
+                    playerObj.scoreUrl = scoreLinkVal;
+                }
+
+                rawPlayers.push(playerObj);
             });
 
             const playersData = rawPlayers.map(p => ({
@@ -253,22 +502,26 @@
                 isWinner: (p.earnings === maxEarnings)
             }));
 
+            debugLog("Saving match payload:", { customGameId, playersData });
             submitBtn.disabled = true;
             submitBtn.textContent = "Saving Match Record...";
+
             try {
                 const matchData = {
                     gameId: customGameId,
                     date: matchDate.value,
-                    location: locationInput.value,
+                    location: locationInput.value.trim(),
                     players: playersData,
                     createdAt: new Date().toISOString()
                 };
                 await setDoc(doc(db, "games", "Monopoly", "matches", customGameId), matchData);
+                debugLog("Match successfully saved to Firestore:", customGameId);
                 formStatus.classList.remove('hidden');
                 formStatus.className = "text-xs p-3 rounded-xl border bg-emerald-950/80 text-emerald-300 border-emerald-800";
                 formStatus.textContent = `Match record ${customGameId} successfully logged! Redirecting...`;
                 setTimeout(() => window.location.href = `view.html?game=${encodeURIComponent(customGameId)}`, 1200);
             } catch (err) {
+                debugLog("Error saving match:", err);
                 formStatus.classList.remove('hidden');
                 formStatus.className = "text-xs p-3 rounded-xl border bg-red-950/80 text-red-300 border-red-800";
                 formStatus.textContent = err.message || "Failed to save match record.";
@@ -278,6 +531,21 @@
         });
 
         initPage();
+    </script>
+
+    <!-- Offline Service Worker & Redirect Bootstrap -->
+    <script>
+        (function() {
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/sw.js', { scope: '/' })
+                        .catch(() => {});
+                });
+            }
+            window.addEventListener('offline', () => {
+                window.location.href = '/offline.html';
+            });
+        })();
     </script>
 </body>
 </html>
