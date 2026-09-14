@@ -17,25 +17,42 @@
         body { font-family: 'Google Sans', sans-serif; }
         .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
+        .log-highlight-action { color: #f59e0b; font-weight: 800; }
+        .log-highlight-money { color: #10b981; font-weight: 900; }
+        .log-highlight-prop { color: #38bdf8; font-weight: 700; }
+        .log-highlight-player { color: #e2e8f0; font-weight: 700; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
 
+    <!-- Stackable Notifications Container -->
+    <div id="popupStackContainer" class="fixed top-16 right-4 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
+
     <!-- Navigation Header -->
-    <nav class="glass-panel sticky top-0 z-50">
+    <nav class="glass-panel sticky top-0 z-40">
         <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
             <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
                 <span class="font-mono font-bold text-xs uppercase tracking-wider text-slate-500">Room:</span>
                 <span id="navRoomCode" class="font-mono font-black text-amber-500 text-sm tracking-wider">----</span>
+                <span id="wakeLockBadge" class="hidden text-[9px] font-mono text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20" title="Screen will stay awake">Awake</span>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2">
+                <button id="btnOpenEndGameModal" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1">
+                    <span class="material-icons text-xs">stop_circle</span> End Game
+                </button>
+                <a href="archive.html" class="px-2.5 py-1.5 bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 rounded-xl hover:text-amber-500 transition flex items-center gap-1 shadow-sm">
+                    <span class="material-icons text-xs">inventory_2</span> Archives
+                </a>
+                <span id="userRoleBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400">
+                    Role: Assigning...
+                </span>
                 <span id="userStatusBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
                     Connecting...
                 </span>
-                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-amber-500 transition-colors">
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-amber-500 transition-colors ml-1">
                     <span class="material-icons text-lg" id="themeIcon">light_mode</span>
                 </button>
                 <a href="../tracker.html" class="p-1.5 text-slate-400 hover:text-rose-500 transition" title="Exit Table">
@@ -57,8 +74,11 @@
                 <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">My Total Loans</span>
                 <div id="statMyLoans" class="text-xl font-black text-rose-500 font-mono">$0</div>
             </div>
-            <div class="glass-panel rounded-2xl p-4 text-center space-y-0.5 shadow-sm">
-                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Claimed Props</span>
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-0.5 shadow-sm cursor-pointer hover:border-sky-500 transition" id="boxMyProps" title="Click to view owned deeds">
+                <div class="flex items-center justify-center gap-1">
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Claimed Props</span>
+                    <span class="material-icons text-[12px] text-sky-400">visibility</span>
+                </div>
                 <div id="statMyProps" class="text-xl font-black text-sky-500 font-mono">0</div>
             </div>
             <div class="glass-panel rounded-2xl p-4 text-center space-y-0.5 shadow-sm">
@@ -67,81 +87,135 @@
             </div>
         </div>
 
-        <!-- Table Operations & Permissions Warning -->
         <div id="writeForbiddenAlert" class="hidden p-3 rounded-2xl border bg-rose-500/10 border-rose-500/30 text-rose-500 text-xs text-center font-semibold">
             Read-Only: Awaiting host authorization to record actions for your profile.
+        </div>
+
+        <!-- Role Selector Bar -->
+        <div class="glass-panel rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm border border-slate-200/80 dark:border-slate-800/80">
+            <div class="flex items-center gap-2">
+                <span class="material-icons text-amber-500 text-sm">badge</span>
+                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Table Role Assignment:</span>
+                <span class="text-[11px] text-slate-400">Claim duty (Alerts route to your screen)</span>
+            </div>
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <select id="myRoleSelect" class="bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-amber-500">
+                    <option value="Player">Standard Player</option>
+                    <option value="Banker">Banker (Treasury & Loans)</option>
+                    <option value="Builder">Builder (Houses & Hotels)</option>
+                    <option value="Props Giver">Props Giver (Deed Cards)</option>
+                </select>
+                <button id="btnClaimRole" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-sm">
+                    Claim Role
+                </button>
+            </div>
         </div>
 
         <!-- Action Logging Card -->
         <div id="transactionControlCard" class="glass-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
                 <h2 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-1.5">
-                    <span class="material-icons text-amber-500 text-sm">edit_note</span> Quick Action Entry
+                    <span class="material-icons text-amber-500 text-sm">bolt</span> Fast Action Dropdown Menu
                 </h2>
                 <button id="btnOpenAdminOverride" class="hidden text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 transition">
                     God Mode / Admin Panel
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
                 <div>
                     <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Acting Player</label>
-                    <select id="txPlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500">
-                    </select>
+                    <select id="txPlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500"></select>
                 </div>
+
                 <div>
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Action Type</label>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Action</label>
                     <select id="txActionType" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500">
-                        <option value="buy">Paid / Buy Property</option>
-                        <option value="rent">Pay Rent (Settlement)</option>
+                        <option value="buy">Buy Property</option>
+                        <option value="rent">Pay Rent</option>
+                        <option value="build">Build Houses / Motel / Hotel</option>
                         <option value="loan">Take Bank Loan</option>
                         <option value="repay">Repay Loan</option>
-                        <option value="build">Build Hotel / Houses</option>
-                        <option value="collect">Collect (Chance / Salary)</option>
+                        <option value="salary">Collect Salary ($200)</option>
+                        <option value="collect">Collect Chance / Community</option>
                         <option value="collect_all">Collect $10 From All</option>
                         <option value="repairs">Pay Repairs Tax ($115/H)</option>
+                        <option value="jail_fee">Get Out of Jail ($100)</option>
                     </select>
                 </div>
-                <div>
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Target / Recipient</label>
-                    <input type="text" id="txTargetInput" placeholder="e.g. Vadodara, Bank, Dhyana" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-amber-500">
+
+                <div id="targetPropertyCol">
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Select Property</label>
+                    <select id="txPropertySelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500"></select>
                 </div>
+
+                <div id="targetBuildingCol" class="hidden">
+                    <label class="block text-[9px] font-bold text-amber-500 uppercase mb-1">Target Level</label>
+                    <select id="txBuildingLevelSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold text-amber-600 dark:text-amber-400 focus:outline-none focus:border-amber-500">
+                        <option value="1">1 House</option>
+                        <option value="2">2 Houses</option>
+                        <option value="2.5">2.5 Motel</option>
+                        <option value="3">3 Houses</option>
+                        <option value="4">4 Houses</option>
+                        <option value="5" selected>5 Hotel</option>
+                    </select>
+                </div>
+
+                <div id="targetPlayerCol" class="hidden">
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Pay To</label>
+                    <select id="txTargetPlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500"></select>
+                </div>
+
                 <div>
                     <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Amount ($)</label>
-                    <input type="number" id="txAmountInput" placeholder="0" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold focus:outline-none focus:border-amber-500">
+                    <input type="number" id="txAmountInput" placeholder="0" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-amber-500 focus:outline-none focus:border-amber-500">
                 </div>
             </div>
 
             <button id="btnSubmitTx" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md shadow-amber-500/20 flex items-center justify-center gap-1">
-                <span class="material-icons text-sm">check_circle</span> Commit Action to Cloud Ledger
+                <span class="material-icons text-sm">check_circle</span> Commit Action to Ledger
             </button>
         </div>
 
-        <!-- Table Overview & Immutable Audit Log -->
+        <!-- Overview & Audit Log -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Roster Overview -->
             <div class="glass-panel rounded-3xl p-5 space-y-4 shadow-xl">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
-                    <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Active Roster</h3>
+                    <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Active Table Roster</h3>
                     <span id="playerTotalCount" class="text-[10px] font-mono text-slate-400">0 Players</span>
                 </div>
-                <div id="rosterListContainer" class="space-y-2.5 max-h-72 overflow-y-auto custom-scroll">
-                </div>
+                <div id="rosterListContainer" class="space-y-2.5 max-h-72 overflow-y-auto custom-scroll"></div>
             </div>
 
-            <!-- Immutable Audit Ledger -->
             <div class="glass-panel rounded-3xl p-5 space-y-4 shadow-xl">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
                     <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white">Ledger Logs</h3>
                     <span class="text-[10px] text-emerald-500 font-mono">Live Syncing</span>
                 </div>
-                <div id="logsContainer" class="space-y-1.5 max-h-72 overflow-y-auto custom-scroll font-mono text-xs">
-                </div>
+                <div id="logsContainer" class="space-y-1.5 max-h-72 overflow-y-auto custom-scroll font-mono text-xs"></div>
             </div>
         </div>
     </main>
 
-    <!-- ADMIN GOD MODE OVERRIDE MODAL -->
+    <!-- Property Portfolio Inspector Modal -->
+    <div id="propsModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div>
+                    <h3 id="propsModalTitle" class="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                        <span class="material-icons text-sky-500 text-base">domain</span> Player Properties Portfolio
+                    </h3>
+                    <p id="propsModalSubtitle" class="text-[11px] text-slate-500">Deed cards and current building levels</p>
+                </div>
+                <button type="button" id="btnClosePropsModal" class="text-slate-400 hover:text-white">
+                    <span class="material-icons text-base">close</span>
+                </button>
+            </div>
+            <div id="propsListContainer" class="space-y-2 max-h-80 overflow-y-auto custom-scroll pr-1"></div>
+        </div>
+    </div>
+
+    <!-- Admin God Mode Override Modal -->
     <div id="adminModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-panel rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -155,7 +229,15 @@
             <div class="space-y-3">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Select Target Player</label>
-                    <select id="adminPlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white">
+                    <select id="adminPlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white"></select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Assign Role</label>
+                    <select id="adminRoleSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs">
+                        <option value="Player">Standard Player</option>
+                        <option value="Banker">Banker</option>
+                        <option value="Builder">Builder</option>
+                        <option value="Props Giver">Props Giver</option>
                     </select>
                 </div>
                 <div>
@@ -167,7 +249,7 @@
                     <input type="number" id="adminLoansInput" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Properties List (Comma separated)</label>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Properties List (e.g. Vadodara:5, Agra:0)</label>
                     <input type="text" id="adminPropsInput" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs">
                 </div>
                 <div class="flex items-center gap-2 pt-2">
@@ -181,10 +263,102 @@
         </div>
     </div>
 
-    <!-- Live Sound & Logic Module -->
+    <!-- End Game / Archive Modal -->
+    <div id="endGameModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl border border-rose-500/30">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                    <span class="material-icons text-rose-500 text-base">sports_score</span> Finish or Pause Session
+                </h3>
+                <button type="button" id="btnCloseEndGameModal" class="text-slate-400 hover:text-white">
+                    <span class="material-icons text-base">close</span>
+                </button>
+            </div>
+
+            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                Choose whether to record the official match outcomes permanently into official standings or pause state to resume later.
+            </p>
+
+            <div class="p-4 rounded-2xl border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-900 dark:text-white">Option A: Official Match Settlement</span>
+                    <span class="text-[9px] bg-emerald-500/15 text-emerald-500 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">Archives &amp; Records</span>
+                </div>
+                <p class="text-[11px] text-slate-400">
+                    Calculates net standings, exports to <code class="font-mono text-amber-400">/matches</code>, creates scorecard URLs, and archives the room[cite: 1, 2].
+                </p>
+                <div class="pt-1">
+                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Venue / Location</label>
+                    <input type="text" id="endGameVenueInput" value="Living Room" class="w-full bg-white/50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <button id="btnEndAndRecord" class="w-full mt-2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1">
+                    <span class="material-icons text-sm">archive</span> Settle &amp; Record Official Match
+                </button>
+            </div>
+
+            <div class="p-4 rounded-2xl border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-slate-900 dark:text-white">Option B: Save for Later</span>
+                    <span class="text-[9px] bg-amber-500/15 text-amber-500 font-bold px-2 py-0.5 rounded-full border border-amber-500/30">Pause Room</span>
+                </div>
+                <p class="text-[11px] text-slate-400">
+                    Moves the live room to <code class="font-mono text-amber-400">saved_games</code>. Anyone with the link or via the Archive tab can reopen and continue playing later[cite: 1, 2].
+                </p>
+                <button id="btnSaveForLater" class="w-full mt-2 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-md shadow-amber-500/20 flex items-center justify-center gap-1">
+                    <span class="material-icons text-sm">pause_circle</span> Save &amp; Pause Session
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
-        import { db, doc, onSnapshot, updateDoc, auth } from "../../web-info/firebase.js";
+        import { db, doc, onSnapshot, updateDoc, setDoc, deleteDoc, getDocs, collection, auth } from "../../web-info/firebase.js";
         import { isPermanentAdmin } from "../../web-info/p-admin-list.js";
+
+        const BOARD_PROPERTIES = [
+            { name: "Guwahati", group: "Brown", price: 60, housePrice: 50, rents: { 0: 2, 1: 10, 2: 30, 2.5: 60, 3: 90, 4: 160, 5: 250 } },
+            { name: "Bhubaneswar", group: "Brown", price: 60, housePrice: 50, rents: { 0: 4, 1: 20, 2: 60, 2.5: 120, 3: 180, 4: 320, 5: 450 } },
+            { name: "Panaji", group: "Light Blue", price: 100, housePrice: 50, rents: { 0: 6, 1: 30, 2: 90, 2.5: 180, 3: 270, 4: 400, 5: 550 } },
+            { name: "Agra", group: "Light Blue", price: 100, housePrice: 50, rents: { 0: 6, 1: 30, 2: 90, 2.5: 180, 3: 270, 4: 400, 5: 550 } },
+            { name: "Vadodara", group: "Light Blue", price: 120, housePrice: 50, rents: { 0: 8, 1: 40, 2: 100, 2.5: 200, 3: 300, 4: 450, 5: 600 } },
+            { name: "Ludhiana", group: "Pink", price: 140, housePrice: 100, rents: { 0: 10, 1: 50, 2: 150, 2.5: 300, 3: 450, 4: 625, 5: 750 } },
+            { name: "Patna", group: "Pink", price: 140, housePrice: 100, rents: { 0: 10, 1: 50, 2: 150, 2.5: 300, 3: 450, 4: 625, 5: 750 } },
+            { name: "Bhopal", group: "Pink", price: 160, housePrice: 100, rents: { 0: 12, 1: 60, 2: 180, 2.5: 350, 3: 500, 4: 700, 5: 900 } },
+            { name: "Indore", group: "Orange", price: 180, housePrice: 100, rents: { 0: 14, 1: 70, 2: 200, 2.5: 400, 3: 550, 4: 750, 5: 950 } },
+            { name: "Nagpur", group: "Orange", price: 180, housePrice: 100, rents: { 0: 14, 1: 70, 2: 200, 2.5: 400, 3: 550, 4: 750, 5: 950 } },
+            { name: "Kochi", group: "Orange", price: 200, housePrice: 100, rents: { 0: 16, 1: 80, 2: 220, 2.5: 450, 3: 600, 4: 800, 5: 1000 } },
+            { name: "Lucknow", group: "Red", price: 220, housePrice: 150, rents: { 0: 18, 1: 90, 2: 250, 2.5: 500, 3: 700, 4: 875, 5: 1050 } },
+            { name: "Chandigarh", group: "Red", price: 220, housePrice: 150, rents: { 0: 18, 1: 90, 2: 250, 2.5: 500, 3: 700, 4: 875, 5: 1050 } },
+            { name: "Jaipur", group: "Red", price: 240, housePrice: 150, rents: { 0: 20, 1: 100, 2: 300, 2.5: 550, 3: 750, 4: 925, 5: 1100 } },
+            { name: "Pune", group: "Yellow", price: 260, housePrice: 150, rents: { 0: 22, 1: 110, 2: 330, 2.5: 600, 3: 800, 4: 975, 5: 1150 } },
+            { name: "Hyderabad", group: "Yellow", price: 260, housePrice: 150, rents: { 0: 22, 1: 110, 2: 330, 2.5: 600, 3: 800, 4: 975, 5: 1150 } },
+            { name: "Ahmedabad", group: "Yellow", price: 280, housePrice: 150, rents: { 0: 24, 1: 120, 2: 360, 2.5: 650, 3: 850, 4: 1025, 5: 1200 } },
+            { name: "Kolkata", group: "Green", price: 300, housePrice: 200, rents: { 0: 26, 1: 130, 2: 390, 2.5: 700, 3: 900, 4: 1100, 5: 1275 } },
+            { name: "Chennai", group: "Green", price: 300, housePrice: 200, rents: { 0: 26, 1: 130, 2: 390, 2.5: 700, 3: 900, 4: 1100, 5: 1275 } },
+            { name: "Bengaluru", group: "Green", price: 320, housePrice: 200, rents: { 0: 28, 1: 150, 2: 450, 2.5: 750, 3: 1000, 4: 1200, 5: 1400 } },
+            { name: "Delhi", group: "Dark Blue", price: 350, housePrice: 200, rents: { 0: 35, 1: 175, 2: 500, 2.5: 850, 3: 1100, 4: 1300, 5: 1500 } },
+            { name: "Mumbai", group: "Dark Blue", price: 400, housePrice: 200, rents: { 0: 50, 1: 200, 2: 600, 2.5: 1000, 3: 1400, 4: 1700, 5: 2000 } },
+            { name: "Station 1 (Chennai Central)", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
+            { name: "Station 2 (Howrah)", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
+            { name: "Station 3 (New Delhi)", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
+            { name: "Station 4 (CSMT)", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
+            { name: "Electric Company", group: "Utility", price: 150, housePrice: 0, rents: { 0: 20 } },
+            { name: "Water Works", group: "Utility", price: 150, housePrice: 0, rents: { 0: 20 } }
+        ];
+
+        let wakeLock = null;
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    document.getElementById('wakeLockBadge').classList.remove('hidden');
+                }
+            } catch (err) {}
+        }
+        requestWakeLock();
+        document.addEventListener('visibilitychange', () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') requestWakeLock();
+        });
 
         function getOrCreateDeviceId() {
             let id = localStorage.getItem('vip_device_id');
@@ -199,14 +373,28 @@
         const urlParams = new URLSearchParams(window.location.search);
         const roomCode = (urlParams.get('code') || '').toUpperCase();
         const currentUser = urlParams.get('user') || '';
-        const currentRole = urlParams.get('role') || 'player';
 
         document.getElementById('navRoomCode').textContent = roomCode;
 
         let roomData = null;
         let isMasterAdmin = false;
+        let lastSeenTimestamp = Date.now();
 
-        function playTone(freq = 600, duration = 0.15) {
+        const txActionType = document.getElementById('txActionType');
+        const txPlayerSelect = document.getElementById('txPlayerSelect');
+        const txPropertySelect = document.getElementById('txPropertySelect');
+        const txBuildingLevelSelect = document.getElementById('txBuildingLevelSelect');
+        const txTargetPlayerSelect = document.getElementById('txTargetPlayerSelect');
+        const txAmountInput = document.getElementById('txAmountInput');
+        const targetPropertyCol = document.getElementById('targetPropertyCol');
+        const targetBuildingCol = document.getElementById('targetBuildingCol');
+        const targetPlayerCol = document.getElementById('targetPlayerCol');
+        const myRoleSelect = document.getElementById('myRoleSelect');
+        const btnClaimRole = document.getElementById('btnClaimRole');
+        const userRoleBadge = document.getElementById('userRoleBadge');
+        const popupStackContainer = document.getElementById('popupStackContainer');
+
+        function playBeep(freq = 600, duration = 0.15) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
@@ -214,12 +402,170 @@
                 osc.connect(gain);
                 gain.connect(ctx.destination);
                 osc.frequency.setValueAtTime(freq, ctx.currentTime);
-                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.setValueAtTime(0.12, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
                 osc.start();
                 osc.stop(ctx.currentTime + duration);
             } catch (e) {}
         }
+
+        function spawnTargetedPopup(title, message, icon = 'info', color = 'amber') {
+            const popup = document.createElement('div');
+            popup.className = `pointer-events-auto p-4 rounded-2xl glass-panel shadow-2xl border border-${color}-500/40 space-y-2 transform transition-all duration-300`;
+            popup.innerHTML = `
+                <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-2 text-${color}-500 font-bold text-xs">
+                        <span class="material-icons text-sm">${icon}</span>
+                        <span>${title}</span>
+                    </div>
+                </div>
+                <p class="text-xs text-slate-800 dark:text-slate-200 font-medium">${message}</p>
+                <div class="flex justify-end pt-1">
+                    <button class="px-3 py-1 bg-${color}-500 hover:bg-${color}-400 text-slate-950 font-black rounded-lg text-[10px] transition">
+                        Got it / Done
+                    </button>
+                </div>
+            `;
+            popup.querySelector('button').onclick = () => popup.remove();
+            popupStackContainer.appendChild(popup);
+        }
+
+        function getPropertyInfo(propName) {
+            if (!roomData || !roomData.players) return null;
+            for (const [playerName, data] of Object.entries(roomData.players)) {
+                const props = data.properties || [];
+                for (const p of props) {
+                    if (typeof p === 'string' && p === propName) {
+                        return { owner: playerName, level: 0 };
+                    } else if (typeof p === 'object' && p.name === propName) {
+                        return { owner: playerName, level: p.level !== undefined ? p.level : 0 };
+                    }
+                }
+            }
+            return null;
+        }
+
+        function updatePropertyDropdown() {
+            const action = txActionType.value;
+            const actingPlayer = txPlayerSelect.value;
+            const previousSelection = txPropertySelect.value;
+
+            txPropertySelect.innerHTML = '';
+            let filteredProperties = [];
+
+            if (action === 'buy') {
+                filteredProperties = BOARD_PROPERTIES.filter(prop => !getPropertyInfo(prop.name));
+            } else if (action === 'rent') {
+                filteredProperties = BOARD_PROPERTIES.filter(prop => {
+                    const info = getPropertyInfo(prop.name);
+                    return info && info.owner !== actingPlayer;
+                });
+            } else if (action === 'build') {
+                const me = roomData?.players?.[actingPlayer];
+                const myProps = me?.properties || [];
+                const myPropNames = myProps.map(p => typeof p === 'string' ? p : p.name);
+                filteredProperties = BOARD_PROPERTIES.filter(prop => 
+                    myPropNames.includes(prop.name) && prop.group !== 'Station' && prop.group !== 'Utility'
+                );
+            }
+
+            if (filteredProperties.length === 0) {
+                const opt = document.createElement('option');
+                opt.value = "";
+                opt.textContent = action === 'buy' ? "-- No Unowned Properties Left --" :
+                                  action === 'rent' ? "-- No Rentable Properties --" :
+                                  action === 'build' ? "-- No Eligible Properties Owned --" : "-- None Available --";
+                opt.disabled = true;
+                txPropertySelect.appendChild(opt);
+            } else {
+                filteredProperties.forEach(prop => {
+                    const opt = document.createElement('option');
+                    opt.value = prop.name;
+                    const info = getPropertyInfo(prop.name);
+                    let label = `${prop.name}`;
+                    if (info) {
+                        const lvlText = info.level === 5 ? ' [Hotel]' : info.level === 2.5 ? ' [Motel]' : info.level > 0 ? ` [${info.level}H]` : '';
+                        label += ` (${info.owner}${lvlText})`;
+                    } else {
+                        label += ` ($${prop.price})`;
+                    }
+                    opt.textContent = label;
+                    txPropertySelect.appendChild(opt);
+                });
+
+                if (filteredProperties.some(p => p.name === previousSelection)) {
+                    txPropertySelect.value = previousSelection;
+                }
+            }
+
+            syncActionFields();
+        }
+
+        function syncActionFields() {
+            const action = txActionType.value;
+            const selectedPropName = txPropertySelect.value;
+            const propObj = BOARD_PROPERTIES.find(p => p.name === selectedPropName);
+
+            if (action === 'buy') {
+                targetPropertyCol.classList.remove('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.add('hidden');
+                txAmountInput.value = propObj ? propObj.price : 0;
+            } else if (action === 'rent') {
+                targetPropertyCol.classList.remove('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.remove('hidden');
+
+                const info = getPropertyInfo(selectedPropName);
+                if (info) {
+                    txTargetPlayerSelect.value = info.owner;
+                    if (propObj && propObj.rents) {
+                        txAmountInput.value = propObj.rents[info.level] !== undefined ? propObj.rents[info.level] : propObj.rents[0];
+                    }
+                }
+            } else if (action === 'build') {
+                targetPropertyCol.classList.remove('hidden');
+                targetBuildingCol.classList.remove('hidden');
+                targetPlayerCol.classList.add('hidden');
+
+                const chosenLevel = parseFloat(txBuildingLevelSelect.value) || 1;
+                const info = getPropertyInfo(selectedPropName);
+                const currentLevel = info ? info.level : 0;
+                const levelDiff = Math.max(0.5, chosenLevel - currentLevel);
+                
+                const houseBase = propObj ? propObj.housePrice : 100;
+                txAmountInput.value = Math.round(levelDiff * houseBase);
+            } else if (action === 'salary') {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.add('hidden');
+                txAmountInput.value = 200;
+            } else if (action === 'jail_fee') {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.add('hidden');
+                txAmountInput.value = 100;
+            } else if (action === 'collect_all') {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.add('hidden');
+                txAmountInput.value = 10;
+            } else if (action === 'repairs') {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.add('hidden');
+                txAmountInput.value = 115;
+            } else {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.add('hidden');
+            }
+        }
+
+        txActionType.addEventListener('change', updatePropertyDropdown);
+        txPlayerSelect.addEventListener('change', updatePropertyDropdown);
+        txPropertySelect.addEventListener('change', syncActionFields);
+        txBuildingLevelSelect.addEventListener('change', syncActionFields);
 
         if (!roomCode) {
             alert("No room code provided");
@@ -228,7 +574,6 @@
 
         const roomRef = doc(db, "games", "Monopoly", "rooms", roomCode);
 
-        // Real-Time Cloud Subscription
         onSnapshot(roomRef, (snapshot) => {
             if (!snapshot.exists()) {
                 alert("Room no longer exists");
@@ -246,15 +591,76 @@
             renderStats();
             renderRoster();
             renderLogs();
+            updatePropertyDropdown();
+            processTargetedAlerts();
         });
+
+        function processTargetedAlerts() {
+            const logs = roomData.logs || [];
+            if (logs.length === 0) return;
+
+            const latestLog = logs[0];
+            const logTime = new Date().getTime();
+            if (latestLog._ts && latestLog._ts <= lastSeenTimestamp) return;
+
+            const myRole = roomData.players[currentUser]?.role || 'Player';
+            const text = latestLog.text || '';
+            const targetRecipient = latestLog.targetRecipient || '';
+            const action = latestLog.action || '';
+
+            let shouldShow = false;
+            let title = "Table Notification";
+            let msg = text;
+            let icon = 'info';
+            let color = 'amber';
+
+            if (isMasterAdmin) {
+                shouldShow = true;
+                title = "Table Event Alert";
+            }
+
+            if (action === 'buy' && (myRole === 'Props Giver' || isMasterAdmin)) {
+                shouldShow = true;
+                title = "Hand Over Deed Card";
+                icon = 'style';
+                color = 'sky';
+            } else if (action === 'build' && (myRole === 'Builder' || isMasterAdmin)) {
+                shouldShow = true;
+                title = "Construction Placement";
+                icon = 'apartment';
+                color = 'amber';
+            } else if ((action === 'loan' || action === 'salary' || action === 'repairs') && (myRole === 'Banker' || isMasterAdmin)) {
+                shouldShow = true;
+                title = "Banker Treasury Action";
+                icon = 'account_balance';
+                color = 'emerald';
+            } else if (action === 'rent' && (targetRecipient === currentUser || isMasterAdmin)) {
+                shouldShow = true;
+                title = "Rent Received!";
+                msg = `Received $${latestLog.amount} rent from ${latestLog.actor} for ${latestLog.property}`;
+                icon = 'payments';
+                color = 'emerald';
+            }
+
+            if (shouldShow && latestLog.actor !== currentUser) {
+                spawnTargetedPopup(title, msg, icon, color);
+                playBeep(800, 0.2);
+            }
+
+            lastSeenTimestamp = logTime;
+        }
 
         function updateUIPermissions() {
             const statusBadge = document.getElementById('userStatusBadge');
             const alertForbidden = document.getElementById('writeForbiddenAlert');
             const btnOverride = document.getElementById('btnOpenAdminOverride');
-            const playerData = roomData.players[currentUser];
+            const playerData = roomData.players[currentUser] || {};
 
-            const canWrite = isMasterAdmin || (playerData && playerData.canWrite);
+            const myRole = playerData.role || 'Player';
+            userRoleBadge.textContent = `Role: ${myRole}`;
+            myRoleSelect.value = myRole;
+
+            const canWrite = isMasterAdmin || playerData.canWrite;
 
             if (isMasterAdmin) {
                 statusBadge.textContent = "Host / Master Device";
@@ -273,22 +679,68 @@
                 alertForbidden.classList.remove('hidden');
             }
 
-            const txPlayerSelect = document.getElementById('txPlayerSelect');
-            txPlayerSelect.innerHTML = '';
             const eligiblePlayers = isMasterAdmin ? Object.keys(roomData.players) : [currentUser];
+            const prevSelectedPlayer = txPlayerSelect.value;
+            txPlayerSelect.innerHTML = '';
             eligiblePlayers.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p;
                 opt.textContent = p;
                 txPlayerSelect.appendChild(opt);
             });
+            if (eligiblePlayers.includes(prevSelectedPlayer)) {
+                txPlayerSelect.value = prevSelectedPlayer;
+            }
+
+            txTargetPlayerSelect.innerHTML = '';
+            Object.keys(roomData.players).forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                txTargetPlayerSelect.appendChild(opt);
+            });
         }
 
-        function renderStats() {
-            const me = roomData.players[currentUser] || { cash: 0, loans: 0, properties: [] };
-            const propVal = (me.properties || []).length * 200;
-            const net = me.cash + propVal - me.loans;
+        btnClaimRole.onclick = async () => {
+            const chosenRole = myRoleSelect.value;
+            const updatedPlayers = { ...roomData.players };
+            if (!updatedPlayers[currentUser]) return;
 
+            updatedPlayers[currentUser].role = chosenRole;
+            const updatedLogs = [{ 
+                time: new Date().toLocaleTimeString(), 
+                text: `${currentUser} claimed role: ${chosenRole}`,
+                actor: currentUser,
+                _ts: Date.now()
+            }, ...(roomData.logs || [])];
+
+            await updateDoc(roomRef, {
+                players: updatedPlayers,
+                logs: updatedLogs
+            });
+
+            if (!isMasterAdmin) {
+                playBeep(750, 0.1);
+            }
+        };
+
+        function renderStats() {
+            const defaultCash = roomData.startingCash !== undefined ? roomData.startingCash : 1500;
+            const me = roomData.players[currentUser] || { cash: defaultCash, loans: 0, properties: [] };
+            
+            let propVal = 0;
+            (me.properties || []).forEach(p => {
+                const pName = typeof p === 'string' ? p : p.name;
+                const pLevel = typeof p === 'object' ? p.level : 0;
+                const propDef = BOARD_PROPERTIES.find(b => b.name === pName);
+                if (propDef) {
+                    propVal += propDef.price + (pLevel * (propDef.housePrice || 0));
+                } else {
+                    propVal += 200;
+                }
+            });
+
+            const net = me.cash + propVal - me.loans;
             document.getElementById('statMyCash').textContent = `$${me.cash.toLocaleString()}`;
             document.getElementById('statMyLoans').textContent = `$${me.loans.toLocaleString()}`;
             document.getElementById('statMyProps').textContent = `${(me.properties || []).length}`;
@@ -303,8 +755,22 @@
 
             Object.entries(players).forEach(([name, p]) => {
                 const isMe = name === currentUser;
-                const propCount = (p.properties || []).length;
-                const net = p.cash + (propCount * 200) - p.loans;
+                const props = p.properties || [];
+                const role = p.role || 'Player';
+
+                let propVal = 0;
+                props.forEach(pr => {
+                    const pName = typeof pr === 'string' ? pr : pr.name;
+                    const pLevel = typeof pr === 'object' ? pr.level : 0;
+                    const propDef = BOARD_PROPERTIES.find(b => b.name === pName);
+                    if (propDef) {
+                        propVal += propDef.price + (pLevel * (propDef.housePrice || 0));
+                    } else {
+                        propVal += 200;
+                    }
+                });
+
+                const net = p.cash + propVal - p.loans;
 
                 const item = document.createElement('div');
                 item.className = `p-3 rounded-2xl border ${isMe ? 'bg-amber-500/10 border-amber-500/30' : 'bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800'} flex items-center justify-between shadow-sm`;
@@ -312,9 +778,17 @@
                     <div>
                         <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                             <span>${name}</span>
+                            <span class="text-[9px] px-2 py-0.5 rounded-full font-mono bg-white/60 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-amber-600 dark:text-amber-400 font-bold">${role}</span>
                             ${p.canWrite ? '<span class="material-icons text-[12px] text-emerald-500">verified</span>' : ''}
                         </div>
-                        <div class="text-[10px] text-slate-400 font-mono">Props: ${propCount} | Loans: $${p.loans}</div>
+                        <div class="text-[10px] text-slate-400 font-mono mt-0.5 flex items-center gap-2">
+                            <button type="button" class="text-sky-500 hover:underline flex items-center gap-0.5" onclick="window.viewPlayerProperties('${name}')">
+                                <span>Props: ${props.length}</span>
+                                <span class="material-icons text-[10px]">open_in_new</span>
+                            </button>
+                            <span>|</span>
+                            <span>Loans: $${p.loans}</span>
+                        </div>
                     </div>
                     <div class="text-right font-mono">
                         <div class="text-xs font-bold text-emerald-500">$${p.cash.toLocaleString()}</div>
@@ -325,6 +799,28 @@
             });
         }
 
+        function formatHighlightedLog(rawText) {
+            let formatted = rawText;
+            if (roomData && roomData.players) {
+                Object.keys(roomData.players).forEach(name => {
+                    const re = new RegExp(`\\b${name}\\b`, 'g');
+                    formatted = formatted.replace(re, `<span class="log-highlight-player">${name}</span>`);
+                });
+            }
+            const actions = ['paid', 'rent', 'to buy', 'upgraded', 'salary', 'loan', 'repaid', 'collected', 'jail'];
+            actions.forEach(act => {
+                const re = new RegExp(`\\b${act}\\b`, 'gi');
+                formatted = formatted.replace(re, `<span class="log-highlight-action">$&</span>`);
+            });
+            const buildings = ['Hotel', 'Motel', 'Houses', 'House'];
+            buildings.forEach(b => {
+                const re = new RegExp(`\\b${b}\\b`, 'gi');
+                formatted = formatted.replace(re, `<span class="log-highlight-prop">$&</span>`);
+            });
+            formatted = formatted.replace(/\$(\d[\d,]*)/g, `<span class="log-highlight-money">$$$1</span>`);
+            return formatted;
+        }
+
         function renderLogs() {
             const container = document.getElementById('logsContainer');
             container.innerHTML = '';
@@ -332,19 +828,20 @@
                 const row = document.createElement('div');
                 row.className = "p-1.5 border-b border-slate-200/50 dark:border-slate-800/50 flex items-start gap-2";
                 row.innerHTML = `
-                    <span class="text-slate-500 text-[10px] shrink-0">[${log.time}]</span>
-                    <span class="text-slate-700 dark:text-slate-300 break-words">${log.text}</span>
+                    <span class="text-slate-500 text-[10px] shrink-0 font-mono">[${log.time}]</span>
+                    <span class="text-slate-700 dark:text-slate-300 break-words">${formatHighlightedLog(log.text)}</span>
                 `;
                 container.appendChild(row);
             });
         }
 
-        // Action Submission
         document.getElementById('btnSubmitTx').onclick = async () => {
-            const actingPlayer = document.getElementById('txPlayerSelect').value;
-            const action = document.getElementById('txActionType').value;
-            const target = document.getElementById('txTargetInput').value.trim();
-            const amount = parseFloat(document.getElementById('txAmountInput').value) || 0;
+            const actingPlayer = txPlayerSelect.value;
+            const action = txActionType.value;
+            const targetProp = txPropertySelect.value;
+            const targetPayee = txTargetPlayerSelect.value;
+            const targetLevel = parseFloat(txBuildingLevelSelect.value) || 0;
+            const amount = parseFloat(txAmountInput.value) || 0;
 
             const playerData = roomData.players[currentUser];
             if (!isMasterAdmin && (!playerData || !playerData.canWrite)) {
@@ -354,20 +851,39 @@
             const updatedPlayers = { ...roomData.players };
             const p = updatedPlayers[actingPlayer];
             let logText = "";
+            let recipientTarget = "";
 
             if (action === 'buy') {
                 p.cash -= amount;
                 p.properties = p.properties || [];
-                if (target) p.properties.push(target);
-                logText = `${actingPlayer} paid $${amount} to buy ${target || 'property'}`;
+                p.properties.push({ name: targetProp, level: 0 });
+                logText = `${actingPlayer} paid $${amount} to buy ${targetProp}`;
             } else if (action === 'rent') {
                 p.cash -= amount;
-                if (target && updatedPlayers[target]) {
-                    updatedPlayers[target].cash += amount;
-                    logText = `${actingPlayer} paid $${amount} rent to ${target}`;
+                recipientTarget = targetPayee;
+                if (targetPayee && updatedPlayers[targetPayee] && targetPayee !== actingPlayer) {
+                    updatedPlayers[targetPayee].cash += amount;
+                    logText = `${actingPlayer} paid $${amount} rent to ${targetPayee} for ${targetProp}`;
                 } else {
-                    logText = `${actingPlayer} paid $${amount} rent for ${target}`;
+                    logText = `${actingPlayer} paid $${amount} rent for ${targetProp}`;
                 }
+            } else if (action === 'build') {
+                p.cash -= amount;
+                p.properties = (p.properties || []).map(pr => {
+                    const name = typeof pr === 'string' ? pr : pr.name;
+                    if (name === targetProp) {
+                        return { name, level: targetLevel };
+                    }
+                    return typeof pr === 'string' ? { name: pr, level: 0 } : pr;
+                });
+                const lvlName = targetLevel === 5 ? 'Hotel' : targetLevel === 2.5 ? 'Motel' : `${targetLevel} Houses`;
+                logText = `${actingPlayer} upgraded ${targetProp} to ${lvlName} for $${amount}`;
+            } else if (action === 'salary') {
+                p.cash += amount;
+                logText = `${actingPlayer} collected $${amount} salary`;
+            } else if (action === 'jail_fee') {
+                p.cash -= amount;
+                logText = `${actingPlayer} paid $${amount} to get out of jail`;
             } else if (action === 'loan') {
                 p.cash += amount;
                 p.loans += amount;
@@ -375,43 +891,102 @@
             } else if (action === 'repay') {
                 p.cash -= amount;
                 p.loans = Math.max(0, p.loans - amount);
-                logText = `${actingPlayer} repaid $${amount} of loan`;
-            } else if (action === 'build') {
-                p.cash -= amount;
-                logText = `${actingPlayer} paid $${amount} to build on ${target}`;
+                logText = `${actingPlayer} repaid $${amount} loan`;
             } else if (action === 'collect') {
                 p.cash += amount;
-                logText = `${actingPlayer} collected $${amount} (${target || 'Salary/Bank'})`;
+                logText = `${actingPlayer} collected $${amount} (Chance / Community)`;
             } else if (action === 'collect_all') {
                 let total = 0;
                 Object.keys(updatedPlayers).forEach(k => {
                     if (k !== actingPlayer) {
-                        updatedPlayers[k].cash -= 10;
-                        total += 10;
+                        updatedPlayers[k].cash -= amount;
+                        total += amount;
                     }
                 });
                 p.cash += total;
-                logText = `${actingPlayer} collected $10 from all players ($${total})`;
+                logText = `${actingPlayer} collected $${amount} from each player (+$${total})`;
             } else if (action === 'repairs') {
                 p.cash -= amount;
-                logText = `${actingPlayer} paid $${amount} for building repairs tax`;
+                logText = `${actingPlayer} paid $${amount} for building repairs`;
             }
 
-            const updatedLogs = [{ time: new Date().toLocaleTimeString(), text: logText }, ...(roomData.logs || [])];
+            const updatedLogs = [{ 
+                time: new Date().toLocaleTimeString(), 
+                text: logText,
+                actor: actingPlayer,
+                action: action,
+                amount: amount,
+                property: targetProp,
+                targetRecipient: recipientTarget,
+                _ts: Date.now()
+            }, ...(roomData.logs || [])];
 
             await updateDoc(roomRef, {
                 players: updatedPlayers,
                 logs: updatedLogs
             });
-
-            playTone(850, 0.2);
-            document.getElementById('txTargetInput').value = '';
-            document.getElementById('txAmountInput').value = '';
         };
 
-        // Admin Override Modal
+        // Properties Inspector Modal Handlers
+        const propsModal = document.getElementById('propsModal');
+        const propsListContainer = document.getElementById('propsListContainer');
+        const propsModalTitle = document.getElementById('propsModalTitle');
+        const propsModalSubtitle = document.getElementById('propsModalSubtitle');
+
+        document.getElementById('boxMyProps').onclick = () => window.viewPlayerProperties(currentUser);
+        document.getElementById('btnClosePropsModal').onclick = () => propsModal.classList.add('hidden');
+
+        window.viewPlayerProperties = function(playerName) {
+            const playerObj = roomData?.players?.[playerName];
+            if (!playerObj) return;
+
+            propsModalTitle.innerHTML = `<span class="material-icons text-sky-500 text-base">domain</span> ${playerName}'s Properties`;
+            propsListContainer.innerHTML = '';
+
+            const props = playerObj.properties || [];
+            propsModalSubtitle.textContent = `Portfolio Size: ${props.length} Properties Claimed`;
+
+            if (props.length === 0) {
+                propsListContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No properties owned by this player yet.</p>`;
+            } else {
+                props.forEach(p => {
+                    const pName = typeof p === 'string' ? p : p.name;
+                    const pLevel = typeof p === 'object' ? p.level : 0;
+                    const propDef = BOARD_PROPERTIES.find(b => b.name === pName) || { price: 200, group: "General", rents: { 0: 25 } };
+                    
+                    const levelBadge = pLevel === 5 ? '<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-500 font-bold text-[10px]">Hotel (5H)</span>' :
+                                       pLevel === 2.5 ? '<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 font-bold text-[10px]">Motel (2.5)</span>' :
+                                       pLevel > 0 ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-bold text-[10px]">${pLevel} Houses</span>` :
+                                       '<span class="px-2 py-0.5 rounded bg-slate-500/20 text-slate-400 text-[10px]">Unimproved</span>';
+
+                    const currentRent = propDef.rents ? (propDef.rents[pLevel] !== undefined ? propDef.rents[pLevel] : propDef.rents[0]) : 0;
+
+                    const row = document.createElement('div');
+                    row.className = "bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl flex items-center justify-between shadow-sm";
+                    row.innerHTML = `
+                        <div>
+                            <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
+                                <span>${pName}</span>
+                                ${levelBadge}
+                            </div>
+                            <div class="text-[10px] text-slate-400 font-mono mt-0.5">Base: $${propDef.price} | Set: ${propDef.group}</div>
+                        </div>
+                        <div class="text-right font-mono">
+                            <span class="text-[10px] text-slate-400 uppercase block">Current Rent</span>
+                            <span class="text-xs font-bold text-amber-500">$${currentRent}</span>
+                        </div>
+                    `;
+                    propsListContainer.appendChild(row);
+                });
+            }
+
+            propsModal.classList.remove('hidden');
+        };
+
+        // Admin Override Modal Handlers
         const adminModal = document.getElementById('adminModal');
         const adminPlayerSelect = document.getElementById('adminPlayerSelect');
+        const adminRoleSelect = document.getElementById('adminRoleSelect');
 
         document.getElementById('btnOpenAdminOverride').onclick = () => {
             adminPlayerSelect.innerHTML = '';
@@ -431,7 +1006,14 @@
             const p = roomData.players[name];
             document.getElementById('adminCashInput').value = p.cash;
             document.getElementById('adminLoansInput').value = p.loans;
-            document.getElementById('adminPropsInput').value = (p.properties || []).join(', ');
+            
+            const propsStr = (p.properties || []).map(pr => {
+                if (typeof pr === 'string') return `${pr}:0`;
+                return `${pr.name}:${pr.level || 0}`;
+            }).join(', ');
+            
+            document.getElementById('adminPropsInput').value = propsStr;
+            adminRoleSelect.value = p.role || 'Player';
             document.getElementById('adminAllowWriteCheckbox').checked = !!p.canWrite;
         }
 
@@ -444,10 +1026,25 @@
 
             p.cash = parseFloat(document.getElementById('adminCashInput').value) || 0;
             p.loans = parseFloat(document.getElementById('adminLoansInput').value) || 0;
-            p.properties = document.getElementById('adminPropsInput').value.split(',').map(s => s.trim()).filter(Boolean);
+            
+            const rawProps = document.getElementById('adminPropsInput').value.split(',').map(s => s.trim()).filter(Boolean);
+            p.properties = rawProps.map(item => {
+                if (item.includes(':')) {
+                    const [propName, lvl] = item.split(':');
+                    return { name: propName.trim(), level: parseFloat(lvl) || 0 };
+                }
+                return { name: item, level: 0 };
+            });
+
+            p.role = adminRoleSelect.value;
             p.canWrite = document.getElementById('adminAllowWriteCheckbox').checked;
 
-            const updatedLogs = [{ time: new Date().toLocaleTimeString(), text: `[ADMIN OVERRIDE] Updated stats for ${name}` }, ...(roomData.logs || [])];
+            const updatedLogs = [{ 
+                time: new Date().toLocaleTimeString(), 
+                text: `[ADMIN OVERRIDE] Updated stats and assigned role (${p.role}) to ${name}`,
+                actor: 'Admin',
+                _ts: Date.now()
+            }, ...(roomData.logs || [])];
 
             await updateDoc(roomRef, {
                 players: updatedPlayers,
@@ -455,6 +1052,150 @@
             });
 
             adminModal.classList.add('hidden');
+        };
+
+        // End Game / Archiving Handlers
+        const endGameModal = document.getElementById('endGameModal');
+        const btnOpenEndGameModal = document.getElementById('btnOpenEndGameModal');
+        const btnCloseEndGameModal = document.getElementById('btnCloseEndGameModal');
+        const btnEndAndRecord = document.getElementById('btnEndAndRecord');
+        const btnSaveForLater = document.getElementById('btnSaveForLater');
+        const endGameVenueInput = document.getElementById('endGameVenueInput');
+
+        btnOpenEndGameModal.onclick = () => endGameModal.classList.remove('hidden');
+        btnCloseEndGameModal.onclick = () => endGameModal.classList.add('hidden');
+
+        function generatePlayerCountUrl(playerName) {
+            const p = roomData.players[playerName];
+            if (!p) return "../count.html";
+
+            const params = new URLSearchParams();
+            const propPairs = [];
+
+            (p.properties || []).forEach(item => {
+                const propName = typeof item === 'string' ? item : item.name;
+                const level = typeof item === 'object' ? item.level : 0;
+                const idx = BOARD_PROPERTIES.findIndex(b => b.name === propName);
+                if (idx !== -1) propPairs.push(idx, level);
+            });
+
+            if (propPairs.length > 0) params.set('props', propPairs.join(','));
+            params.set('cash_total', p.cash || 0);
+            if (p.loans > 0) params.set('debts', p.loans);
+
+            return `../count.html?${params.toString()}`;
+        }
+
+        btnEndAndRecord.onclick = async () => {
+            if (!isMasterAdmin) return alert("Only the host or master device can officially end and record matches.");
+            if (!confirm("Are you sure you want to finalize this game? Results will be permanently logged to match archives.")) return;
+
+            btnEndAndRecord.disabled = true;
+            btnEndAndRecord.textContent = "Processing Record...";
+
+            try {
+                const today = new Date();
+                const dd = String(today.getDate()).padStart(2, '0');
+                const mm = String(today.getMonth() + 1).padStart(2, '0');
+                const yyyy = today.getFullYear();
+                const formattedDate = `${dd}-${mm}-${yyyy}`;
+
+                const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
+                let countSameDate = 0;
+                matchesSnap.forEach(d => {
+                    if (d.id.startsWith(formattedDate)) countSameDate++;
+                });
+                const matchDocId = `${formattedDate}-${String(countSameDate + 1).padStart(2, '0')}`;
+
+                let highestNet = -Infinity;
+                const compiledPlayers = Object.entries(roomData.players).map(([name, p]) => {
+                    let propVal = 0;
+                    let citiesCount = 0;
+                    let stationsCount = 0;
+
+                    (p.properties || []).forEach(item => {
+                        const propName = typeof item === 'string' ? item : item.name;
+                        const level = typeof item === 'object' ? item.level : 0;
+                        const def = BOARD_PROPERTIES.find(b => b.name === propName);
+                        if (def) {
+                            propVal += def.price + (level * (def.housePrice || 0));
+                            if (def.group === 'Station' || def.group === 'Utility') stationsCount++;
+                            else citiesCount++;
+                        }
+                    });
+
+                    const netScore = p.cash + propVal - p.loans;
+                    if (netScore > highestNet) highestNet = netScore;
+
+                    return {
+                        name,
+                        isMember: true,
+                        isGuest: false,
+                        cash: p.cash,
+                        earnings: netScore,
+                        loans: p.loans,
+                        cities: citiesCount,
+                        stations: stationsCount,
+                        scoreUrl: generatePlayerCountUrl(name),
+                        ownedCities: (p.properties || []).map(pr => typeof pr === 'string' ? pr : pr.name)
+                    };
+                });
+
+                const finalPlayersData = compiledPlayers.map(p => ({
+                    ...p,
+                    isWinner: p.earnings === highestNet
+                }));
+
+                const officialMatchData = {
+                    gameId: matchDocId,
+                    date: `${yyyy}-${mm}-${dd}`,
+                    location: endGameVenueInput.value.trim() || "Living Room",
+                    players: finalPlayersData,
+                    roomCode: roomCode,
+                    createdAt: new Date().toISOString()
+                };
+                await setDoc(doc(db, "games", "Monopoly", "matches", matchDocId), officialMatchData);
+
+                await setDoc(doc(db, "games", "Monopoly", "archived_rooms", roomCode), {
+                    ...roomData,
+                    status: "Completed",
+                    officialMatchId: matchDocId,
+                    archivedAt: new Date().toISOString()
+                });
+
+                await deleteDoc(roomRef);
+
+                alert(`Match permanently saved to archives as ID: ${matchDocId}`);
+                window.location.href = `../view.html?game=${encodeURIComponent(matchDocId)}`;
+            } catch (err) {
+                alert("Failed to archive match: " + err.message);
+                btnEndAndRecord.disabled = false;
+                btnEndAndRecord.textContent = "Settle & Record Official Match";
+            }
+        };
+
+        btnSaveForLater.onclick = async () => {
+            if (!isMasterAdmin) return alert("Only the host or master device can save this session.");
+            if (!confirm("Save this game to resume later? Current table will be placed in saved storage.")) return;
+
+            btnSaveForLater.disabled = true;
+            btnSaveForLater.textContent = "Saving Session...";
+
+            try {
+                await setDoc(doc(db, "games", "Monopoly", "saved_games", roomCode), {
+                    ...roomData,
+                    status: "Saved / Paused",
+                    savedAt: new Date().toISOString()
+                });
+
+                await deleteDoc(roomRef);
+                alert("Session paused and saved! You can resume it anytime from the Archives tab.");
+                window.location.href = "archive.html";
+            } catch (err) {
+                alert("Failed to save session: " + err.message);
+                btnSaveForLater.disabled = false;
+                btnSaveForLater.textContent = "Save & Pause Session";
+            }
         };
     </script>
 </body>

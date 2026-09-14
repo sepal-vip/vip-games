@@ -697,6 +697,10 @@
         });
 
         initInspector();
+        import { cleanAndArchiveOldRooms } from "./track/auto-archive.js";
+
+        // Run passive background cleanup of expired rooms
+        cleanAndArchiveOldRooms();
     </script>
     
     <!-- Offline Service Worker Bootstrap -->
