@@ -13,6 +13,10 @@
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
     <link rel="stylesheet" href="../../web-info/global-style.css">
     <script src="../../web-info/theme.js"></script>
+
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
     <style>
         body { font-family: 'Google Sans', sans-serif; }
         .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -30,37 +34,69 @@
     <!-- Stackable Notifications Container -->
     <div id="popupStackContainer" class="fixed top-16 right-4 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
 
-    <!-- Navigation Header -->
-    <nav class="glass-panel sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="font-mono font-bold text-xs uppercase tracking-wider text-slate-500">Room:</span>
-                <span id="navRoomCode" class="font-mono font-black text-amber-500 text-sm tracking-wider">----</span>
-                <span id="wakeLockBadge" class="hidden text-[9px] font-mono text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20" title="Screen will stay awake">Awake</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button id="btnOpenEndGameModal" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1">
-                    <span class="material-icons text-xs">stop_circle</span> End Game
+    <!-- Responsive Navigation Header -->
+<nav class="glass-panel sticky top-0 z-40">
+    <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+        <!-- Left: Room & Wake Status -->
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="font-mono font-bold text-[11px] uppercase tracking-wider text-slate-500">Room:</span>
+            <span id="navRoomCode" class="font-mono font-black text-amber-500 text-sm tracking-wider">----</span>
+            <span id="wakeLockBadge" class="hidden text-[8px] font-mono text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Awake</span>
+        </div>
+
+        <!-- Center / Right: Active Role & Minimal Quick Tools -->
+        <div class="flex items-center gap-2">
+            <span id="userRoleBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 truncate max-w-[110px] sm:max-w-none">
+                Assigning...
+            </span>
+
+            <!-- Desktop-Only Quick Buttons -->
+            <div class="hidden md:flex items-center gap-1.5">
+                <button id="btnOpenShareModal" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 font-bold rounded-xl text-xs transition flex items-center gap-1">
+                    <span class="material-icons text-xs">qr_code_2</span> Share
                 </button>
-                <a href="archive.html" class="px-2.5 py-1.5 bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-700 dark:text-slate-300 rounded-xl hover:text-amber-500 transition flex items-center gap-1 shadow-sm">
+                <a href="archive.html" class="px-2.5 py-1 bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-300 rounded-xl hover:text-amber-500 transition flex items-center gap-1">
                     <span class="material-icons text-xs">inventory_2</span> Archives
                 </a>
-                <span id="userRoleBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400">
-                    Role: Assigning...
-                </span>
-                <span id="userStatusBadge" class="text-[10px] font-bold px-2.5 py-1 rounded-full border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                    Connecting...
-                </span>
-                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-amber-500 transition-colors ml-1">
-                    <span class="material-icons text-lg" id="themeIcon">light_mode</span>
+                <button id="btnOpenEndGameModal" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1">
+                    <span class="material-icons text-xs">stop_circle</span> End
                 </button>
-                <a href="../tracker.html" class="p-1.5 text-slate-400 hover:text-rose-500 transition" title="Exit Table">
-                    <span class="material-icons text-base">logout</span>
-                </a>
             </div>
+
+            <!-- Theme Toggle -->
+            <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-amber-500 transition-colors">
+                <span class="material-icons text-base" id="themeIcon">light_mode</span>
+            </button>
+
+            <!-- Mobile Kebab Dropdown (3 dots) -->
+            <div class="relative md:hidden">
+                <button id="btnMobileMenuToggle" class="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-300 hover:text-white transition">
+                    <span class="material-icons text-base block">more_vert</span>
+                </button>
+                <div id="mobileMenuDropdown" class="hidden absolute right-0 mt-2 w-44 glass-panel bg-slate-950/95 border border-slate-800 rounded-2xl shadow-2xl p-1.5 space-y-1 z-50 text-xs font-bold">
+                    <button id="btnMobileShare" class="w-full px-3 py-2 text-left rounded-xl hover:bg-amber-500/10 text-amber-400 flex items-center gap-2 transition">
+                        <span class="material-icons text-sm">qr_code_2</span> Share Room / QR
+                    </button>
+                    <a href="archive.html" class="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2 transition block">
+                        <span class="material-icons text-sm">inventory_2</span> Saved & Archives
+                    </a>
+                    <button id="btnMobileEndGame" class="w-full px-3 py-2 text-left rounded-xl hover:bg-rose-500/10 text-rose-400 flex items-center gap-2 transition">
+                        <span class="material-icons text-sm">stop_circle</span> End Game
+                    </button>
+                    <a href="../tracker.html" class="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-800 text-slate-400 flex items-center gap-2 transition block border-t border-slate-800 pt-2">
+                        <span class="material-icons text-sm">logout</span> Exit Table
+                    </a>
+                </div>
+            </div>
+
+            <!-- Desktop Exit -->
+            <a href="../tracker.html" class="hidden md:block p-1.5 text-slate-400 hover:text-rose-500 transition" title="Exit Table">
+                <span class="material-icons text-base">logout</span>
+            </a>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <!-- Main Workspace -->
     <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
@@ -131,17 +167,20 @@
                 <div>
                     <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Action</label>
                     <select id="txActionType" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500">
-                        <option value="buy">Buy Property</option>
-                        <option value="rent">Pay Rent</option>
-                        <option value="build">Build Houses / Motel / Hotel</option>
-                        <option value="loan">Take Bank Loan</option>
-                        <option value="repay">Repay Loan</option>
-                        <option value="salary">Collect Salary ($200)</option>
-                        <option value="collect">Collect Chance / Community</option>
-                        <option value="collect_all">Collect $10 From All</option>
-                        <option value="repairs">Pay Repairs Tax ($115/H)</option>
-                        <option value="jail_fee">Get Out of Jail ($100)</option>
-                    </select>
+    <option value="buy">Buy Property</option>
+    <option value="rent">Pay Rent</option>
+    <option value="build">Build Houses / Motel / Hotel</option>
+    <option value="loan">Take Bank Loan</option>
+    <option value="repay">Repay Loan</option>
+    <option value="player_loan">Borrow Loan From Player</option>
+    <option value="repay_player_loan">Repay Player Loan</option>
+    <option value="salary">Collect Salary ($200)</option>
+    <option value="collect">Collect Chance / Community</option>
+    <option value="pay_chance">Pay Chance / Community Fee</option>
+    <option value="collect_all">Collect $10 From All</option>
+    <option value="repairs">Pay Repairs Tax ($115/H)</option>
+    <option value="jail_fee">Get Out of Jail ($100)</option>
+</select>
                 </div>
 
                 <div id="targetPropertyCol">
@@ -196,6 +235,39 @@
             </div>
         </div>
     </main>
+
+    <!-- SHARE ROOM / QR MODAL -->
+    <div id="shareRoomModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-6 space-y-5 shadow-2xl border border-amber-500/30 text-center">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="material-icons text-amber-500 text-base">qr_code_2</span> Share Table Room
+                </h3>
+                <button type="button" id="btnCloseShareModal" class="text-slate-400 hover:text-white">
+                    <span class="material-icons text-base">close</span>
+                </button>
+            </div>
+
+            <div>
+                <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">Room Code</span>
+                <span id="shareModalCodeDisplay" class="text-3xl font-black font-mono text-amber-500 tracking-widest">----</span>
+            </div>
+
+            <!-- QR Canvas Container -->
+            <div class="flex flex-col items-center justify-center bg-white p-4 rounded-2xl mx-auto w-48 h-48 shadow-md">
+                <div id="qrCodeContainer"></div>
+            </div>
+
+            <div class="space-y-2 pt-1">
+                <button id="btnCopyRoomLink" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
+                    <span class="material-icons text-sm">link</span> Copy Direct Link
+                </button>
+                <button id="btnCopyShareText" class="w-full py-2.5 bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl text-xs hover:text-white transition flex items-center justify-center gap-1.5">
+                    <span class="material-icons text-sm">content_copy</span> Copy Share Message
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- Property Portfolio Inspector Modal -->
     <div id="propsModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
@@ -394,6 +466,70 @@
         const userRoleBadge = document.getElementById('userRoleBadge');
         const popupStackContainer = document.getElementById('popupStackContainer');
 
+        // Share & QR Modal Elements
+        const shareRoomModal = document.getElementById('shareRoomModal');
+        const btnOpenShareModal = document.getElementById('btnOpenShareModal');
+        const btnCloseShareModal = document.getElementById('btnCloseShareModal');
+        const shareModalCodeDisplay = document.getElementById('shareModalCodeDisplay');
+        const qrCodeContainer = document.getElementById('qrCodeContainer');
+        const btnCopyRoomLink = document.getElementById('btnCopyRoomLink');
+        const btnCopyShareText = document.getElementById('btnCopyShareText');
+
+        // Mobile menu toggle
+        const btnMobileMenuToggle = document.getElementById('btnMobileMenuToggle');
+        const mobileMenuDropdown = document.getElementById('mobileMenuDropdown');
+        const btnMobileShare = document.getElementById('btnMobileShare');
+        const btnMobileEndGame = document.getElementById('btnMobileEndGame');
+
+        btnMobileMenuToggle.onclick = (e) => {
+            e.stopPropagation();
+            mobileMenuDropdown.classList.toggle('hidden');
+        };
+
+        document.addEventListener('click', () => {
+            mobileMenuDropdown.classList.add('hidden');
+        });
+
+        btnMobileShare.onclick = () => {
+            mobileMenuDropdown.classList.add('hidden');
+            btnOpenShareModal.click();
+        };
+
+        btnMobileEndGame.onclick = () => {
+            mobileMenuDropdown.classList.add('hidden');
+            btnOpenEndGameModal.click();
+        };
+
+        btnOpenShareModal.onclick = () => {
+            const joinLink = `${window.location.origin}/g-mono/tracker.html?code=${roomCode}`;
+            shareModalCodeDisplay.textContent = roomCode;
+
+            qrCodeContainer.innerHTML = '';
+            new QRCode(qrCodeContainer, {
+                text: joinLink,
+                width: 160,
+                height: 160,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+            });
+
+            shareRoomModal.classList.remove('hidden');
+
+            btnCopyRoomLink.onclick = () => {
+                navigator.clipboard.writeText(joinLink);
+                alert("Room direct join link copied!");
+            };
+
+            btnCopyShareText.onclick = () => {
+                const text = `Join my Monopoly Referee table!\nRoom Code: ${roomCode}\nLink: ${joinLink}`;
+                navigator.clipboard.writeText(text);
+                alert("Share invitation message copied!");
+            };
+        };
+
+        btnCloseShareModal.onclick = () => shareRoomModal.classList.add('hidden');
+
         function playBeep(freq = 600, duration = 0.15) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -523,6 +659,16 @@
                         txAmountInput.value = propObj.rents[info.level] !== undefined ? propObj.rents[info.level] : propObj.rents[0];
                     }
                 }
+            } else if (action === 'player_loan') {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.remove('hidden');
+                txAmountInput.value = 100;
+            } else if (action === 'repay_player_loan') {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.remove('hidden');
+                txAmountInput.value = 100;
             } else if (action === 'build') {
                 targetPropertyCol.classList.remove('hidden');
                 targetBuildingCol.classList.remove('hidden');
@@ -555,6 +701,11 @@
                 targetBuildingCol.classList.add('hidden');
                 targetPlayerCol.classList.add('hidden');
                 txAmountInput.value = 115;
+            } else if (action === 'pay_chance') {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.add('hidden');
+                txAmountInput.value = 50;
             } else {
                 targetPropertyCol.classList.add('hidden');
                 targetBuildingCol.classList.add('hidden');
@@ -662,21 +813,23 @@
 
             const canWrite = isMasterAdmin || playerData.canWrite;
 
-            if (isMasterAdmin) {
-                statusBadge.textContent = "Host / Master Device";
-                statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400";
-                btnOverride.classList.remove('hidden');
-                alertForbidden.classList.add('hidden');
-            } else if (canWrite) {
-                statusBadge.textContent = `${currentUser} (Authorized)`;
-                statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-emerald-500/15 border-emerald-500/30 text-emerald-500";
-                btnOverride.classList.add('hidden');
-                alertForbidden.classList.add('hidden');
-            } else {
-                statusBadge.textContent = `${currentUser} (Read-Only)`;
-                statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-slate-500/15 border-slate-500/30 text-slate-400";
-                btnOverride.classList.add('hidden');
-                alertForbidden.classList.remove('hidden');
+            if (statusBadge) {
+                if (isMasterAdmin) {
+                    statusBadge.textContent = "Host / Master Device";
+                    statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400";
+                } else if (canWrite) {
+                    statusBadge.textContent = `${currentUser} (Authorized)`;
+                    statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-emerald-500/15 border-emerald-500/30 text-emerald-500";
+                } else {
+                    statusBadge.textContent = `${currentUser} (Read-Only)`;
+                    statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-slate-500/15 border-slate-500/30 text-slate-400";
+                }
+            }
+            if (btnOverride) {
+                btnOverride.classList.toggle('hidden', !isMasterAdmin);
+            }
+            if (alertForbidden) {
+                alertForbidden.classList.toggle('hidden', isMasterAdmin || canWrite);
             }
 
             const eligiblePlayers = isMasterAdmin ? Object.keys(roomData.players) : [currentUser];
@@ -867,6 +1020,32 @@
                 } else {
                     logText = `${actingPlayer} paid $${amount} rent for ${targetProp}`;
                 }
+            } else if (action === 'pay_chance') {
+                p.cash -= amount;
+                logText = `${actingPlayer} paid $${amount} to Bank for Chance / Community card`;
+            } else if (action === 'player_loan') {
+                if (targetPayee && updatedPlayers[targetPayee] && targetPayee !== actingPlayer) {
+                    updatedPlayers[targetPayee].cash -= amount;
+                    p.cash += amount;
+                    p.loans += amount;
+                    recipientTarget = targetPayee;
+                    logText = `${actingPlayer} borrowed $${amount} loan from ${targetPayee}`;
+                } else {
+                    return alert('Please select which player is providing the loan.');
+                }
+            } else if (action === 'repay_player_loan') {
+                if (!targetPayee || !updatedPlayers[targetPayee] || targetPayee === actingPlayer) {
+                    return alert('Please select the player you are repaying.');
+                }
+                if (p.cash < amount) {
+                    return alert(`${actingPlayer} does not have enough cash to repay $${amount}.`);
+                }
+
+                p.cash -= amount;
+                updatedPlayers[targetPayee].cash += amount;
+                p.loans = Math.max(0, p.loans - amount);
+                recipientTarget = targetPayee;
+                logText = `${actingPlayer} repaid $${amount} loan to ${targetPayee}`;
             } else if (action === 'build') {
                 p.cash -= amount;
                 p.properties = (p.properties || []).map(pr => {
