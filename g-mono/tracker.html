@@ -204,10 +204,23 @@
         const directInput = document.getElementById('startCashInput');
         const displayTotal = document.getElementById('displayStartCashTotal');
 
-        btnOpenShareModal.onclick = () => {
-    // Directs players to the gateway selection screen
-    const joinLink = `https://sepal-vip.github.io/vip-games/g-mono/tracker.html?code=${roomCode}`;
-    shareModalCodeDisplay.textContent = roomCode;
+        // Inside <script type="module"> in tracker.html:
+
+const urlParams = new URLSearchParams(window.location.search);
+const incomingCode = urlParams.get('code');
+
+if (incomingCode) {
+    // Switch to Join tab immediately
+    tabJoinBtn.click();
+    joinRoomCode.value = incomingCode.trim().toUpperCase();
+
+    // Auto-fetch available roster so the player immediately sees the dropdown
+    window.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            btnFetchRoom.click();
+        }, 300);
+    });
+}
 
     qrCodeContainer.innerHTML = '';
     new QRCode(qrCodeContainer, {
