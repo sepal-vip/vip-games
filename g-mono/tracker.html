@@ -3,100 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VIP Gaming &amp; Match Suite - Live Referee Tracker</title>
+    <title>Monopoly Tracker - Gateway</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = { darkMode: 'class' }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
-    
-    <!-- Global Liquid Glass Stylesheet & Theme Controller -->
     <link rel="stylesheet" href="../web-info/global-style.css">
     <script src="../web-info/theme.js"></script>
-
-    <style> 
-        body { font-family: 'Google Sans', sans-serif; } 
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-amber-500 selection:text-slate-950 transition-colors duration-500 relative overflow-x-hidden">
-    
-    <!-- Liquid Background Elements -->
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
 
-    <!-- Top Navigation -->
-    <nav class="glass-panel sticky top-0 z-50 transition-colors duration-500">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+    <nav class="glass-panel sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
             <a href="g-mono.html" class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white text-sm font-medium transition">
                 <span class="material-icons text-base">arrow_back</span> Monopoly Suite
                 <img src="https://sepal-vip.github.io/vip-games/monoploy-icon.png" alt="Monopoly Icon" class="w-4 h-4">
             </a>
-            <div class="flex items-center gap-4">
-                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-amber-500 transition-colors" title="Toggle Theme">
+            <div class="flex items-center gap-3">
+                <button id="themeToggle" class="text-slate-600 dark:text-slate-300 hover:text-amber-500 transition-colors">
                     <span class="material-icons" id="themeIcon">light_mode</span>
                 </button>
-                <div class="flex items-center gap-2 text-amber-600 dark:text-amber-400 font-extrabold text-sm">
-                    <span class="material-icons text-base">casino</span>
-                    <span>Live Referee Tracker</span>
-                </div>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-12 flex flex-col items-center justify-center relative z-10 text-center">
-        <div class="glass-panel rounded-3xl p-8 sm:p-12 shadow-2xl space-y-6 max-w-xl w-full ring-1 ring-amber-500/20">
-            <div class="w-20 h-20 rounded-3xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-lg shadow-amber-500/10">
-                <span class="material-icons text-4xl animate-pulse">construction</span>
-            </div>
-            
-            <div class="space-y-2">
-                <span class="px-3 py-1 text-[10px] font-bold uppercase rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 tracking-wider">
-                    Feature In Active Engineering
-                </span>
-                <h1 class="text-3xl font-black text-slate-900 dark:text-white">Live Multiplayer Referee Engine</h1>
-                <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                    The cloud turn manager, anti-cheat referee engine, automated rent settlements, and physical board companion are actively being assembled.
-                </p>
+    <main class="flex-1 max-w-xl w-full mx-auto px-4 py-10 flex flex-col justify-center relative z-10">
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 ring-1 ring-amber-500/20">
+            <div class="text-center space-y-2">
+                <div class="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto shadow-sm">
+                    <span class="material-icons text-3xl">casino</span>
+                </div>
+                <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Monopoly Game Referee</h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Host or join a synchronized live game ledger.</p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-left font-mono text-xs">
-                <div class="p-3 bg-white/40 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-1 shadow-sm">
-                    <div class="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-sans font-bold">
-                        <span class="material-icons text-sm">wifi</span> Cloud Sync Turns
-                    </div>
-                    <p class="text-[11px] text-slate-500 font-sans">Multi-device state synchronization across player phones.</p>
-                </div>
-                <div class="p-3 bg-white/40 dark:bg-slate-950/70 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-1 shadow-sm">
-                    <div class="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-sans font-bold">
-                        <span class="material-icons text-sm">payments</span> Auto Settlements
-                    </div>
-                    <p class="text-[11px] text-slate-500 font-sans">Automatic rent calculation based on houses and hotels.</p>
-                </div>
+            <div class="flex bg-white/40 dark:bg-slate-900/60 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
+                <button id="tabCreateBtn" class="flex-1 py-2 rounded-xl bg-amber-500 text-slate-950 transition shadow-sm">Host Match</button>
+                <button id="tabJoinBtn" class="flex-1 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Join Table</button>
             </div>
 
-            <div class="pt-4 border-t border-slate-200 dark:border-slate-800/80">
-                <a href="g-mono.html" class="inline-flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-xl transition shadow-md shadow-amber-500/20">
-                    <span class="material-icons text-sm">arrow_back</span> Back to Monopoly Suite
-                </a>
+            <!-- HOST FORM -->
+            <!-- HOST FORM WITH STARTING MONEY COUNTER -->
+<form id="createGameForm" class="space-y-4">
+    <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Your Display Name</label>
+        <input type="text" id="hostName" required placeholder="e.g. Mitansh" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+    </div>
+
+    <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Device Role Mode</label>
+        <select id="hostDeviceMode" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+            <option value="player">Play as Active Player & Admin</option>
+            <option value="master">Dedicated Table Master Device (Shared Screen)</option>
+        </select>
+    </div>
+
+    <div>
+        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Other Player Names (Comma separated)</label>
+        <input type="text" id="initialPlayers" required placeholder="e.g. Dhyana, Rahul" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+    </div>
+
+    <!-- Starting Cash Configuration & Note Counter -->
+    <div class="p-3.5 bg-white/40 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-3 shadow-inner">
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+            <div>
+                <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block">Starting Money Per Player</span>
+                <span id="displayStartCashTotal" class="text-sm font-mono font-black text-slate-900 dark:text-white">$1,500</span>
             </div>
+            <div class="flex bg-white/60 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-[10px]">
+                <button type="button" id="cashModeDirectBtn" class="px-2.5 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 transition">Direct Value</button>
+                <button type="button" id="cashModeNotesBtn" class="px-2.5 py-1 rounded-lg font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Count Notes</button>
+            </div>
+        </div>
+
+        <!-- Mode A: Direct Numeric Input -->
+        <div id="startCashDirectSection">
+            <input type="number" id="startCashInput" value="1500" min="0" placeholder="Enter starting cash per player" class="w-full bg-white/60 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+        </div>
+
+        <!-- Mode B: Physical Cash Note Denomination Counter -->
+        <div id="startCashNotesSection" class="hidden grid grid-cols-3 gap-2">
+            <div class="bg-white/50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] font-mono font-bold text-slate-400">$1</span>
+                <input type="number" data-denom="1" class="start-note-box w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center text-xs font-mono py-0.5" value="5">
+            </div>
+            <div class="bg-white/50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] font-mono font-bold text-slate-400">$5</span>
+                <input type="number" data-denom="5" class="start-note-box w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center text-xs font-mono py-0.5" value="5">
+            </div>
+            <div class="bg-white/50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] font-mono font-bold text-slate-400">$10</span>
+                <input type="number" data-denom="10" class="start-note-box w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center text-xs font-mono py-0.5" value="5">
+            </div>
+            <div class="bg-white/50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] font-mono font-bold text-slate-400">$20</span>
+                <input type="number" data-denom="20" class="start-note-box w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center text-xs font-mono py-0.5" value="6">
+            </div>
+            <div class="bg-white/50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] font-mono font-bold text-slate-400">$50</span>
+                <input type="number" data-denom="50" class="start-note-box w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center text-xs font-mono py-0.5" value="2">
+            </div>
+            <div class="bg-white/50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] font-mono font-bold text-slate-400">$100</span>
+                <input type="number" data-denom="100" class="start-note-box w-10 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center text-xs font-mono py-0.5" value="2">
+            </div>
+            <div class="col-span-3 bg-white/50 dark:bg-slate-950 p-2 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                <span class="text-[10px] font-mono font-bold text-slate-400">$500</span>
+                <input type="number" data-denom="500" class="start-note-box w-16 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded text-center text-xs font-mono py-0.5" value="2">
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" id="btnCreateSubmit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md shadow-amber-500/20">
+        Create Live Room
+    </button>
+</form>
+
+            <!-- JOIN FORM -->
+            <form id="joinGameForm" class="space-y-4 hidden">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">4-Character Room Code</label>
+                    <input type="text" id="joinRoomCode" maxlength="4" required placeholder="e.g. 7K9B" class="w-full uppercase font-mono tracking-widest text-center text-sm font-bold bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div id="joinRosterSection" class="hidden space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Choose Your Identity</label>
+                    <select id="joinPlayerSelect" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
+                    </select>
+                </div>
+                <button type="button" id="btnFetchRoom" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition">
+                    Check Room Availability
+                </button>
+                <button type="submit" id="btnJoinSubmit" class="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition hidden shadow-md shadow-amber-500/20">
+                    Enter Game Table
+                </button>
+            </form>
+            <div id="statusAlert" class="hidden text-xs p-3 rounded-xl border text-center font-medium"></div>
         </div>
     </main>
 
-    <!-- Offline Service Worker Bootstrap -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(() => {});
-            });
+    <script type="module">
+        import { db, doc, getDoc, setDoc, auth } from "../web-info/firebase.js";
+        import { PERMANENT_MASTER_ADMIN_UID, isPermanentAdmin } from "../web-info/p-admin-list.js";
+
+        function getOrCreateDeviceId() {
+            let id = localStorage.getItem('vip_device_id');
+            if (!id) {
+                id = 'dev_' + Math.random().toString(36).substring(2, 9) + Date.now().toString(36);
+                localStorage.setItem('vip_device_id', id);
+            }
+            return id;
         }
-        window.addEventListener('offline', () => {
-            window.location.href = '/offline.html';
+
+        const deviceId = getOrCreateDeviceId();
+        const tabCreateBtn = document.getElementById('tabCreateBtn');
+        const tabJoinBtn = document.getElementById('tabJoinBtn');
+        const createGameForm = document.getElementById('createGameForm');
+        const joinGameForm = document.getElementById('joinGameForm');
+        const statusAlert = document.getElementById('statusAlert');
+        const joinRoomCode = document.getElementById('joinRoomCode');
+        const joinRosterSection = document.getElementById('joinRosterSection');
+        const joinPlayerSelect = document.getElementById('joinPlayerSelect');
+        const btnFetchRoom = document.getElementById('btnFetchRoom');
+        const btnJoinSubmit = document.getElementById('btnJoinSubmit');
+
+        tabCreateBtn.onclick = () => {
+            tabCreateBtn.className = "flex-1 py-2 rounded-xl bg-amber-500 text-slate-950 transition shadow-sm";
+            tabJoinBtn.className = "flex-1 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+            createGameForm.classList.remove('hidden');
+            joinGameForm.classList.add('hidden');
+        };
+
+        tabJoinBtn.onclick = () => {
+            tabJoinBtn.className = "flex-1 py-2 rounded-xl bg-amber-500 text-slate-950 transition shadow-sm";
+            tabCreateBtn.className = "flex-1 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+            joinGameForm.classList.remove('hidden');
+            createGameForm.classList.add('hidden');
+        };
+
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('code')) {
+            tabJoinBtn.click();
+            joinRoomCode.value = urlParams.get('code').toUpperCase();
+            setTimeout(() => btnFetchRoom.click(), 200);
+        }
+        
+
+        // Money Counter Mode Switcher
+let currentCashMode = 'direct';
+const cashDirectBtn = document.getElementById('cashModeDirectBtn');
+const cashNotesBtn = document.getElementById('cashModeNotesBtn');
+const directSection = document.getElementById('startCashDirectSection');
+const notesSection = document.getElementById('startCashNotesSection');
+const directInput = document.getElementById('startCashInput');
+const displayTotal = document.getElementById('displayStartCashTotal');
+
+function computeStartingCash() {
+    let total = 0;
+    if (currentCashMode === 'direct') {
+        total = parseFloat(directInput.value) || 0;
+    } else {
+        document.querySelectorAll('.start-note-box').forEach(box => {
+            const denom = parseFloat(box.dataset.denom);
+            const count = parseFloat(box.value) || 0;
+            total += denom * count;
         });
+        directInput.value = total;
+    }
+    displayTotal.textContent = `$${total.toLocaleString()}`;
+    return total;
+}
+
+cashDirectBtn.onclick = () => {
+    currentCashMode = 'direct';
+    directSection.classList.remove('hidden');
+    notesSection.classList.add('hidden');
+    cashDirectBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 transition";
+    cashNotesBtn.className = "px-2.5 py-1 rounded-lg font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+    computeStartingCash();
+};
+
+cashNotesBtn.onclick = () => {
+    currentCashMode = 'notes';
+    directSection.classList.add('hidden');
+    notesSection.classList.remove('hidden');
+    cashNotesBtn.className = "px-2.5 py-1 rounded-lg font-bold bg-amber-500 text-slate-950 transition";
+    cashDirectBtn.className = "px-2.5 py-1 rounded-lg font-bold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
+    computeStartingCash();
+};
+
+directInput.addEventListener('input', computeStartingCash);
+document.querySelectorAll('.start-note-box').forEach(box => box.addEventListener('input', computeStartingCash));
+
+// Update Room Creation to use the computed starting amount
+createGameForm.onsubmit = async (e) => {
+    e.preventDefault();
+    const hostName = document.getElementById('hostName').value.trim();
+    const mode = document.getElementById('hostDeviceMode').value;
+    const others = document.getElementById('initialPlayers').value.split(',').map(s => s.trim()).filter(Boolean);
+    const startingCash = computeStartingCash();
+
+    if (!hostName) return;
+
+    const roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const players = {};
+
+    if (mode === 'player') {
+        players[hostName] = { 
+            cash: startingCash, 
+            loans: 0, 
+            properties: [], 
+            deviceId: deviceId, 
+            canWrite: true 
+        };
+    }
+    
+    others.forEach(name => {
+        if (!players[name]) {
+            players[name] = { 
+                cash: startingCash, 
+                loans: 0, 
+                properties: [], 
+                deviceId: null, 
+                canWrite: false 
+            };
+        }
+    });
+
+    const currentUid = auth.currentUser ? auth.currentUser.uid : null;
+    const roomData = {
+        roomCode,
+        createdAt: new Date().toISOString(),
+        hostName,
+        hostUid: currentUid,
+        masterDeviceId: deviceId,
+        allowedDevices: [deviceId],
+        startingCash: startingCash,
+        players,
+        logs: [{ 
+            time: new Date().toLocaleTimeString(), 
+            text: `Room created by ${hostName} with $${startingCash.toLocaleString()} starting cash per player` 
+        }]
+    };
+
+    try {
+        await setDoc(doc(db, "games", "Monopoly", "rooms", roomCode), roomData);
+        window.location.href = `track/game.html?code=${roomCode}&user=${encodeURIComponent(hostName)}&role=${mode}`;
+    } catch (err) {
+        showMsg(err.message, "error");
+    }
+};
+
+        btnFetchRoom.onclick = async () => {
+            const code = joinRoomCode.value.trim().toUpperCase();
+            if (code.length < 4) return showMsg("Please enter 4-character code", "error");
+
+            try {
+                const snap = await getDoc(doc(db, "games", "Monopoly", "rooms", code));
+                if (!snap.exists()) return showMsg("Room does not exist.", "error");
+
+                const data = snap.data();
+                joinPlayerSelect.innerHTML = '';
+                let openSlots = 0;
+
+                Object.keys(data.players || {}).forEach(name => {
+                    const p = data.players[name];
+                    const isTaken = p.deviceId && p.deviceId !== deviceId;
+                    const opt = document.createElement('option');
+                    opt.value = name;
+                    opt.textContent = isTaken ? `${name} (Occupied)` : name;
+                    opt.disabled = isTaken;
+                    if (!isTaken) openSlots++;
+                    joinPlayerSelect.appendChild(opt);
+                });
+
+                joinRosterSection.classList.remove('hidden');
+                btnFetchRoom.classList.add('hidden');
+                btnJoinSubmit.classList.remove('hidden');
+            } catch (err) {
+                showMsg(err.message, "error");
+            }
+        };
+
+        joinGameForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const code = joinRoomCode.value.trim().toUpperCase();
+            const user = joinPlayerSelect.value;
+            window.location.href = `track/game.html?code=${code}&user=${encodeURIComponent(user)}&role=player`;
+        };
+
+        function showMsg(txt, type) {
+            statusAlert.classList.remove('hidden');
+            statusAlert.textContent = txt;
+            statusAlert.className = type === 'error'
+                ? "text-xs p-3 rounded-xl border bg-rose-500/10 border-rose-500/30 text-rose-500 text-center font-medium"
+                : "text-xs p-3 rounded-xl border bg-emerald-500/10 border-emerald-500/30 text-emerald-500 text-center font-medium";
+        }
     </script>
 </body>
 </html>
