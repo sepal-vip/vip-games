@@ -204,6 +204,36 @@
         const directInput = document.getElementById('startCashInput');
         const displayTotal = document.getElementById('displayStartCashTotal');
 
+        btnOpenShareModal.onclick = () => {
+    // Directs players to the gateway selection screen
+    const joinLink = `https://sepal-vip.github.io/vip-games/g-mono/tracker.html?code=${roomCode}`;
+    shareModalCodeDisplay.textContent = roomCode;
+
+    qrCodeContainer.innerHTML = '';
+    new QRCode(qrCodeContainer, {
+        text: joinLink,
+        width: 160,
+        height: 160,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.M
+    });
+
+    shareRoomModal.classList.remove('hidden');
+
+    btnCopyRoomLink.onclick = () => {
+        navigator.clipboard.writeText(joinLink);
+        alert("Room join link copied!");
+    };
+
+    btnCopyShareText.onclick = () => {
+        const text = `Join my Monopoly Referee table!\nRoom Code: ${roomCode}\nLink: ${joinLink}`;
+        navigator.clipboard.writeText(text);
+        alert("Share invitation message copied!");
+    };
+};
+
+
         function computeStartingCash() {
             let total = 0;
             if (currentCashMode === 'direct') {
