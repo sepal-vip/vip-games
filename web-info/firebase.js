@@ -13,7 +13,8 @@ import {
      query, 
      where, 
      orderBy, 
-     limit 
+     limit,
+     onSnapshot // <-- Added here
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 import { 
      getAuth, 
@@ -21,8 +22,8 @@ import {
      signInWithEmailAndPassword, 
      createUserWithEmailAndPassword, 
      signOut,
-    GoogleAuthProvider,
-    signInWithPopup 
+     GoogleAuthProvider,
+     signInWithPopup 
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
 const firebaseConfig = {
@@ -44,8 +45,8 @@ export {
      db, 
      auth, 
      googleProvider,
-    signInWithPopup,
-    collection, 
+     signInWithPopup,
+     collection, 
      doc, 
      getDoc, 
      getDocs, 
@@ -57,6 +58,7 @@ export {
      where, 
      orderBy, 
      limit, 
+     onSnapshot, // <-- Added here
      onAuthStateChanged, 
      signInWithEmailAndPassword, 
      createUserWithEmailAndPassword, 
