@@ -57,7 +57,7 @@
                 <button id="tabJoinBtn" class="flex-1 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition">Join Table</button>
             </div>
 
-            <!-- Host Form -->
+            <!-- HOST FORM -->
             <form id="createGameForm" class="space-y-4">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Your Display Name</label>
@@ -67,7 +67,7 @@
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Device Role Mode</label>
                     <select id="hostDeviceMode" class="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
-                        <option value="player">Play as Active Player &amp; Admin</option>
+                        <option value="player">Play as Active Player & Admin</option>
                         <option value="master">Dedicated Table Master Device (Shared Screen)</option>
                     </select>
                 </div>
@@ -131,7 +131,7 @@
                 </button>
             </form>
 
-            <!-- Join Form with Camera Scanner -->
+            <!-- JOIN FORM WITH CAMERA SCANNER -->
             <form id="joinGameForm" class="space-y-4 hidden">
                 <div>
                     <div class="flex items-center justify-between mb-1">
@@ -143,7 +143,7 @@
                     <input type="text" id="joinRoomCode" maxlength="4" required placeholder="e.g. 7K9B" class="w-full uppercase font-mono tracking-widest text-center text-sm font-bold bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500">
                 </div>
 
-                <!-- QR Camera Reader Container -->
+                <!-- QR Camera Reader Box -->
                 <div id="qrScannerBox" class="hidden space-y-2 p-3 bg-black/40 rounded-2xl border border-amber-500/30">
                     <div id="qr-reader" style="width: 100%;"></div>
                     <button type="button" id="btnCloseScanner" class="w-full py-1.5 bg-rose-500/20 text-rose-400 font-bold rounded-xl text-xs hover:bg-rose-500/30 transition">
@@ -170,7 +170,7 @@
 
     <script type="module">
         import { db, doc, getDoc, setDoc, auth } from "../web-info/firebase.js";
-        import { cleanAndArchiveOldRooms } from "./auto-archive.js";
+        import { cleanAndArchiveOldRooms } from "./track/auto-archive.js";
 
         cleanAndArchiveOldRooms();
 
@@ -195,7 +195,7 @@
         const btnFetchRoom = document.getElementById('btnFetchRoom');
         const btnJoinSubmit = document.getElementById('btnJoinSubmit');
 
-        // Cash Denomination Counter
+        // Money Counter Controls
         let currentCashMode = 'direct';
         const cashDirectBtn = document.getElementById('cashModeDirectBtn');
         const cashNotesBtn = document.getElementById('cashModeNotesBtn');
@@ -241,7 +241,7 @@
         directInput.addEventListener('input', computeStartingCash);
         document.querySelectorAll('.start-note-box').forEach(box => box.addEventListener('input', computeStartingCash));
 
-        // Tab Navigation
+        // Tab Switchers
         tabCreateBtn.onclick = () => {
             tabCreateBtn.className = "flex-1 py-2 rounded-xl bg-amber-500 text-slate-950 transition shadow-sm";
             tabJoinBtn.className = "flex-1 py-2 rounded-xl text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition";
@@ -256,19 +256,14 @@
             createGameForm.classList.add('hidden');
         };
 
-        // Auto-handle query parameter routing (e.g., from QR scan or shared links)
         const urlParams = new URLSearchParams(window.location.search);
-        const incomingCode = urlParams.get('code');
-
-        if (incomingCode) {
+        if (urlParams.get('code')) {
             tabJoinBtn.click();
-            joinRoomCode.value = incomingCode.trim().toUpperCase();
-            setTimeout(() => {
-                btnFetchRoom.click();
-            }, 300);
+            joinRoomCode.value = urlParams.get('code').toUpperCase();
+            setTimeout(() => btnFetchRoom.click(), 250);
         }
 
-        // Room Creation
+        // Host submits game -> Launches directly to game table
         createGameForm.onsubmit = async (e) => {
             e.preventDefault();
             const hostName = document.getElementById('hostName').value.trim();
@@ -311,14 +306,14 @@
             }
         };
 
-        // Query Active Room and Fill Dropdown
+        // Fetch & Check Roster
         btnFetchRoom.onclick = async () => {
             const code = joinRoomCode.value.trim().toUpperCase();
             if (code.length < 4) return showMsg("Please enter 4-character code", "error");
 
             try {
                 const snap = await getDoc(doc(db, "games", "Monopoly", "rooms", code));
-                if (!snap.exists()) return showMsg("Room does not exist or has been archived.", "error");
+                if (!snap.exists()) return showMsg("Room does not exist.", "error");
 
                 const data = snap.data();
                 joinPlayerSelect.innerHTML = '';
@@ -350,7 +345,7 @@
             window.location.href = `track/game.html?code=${code}&user=${encodeURIComponent(user)}&role=player`;
         };
 
-        // QR Code Scanner Integration
+        // Camera QR Scanner Controls
         const btnOpenQrScanner = document.getElementById('btnOpenQrScanner');
         const qrScannerBox = document.getElementById('qrScannerBox');
         const btnCloseScanner = document.getElementById('btnCloseScanner');
@@ -367,14 +362,9 @@
                     config,
                     (decodedText) => {
                         let extractedCode = decodedText;
-                        try {
-                            if (decodedText.includes('code=')) {
-                                const urlObj = new URL(decodedText);
-                                extractedCode = urlObj.searchParams.get('code') || decodedText;
-                            }
-                        } catch (e) {
-                            const match = decodedText.match(/code=([A-Za-z0-9]{4})/);
-                            if (match) extractedCode = match[1];
+                        if (decodedText.includes('code=')) {
+                            const urlObj = new URL(decodedText);
+                            extractedCode = urlObj.searchParams.get('code') || decodedText;
                         }
                         joinRoomCode.value = extractedCode.substring(0, 4).toUpperCase();
                         stopQrScanner();
@@ -412,4 +402,3 @@
     </script>
 </body>
 </html>
-
