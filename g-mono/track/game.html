@@ -13,8 +13,6 @@
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
     <link rel="stylesheet" href="../../web-info/global-style.css">
     <script src="../../web-info/theme.js"></script>
-
-    <!-- QR Code Generator -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -31,76 +29,72 @@
     <div class="blob blob-1"></div>
     <div class="blob blob-2"></div>
 
-    <!-- Stackable Notifications Container -->
     <div id="popupStackContainer" class="fixed top-16 right-4 z-50 flex flex-col gap-2.5 max-w-sm w-full pointer-events-none"></div>
 
-    <!-- Responsive Navigation Header -->
-<nav class="glass-panel sticky top-0 z-40">
-    <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
-        <!-- Left: Room & Wake Status -->
-        <div class="flex items-center gap-2">
-            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span class="font-mono font-bold text-[11px] uppercase tracking-wider text-slate-500">Room:</span>
-            <span id="navRoomCode" class="font-mono font-black text-amber-500 text-sm tracking-wider">----</span>
-            <span id="wakeLockBadge" class="hidden text-[8px] font-mono text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Awake</span>
-        </div>
-
-        <!-- Center / Right: Active Role & Minimal Quick Tools -->
-        <div class="flex items-center gap-2">
-            <span id="userRoleBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 truncate max-w-[110px] sm:max-w-none">
-                Assigning...
-            </span>
-
-            <!-- Desktop-Only Quick Buttons -->
-            <div class="hidden md:flex items-center gap-1.5">
-                <button id="btnOpenShareModal" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 font-bold rounded-xl text-xs transition flex items-center gap-1">
-                    <span class="material-icons text-xs">qr_code_2</span> Share
-                </button>
-                <a href="archive.html" class="px-2.5 py-1 bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-300 rounded-xl hover:text-amber-500 transition flex items-center gap-1">
-                    <span class="material-icons text-xs">inventory_2</span> Archives
-                </a>
-                <button id="btnOpenEndGameModal" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1">
-                    <span class="material-icons text-xs">stop_circle</span> End
-                </button>
+    <!-- Top Navigation Header -->
+    <nav class="glass-panel sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span class="font-mono font-bold text-[11px] uppercase tracking-wider text-slate-500">Room:</span>
+                <span id="navRoomCode" class="font-mono font-black text-amber-500 text-sm tracking-wider">----</span>
+                <span id="wakeLockBadge" class="hidden text-[8px] font-mono text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20">Awake</span>
             </div>
 
-            <!-- Theme Toggle -->
-            <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-amber-500 transition-colors">
-                <span class="material-icons text-base" id="themeIcon">light_mode</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <span id="userRoleBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-amber-500/10 border-amber-500/30 text-amber-600 dark:text-amber-400 truncate max-w-[100px] sm:max-w-none">
+                    Assigning...
+                </span>
+                <span id="userStatusBadge" class="hidden sm:inline-block text-[10px] font-bold px-2 py-0.5 rounded-full border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
+                    Connecting...
+                </span>
 
-            <!-- Mobile Kebab Dropdown (3 dots) -->
-            <div class="relative md:hidden">
-                <button id="btnMobileMenuToggle" class="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-300 hover:text-white transition">
-                    <span class="material-icons text-base block">more_vert</span>
-                </button>
-                <div id="mobileMenuDropdown" class="hidden absolute right-0 mt-2 w-44 glass-panel bg-slate-950/95 border border-slate-800 rounded-2xl shadow-2xl p-1.5 space-y-1 z-50 text-xs font-bold">
-                    <button id="btnMobileShare" class="w-full px-3 py-2 text-left rounded-xl hover:bg-amber-500/10 text-amber-400 flex items-center gap-2 transition">
-                        <span class="material-icons text-sm">qr_code_2</span> Share Room / QR
+                <div class="hidden md:flex items-center gap-1.5">
+                    <button id="btnOpenShareModal" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-500 font-bold rounded-xl text-xs transition flex items-center gap-1">
+                        <span class="material-icons text-xs">qr_code_2</span> Share
                     </button>
-                    <a href="archive.html" class="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2 transition block">
-                        <span class="material-icons text-sm">inventory_2</span> Saved & Archives
+                    <a href="archive.html" class="px-2.5 py-1 bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs font-bold text-slate-300 rounded-xl hover:text-amber-500 transition flex items-center gap-1">
+                        <span class="material-icons text-xs">inventory_2</span> Archives
                     </a>
-                    <button id="btnMobileEndGame" class="w-full px-3 py-2 text-left rounded-xl hover:bg-rose-500/10 text-rose-400 flex items-center gap-2 transition">
-                        <span class="material-icons text-sm">stop_circle</span> End Game
+                    <button id="btnOpenEndGameModal" class="px-2.5 py-1 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1">
+                        <span class="material-icons text-xs">stop_circle</span> End
                     </button>
-                    <a href="../tracker.html" class="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-800 text-slate-400 flex items-center gap-2 transition block border-t border-slate-800 pt-2">
-                        <span class="material-icons text-sm">logout</span> Exit Table
-                    </a>
                 </div>
+
+                <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-amber-500 transition-colors">
+                    <span class="material-icons text-base" id="themeIcon">light_mode</span>
+                </button>
+
+                <div class="relative md:hidden">
+                    <button id="btnMobileMenuToggle" class="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-300 hover:text-white transition">
+                        <span class="material-icons text-base block">more_vert</span>
+                    </button>
+                    <div id="mobileMenuDropdown" class="hidden absolute right-0 mt-2 w-44 glass-panel bg-slate-950/95 border border-slate-800 rounded-2xl shadow-2xl p-1.5 space-y-1 z-50 text-xs font-bold">
+                        <button id="btnMobileShare" class="w-full px-3 py-2 text-left rounded-xl hover:bg-amber-500/10 text-amber-400 flex items-center gap-2 transition">
+                            <span class="material-icons text-sm">qr_code_2</span> Share Room / QR
+                        </button>
+                        <a href="archive.html" class="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-800 text-slate-300 flex items-center gap-2 transition block">
+                            <span class="material-icons text-sm">inventory_2</span> Saved & Archives
+                        </a>
+                        <button id="btnMobileEndGame" class="w-full px-3 py-2 text-left rounded-xl hover:bg-rose-500/10 text-rose-400 flex items-center gap-2 transition">
+                            <span class="material-icons text-sm">stop_circle</span> End Game
+                        </button>
+                        <a href="../tracker.html" class="w-full px-3 py-2 text-left rounded-xl hover:bg-slate-800 text-slate-400 flex items-center gap-2 transition block border-t border-slate-800 pt-2">
+                            <span class="material-icons text-sm">logout</span> Exit Table
+                        </a>
+                    </div>
+                </div>
+
+                <a href="../tracker.html" class="hidden md:block p-1.5 text-slate-400 hover:text-rose-500 transition" title="Exit Table">
+                    <span class="material-icons text-base">logout</span>
+                </a>
             </div>
-
-            <!-- Desktop Exit -->
-            <a href="../tracker.html" class="hidden md:block p-1.5 text-slate-400 hover:text-rose-500 transition" title="Exit Table">
-                <span class="material-icons text-base">logout</span>
-            </a>
         </div>
-    </div>
-</nav>
+    </nav>
 
-    <!-- Main Workspace -->
+    <!-- Main Content Area -->
     <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
-        <!-- Metric Grid -->
+        <!-- Top Metrics Cards -->
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="glass-panel rounded-2xl p-4 text-center space-y-0.5 shadow-sm">
                 <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">My Liquid Cash</span>
@@ -123,36 +117,104 @@
             </div>
         </div>
 
-        <div id="writeForbiddenAlert" class="hidden p-3 rounded-2xl border bg-rose-500/10 border-rose-500/30 text-rose-500 text-xs text-center font-semibold">
-            Read-Only: Awaiting host authorization to record actions for your profile.
+        <!-- DICE DISPATCHER & BOARD TRACKER CARD -->
+        <div class="glass-panel rounded-3xl p-5 shadow-xl border border-amber-500/30 space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center">
+                        <span class="material-icons text-lg">casino</span>
+                    </div>
+                    <div>
+                        <h2 class="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">Smart Board Dice &amp; Position Engine</h2>
+                        <span id="turnPlayerStatus" class="text-[10px] text-slate-400">Select player and record roll</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1.5 bg-white/40 dark:bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-800 text-[10px] font-bold">
+                        <span>Speed Die:</span>
+                        <input type="checkbox" id="speedDieToggle" class="accent-amber-500 rounded cursor-pointer" checked>
+                    </div>
+                    <div id="jailStatusIndicator" class="hidden px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-400 text-[10px] font-bold border border-rose-500/30">
+                        In Jail
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dice Controls Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 items-end">
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Rolling Player</label>
+                    <select id="dicePlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500"></select>
+                </div>
+
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Die 1 (White)</label>
+                    <select id="die1Input" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-mono font-bold focus:outline-none focus:border-amber-500">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Die 2 (White)</label>
+                    <select id="die2Input" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-mono font-bold focus:outline-none focus:border-amber-500">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                        <option value="6">6</option>
+                    </select>
+                </div>
+
+                <div id="speedDieCol">
+                    <label class="block text-[9px] font-bold text-amber-500 uppercase mb-1">Speed Die</label>
+                    <select id="dieSpeedInput" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold text-amber-500 focus:outline-none focus:border-amber-500">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="bus">Bus</option>
+                        <option value="mr_m">Mr. Monopoly</option>
+                    </select>
+                </div>
+
+                <div class="col-span-2 flex gap-2">
+                    <button id="btnExecuteRoll" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5">
+                        <span class="material-icons text-sm">navigation</span> Roll &amp; Move
+                    </button>
+                    <button id="btnPayJailBail" class="hidden py-2.5 px-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition shadow-sm" title="Pay $100 Bail to release player">
+                        Pay $100 Bail
+                    </button>
+                </div>
+            </div>
+
+            <!-- Current Position Manual Override -->
+            <div class="flex items-center justify-between text-[11px] pt-1 text-slate-400 border-t border-slate-200/40 dark:border-slate-800/40">
+                <div class="flex items-center gap-1.5">
+                    <span>Current Board Tile:</span>
+                    <select id="manualTileSelect" class="bg-transparent border-b border-dashed border-slate-400 text-slate-200 font-bold text-xs focus:outline-none py-0.5"></select>
+                </div>
+                <span id="tileCategoryBadge" class="font-mono text-[10px] text-amber-500 font-bold">START: GO ($200)</span>
+            </div>
         </div>
 
-        <!-- Role Selector Bar -->
-        <div class="glass-panel rounded-2xl p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-sm border border-slate-200/80 dark:border-slate-800/80">
-            <div class="flex items-center gap-2">
-                <span class="material-icons text-amber-500 text-sm">badge</span>
-                <span class="text-xs font-bold text-slate-800 dark:text-slate-200">Table Role Assignment:</span>
-                <span class="text-[11px] text-slate-400">Claim duty (Alerts route to your screen)</span>
-            </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <select id="myRoleSelect" class="bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-amber-500">
-                    <option value="Player">Standard Player</option>
-                    <option value="Banker">Banker (Treasury & Loans)</option>
-                    <option value="Builder">Builder (Houses & Hotels)</option>
-                    <option value="Props Giver">Props Giver (Deed Cards)</option>
-                </select>
-                <button id="btnClaimRole" class="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-sm">
-                    Claim Role
-                </button>
-            </div>
-        </div>
-
-        <!-- Action Logging Card -->
+        <!-- ACTION LOGGING CARD (AUTO-PREFILLED) -->
         <div id="transactionControlCard" class="glass-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl">
-            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h2 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-1.5">
-                    <span class="material-icons text-amber-500 text-sm">bolt</span> Fast Action Dropdown Menu
-                </h2>
+            <div class="flex flex-wrap items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 gap-2">
+                <div class="flex items-center gap-2">
+                    <h2 class="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-white flex items-center gap-1.5">
+                        <span class="material-icons text-amber-500 text-sm">bolt</span> Action Settlement Engine
+                    </h2>
+                    <!-- Split Payment Toggle -->
+                    <label class="flex items-center gap-1.5 text-[10px] font-bold text-slate-400 bg-white/40 dark:bg-slate-900 px-2 py-0.5 rounded-lg border border-slate-200 dark:border-slate-800 cursor-pointer">
+                        <input type="checkbox" id="splitLoanPaymentToggle" class="accent-amber-500 rounded">
+                        <span>Split Out-of-Pocket / Loan</span>
+                    </label>
+                </div>
                 <button id="btnOpenAdminOverride" class="hidden text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/30 hover:bg-amber-500 hover:text-slate-950 transition">
                     God Mode / Admin Panel
                 </button>
@@ -167,20 +229,20 @@
                 <div>
                     <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Action</label>
                     <select id="txActionType" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500">
-    <option value="buy">Buy Property</option>
-    <option value="rent">Pay Rent</option>
-    <option value="build">Build Houses / Motel / Hotel</option>
-    <option value="loan">Take Bank Loan</option>
-    <option value="repay">Repay Loan</option>
-    <option value="player_loan">Borrow Loan From Player</option>
-    <option value="repay_player_loan">Repay Player Loan</option>
-    <option value="salary">Collect Salary ($200)</option>
-    <option value="collect">Collect Chance / Community</option>
-    <option value="pay_chance">Pay Chance / Community Fee</option>
-    <option value="collect_all">Collect $10 From All</option>
-    <option value="repairs">Pay Repairs Tax ($115/H)</option>
-    <option value="jail_fee">Get Out of Jail ($100)</option>
-</select>
+                        <option value="buy">Buy Property</option>
+                        <option value="rent">Pay Rent</option>
+                        <option value="build">Build Houses / Motel / Hotel</option>
+                        <option value="loan">Take Bank Loan</option>
+                        <option value="repay">Repay Bank Loan</option>
+                        <option value="player_loan">Borrow Loan From Player</option>
+                        <option value="repay_player_loan">Repay Player Loan</option>
+                        <option value="salary">Collect Salary ($200)</option>
+                        <option value="collect">Collect Chance / Community</option>
+                        <option value="pay_chance">Pay Chance / Community Fee</option>
+                        <option value="collect_all">Collect $10 From All</option>
+                        <option value="repairs">Pay Repairs Tax</option>
+                        <option value="jail_fee">Get Out of Jail ($100)</option>
+                    </select>
                 </div>
 
                 <div id="targetPropertyCol">
@@ -201,13 +263,25 @@
                 </div>
 
                 <div id="targetPlayerCol" class="hidden">
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Pay To</label>
+                    <label id="targetPlayerLabel" class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Pay To / Lender</label>
                     <select id="txTargetPlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500"></select>
                 </div>
 
                 <div>
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Amount ($)</label>
+                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Total Amount ($)</label>
                     <input type="number" id="txAmountInput" placeholder="0" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono font-bold text-amber-500 focus:outline-none focus:border-amber-500">
+                </div>
+            </div>
+
+            <!-- Split Loan Details (Optional) -->
+            <div id="splitPaymentRow" class="hidden p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Pay Liquid Out-Of-Pocket</label>
+                    <input type="number" id="splitCashInput" placeholder="0" class="w-full bg-white/60 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 font-mono text-emerald-500 font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Remainder Added as Loan</label>
+                    <input type="number" id="splitLoanInput" placeholder="0" readonly class="w-full bg-white/30 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 font-mono text-rose-400 font-bold">
                 </div>
             </div>
 
@@ -216,7 +290,7 @@
             </button>
         </div>
 
-        <!-- Overview & Audit Log -->
+        <!-- Roster & Immutable Ledger Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="glass-panel rounded-3xl p-5 space-y-4 shadow-xl">
                 <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
@@ -236,7 +310,52 @@
         </div>
     </main>
 
-    <!-- SHARE ROOM / QR MODAL -->
+    <!-- BUS TRAVEL OPTION MODAL -->
+    <div id="busOptionsModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-sky-500/30">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                <h3 class="text-xs font-black text-sky-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <span class="material-icons text-sm">directions_bus</span> Speed Die Bus Ticket Choices
+                </h3>
+                <button type="button" id="btnCloseBusModal" class="text-slate-400 hover:text-white">
+                    <span class="material-icons text-base">close</span>
+                </button>
+            </div>
+            <p class="text-xs text-slate-400">Choose your destination tile combination from this roll:</p>
+            <div id="busChoicesList" class="space-y-2 max-h-60 overflow-y-auto custom-scroll pr-1"></div>
+        </div>
+    </div>
+
+    <!-- COMMUNITY / CHANCE INTERACTIVE MODAL -->
+    <div id="communityCardModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-sm w-full p-6 space-y-4 shadow-2xl border border-amber-500/40 text-center">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+                <span class="material-icons text-2xl">help_outline</span>
+            </div>
+            <h3 id="cardModalTitle" class="text-sm font-black text-slate-100 uppercase tracking-wider">Community Chest Landed</h3>
+            <p class="text-xs text-slate-400">Choose the card instruction to auto-apply to the ledger:</p>
+
+            <div class="space-y-2 text-xs font-bold">
+                <button id="btnCardSalary" class="w-full py-2.5 bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 rounded-xl transition">
+                    Bank Dividend / Prize (+$100)
+                </button>
+                <button id="btnCardPayFee" class="w-full py-2.5 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 rounded-xl transition">
+                    Doctor / School Fee (-$50)
+                </button>
+                <button id="btnCardBirthday" class="w-full py-2.5 bg-sky-500/20 text-sky-400 hover:bg-sky-500/30 rounded-xl transition">
+                    It's Your Birthday! Collect $10 From Each
+                </button>
+                <button id="btnCardRepairsA" class="w-full py-2.5 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded-xl transition">
+                    Repairs: $100/Hotel, $20/House
+                </button>
+                <button id="btnCardRepairsB" class="w-full py-2.5 bg-amber-500/20 text-amber-400 hover:bg-amber-500/30 rounded-xl transition">
+                    Repairs: $115/Hotel, $23/House
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals for Share, Deeds, Admin, End Game -->
     <div id="shareRoomModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-panel rounded-3xl max-w-sm w-full p-6 space-y-5 shadow-2xl border border-amber-500/30 text-center">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -247,17 +366,13 @@
                     <span class="material-icons text-base">close</span>
                 </button>
             </div>
-
             <div>
                 <span class="text-[10px] text-slate-400 uppercase font-bold tracking-wider block mb-1">Room Code</span>
                 <span id="shareModalCodeDisplay" class="text-3xl font-black font-mono text-amber-500 tracking-widest">----</span>
             </div>
-
-            <!-- QR Canvas Container -->
             <div class="flex flex-col items-center justify-center bg-white p-4 rounded-2xl mx-auto w-48 h-48 shadow-md">
                 <div id="qrCodeContainer"></div>
             </div>
-
             <div class="space-y-2 pt-1">
                 <button id="btnCopyRoomLink" class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center justify-center gap-1.5 shadow-sm">
                     <span class="material-icons text-sm">link</span> Copy Direct Link
@@ -269,7 +384,7 @@
         </div>
     </div>
 
-    <!-- Property Portfolio Inspector Modal -->
+    <!-- Properties Inspector Modal -->
     <div id="propsModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-panel rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -287,55 +402,7 @@
         </div>
     </div>
 
-    <!-- Admin God Mode Override Modal -->
-    <div id="adminModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="glass-panel rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
-                <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
-                    <span class="material-icons text-amber-500 text-sm">admin_panel_settings</span> Force Admin Override
-                </h3>
-                <button type="button" id="btnCloseAdminModal" class="text-slate-400 hover:text-white">
-                    <span class="material-icons text-base">close</span>
-                </button>
-            </div>
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Select Target Player</label>
-                    <select id="adminPlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white"></select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Assign Role</label>
-                    <select id="adminRoleSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs">
-                        <option value="Player">Standard Player</option>
-                        <option value="Banker">Banker</option>
-                        <option value="Builder">Builder</option>
-                        <option value="Props Giver">Props Giver</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Override Cash ($)</label>
-                    <input type="number" id="adminCashInput" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Override Total Loans ($)</label>
-                    <input type="number" id="adminLoansInput" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs font-mono">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Properties List (e.g. Vadodara:5, Agra:0)</label>
-                    <input type="text" id="adminPropsInput" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-2 text-xs">
-                </div>
-                <div class="flex items-center gap-2 pt-2">
-                    <input type="checkbox" id="adminAllowWriteCheckbox" class="rounded accent-amber-500">
-                    <label for="adminAllowWriteCheckbox" class="text-xs font-semibold">Grant player permission to record actions</label>
-                </div>
-                <button id="btnSaveAdminOverride" class="w-full py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow-md">
-                    Apply Changes Immediately
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- End Game / Archive Modal -->
+    <!-- End Game Modal -->
     <div id="endGameModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="glass-panel rounded-3xl max-w-md w-full p-6 space-y-5 shadow-2xl border border-rose-500/30">
             <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
@@ -346,91 +413,120 @@
                     <span class="material-icons text-base">close</span>
                 </button>
             </div>
-
-            <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-                Choose whether to record the official match outcomes permanently into official standings or pause state to resume later.
-            </p>
-
             <div class="p-4 rounded-2xl border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800 space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-900 dark:text-white">Option A: Official Match Settlement</span>
-                    <span class="text-[9px] bg-emerald-500/15 text-emerald-500 font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">Archives &amp; Records</span>
-                </div>
-                <p class="text-[11px] text-slate-400">
-                    Calculates net standings, exports to <code class="font-mono text-amber-400">/matches</code>, creates scorecard URLs, and archives the room[cite: 1, 2].
-                </p>
-                <div class="pt-1">
-                    <label class="block text-[10px] uppercase font-bold text-slate-500 mb-1">Venue / Location</label>
-                    <input type="text" id="endGameVenueInput" value="Living Room" class="w-full bg-white/50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-emerald-500">
-                </div>
-                <button id="btnEndAndRecord" class="w-full mt-2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs transition shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1">
-                    <span class="material-icons text-sm">archive</span> Settle &amp; Record Official Match
+                <span class="text-xs font-bold text-slate-900 dark:text-white block">Option A: Official Match Settlement</span>
+                <input type="text" id="endGameVenueInput" value="Living Room" class="w-full bg-white/50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 text-xs">
+                <button id="btnEndAndRecord" class="w-full mt-2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl text-xs">
+                    Settle &amp; Record Official Match
                 </button>
             </div>
-
             <div class="p-4 rounded-2xl border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800 space-y-2">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-bold text-slate-900 dark:text-white">Option B: Save for Later</span>
-                    <span class="text-[9px] bg-amber-500/15 text-amber-500 font-bold px-2 py-0.5 rounded-full border border-amber-500/30">Pause Room</span>
-                </div>
-                <p class="text-[11px] text-slate-400">
-                    Moves the live room to <code class="font-mono text-amber-400">saved_games</code>. Anyone with the link or via the Archive tab can reopen and continue playing later[cite: 1, 2].
-                </p>
-                <button id="btnSaveForLater" class="w-full mt-2 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-md shadow-amber-500/20 flex items-center justify-center gap-1">
-                    <span class="material-icons text-sm">pause_circle</span> Save &amp; Pause Session
+                <span class="text-xs font-bold text-slate-900 dark:text-white block">Option B: Save for Later</span>
+                <button id="btnSaveForLater" class="w-full mt-2 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs">
+                    Save &amp; Pause Session
                 </button>
             </div>
         </div>
     </div>
 
+    <!-- Admin Modal -->
+    <div id="adminModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Force Admin Override</h3>
+                <button type="button" id="btnCloseAdminModal" class="text-slate-400 hover:text-white"><span class="material-icons text-base">close</span></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Target Player</label>
+                    <select id="adminPlayerSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs"></select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Assign Role</label>
+                    <select id="adminRoleSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs">
+                        <option value="Player">Standard Player</option>
+                        <option value="Banker">Banker</option>
+                        <option value="Builder">Builder</option>
+                        <option value="Props Giver">Props Giver</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Override Cash ($)</label>
+                    <input type="number" id="adminCashInput" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Override Total Loans ($)</label>
+                    <input type="number" id="adminLoansInput" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Properties List</label>
+                    <input type="text" id="adminPropsInput" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs">
+                </div>
+                <button id="btnSaveAdminOverride" class="w-full py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">Apply Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- LOGIC MODULE -->
     <script type="module">
         import { db, doc, onSnapshot, updateDoc, setDoc, deleteDoc, getDocs, collection, auth } from "../../web-info/firebase.js";
         import { isPermanentAdmin } from "../../web-info/p-admin-list.js";
 
-        const BOARD_PROPERTIES = [
-            { name: "Guwahati", group: "Brown", price: 60, housePrice: 50, rents: { 0: 2, 1: 10, 2: 30, 2.5: 60, 3: 90, 4: 160, 5: 250 } },
-            { name: "Bhubaneswar", group: "Brown", price: 60, housePrice: 50, rents: { 0: 4, 1: 20, 2: 60, 2.5: 120, 3: 180, 4: 320, 5: 450 } },
-            { name: "Panaji", group: "Light Blue", price: 100, housePrice: 50, rents: { 0: 6, 1: 30, 2: 90, 2.5: 180, 3: 270, 4: 400, 5: 550 } },
-            { name: "Agra", group: "Light Blue", price: 100, housePrice: 50, rents: { 0: 6, 1: 30, 2: 90, 2.5: 180, 3: 270, 4: 400, 5: 550 } },
-            { name: "Vadodara", group: "Light Blue", price: 120, housePrice: 50, rents: { 0: 8, 1: 40, 2: 100, 2.5: 200, 3: 300, 4: 450, 5: 600 } },
-            { name: "Ludhiana", group: "Pink", price: 140, housePrice: 100, rents: { 0: 10, 1: 50, 2: 150, 2.5: 300, 3: 450, 4: 625, 5: 750 } },
-            { name: "Patna", group: "Pink", price: 140, housePrice: 100, rents: { 0: 10, 1: 50, 2: 150, 2.5: 300, 3: 450, 4: 625, 5: 750 } },
-            { name: "Bhopal", group: "Pink", price: 160, housePrice: 100, rents: { 0: 12, 1: 60, 2: 180, 2.5: 350, 3: 500, 4: 700, 5: 900 } },
-            { name: "Indore", group: "Orange", price: 180, housePrice: 100, rents: { 0: 14, 1: 70, 2: 200, 2.5: 400, 3: 550, 4: 750, 5: 950 } },
-            { name: "Nagpur", group: "Orange", price: 180, housePrice: 100, rents: { 0: 14, 1: 70, 2: 200, 2.5: 400, 3: 550, 4: 750, 5: 950 } },
-            { name: "Kochi", group: "Orange", price: 200, housePrice: 100, rents: { 0: 16, 1: 80, 2: 220, 2.5: 450, 3: 600, 4: 800, 5: 1000 } },
-            { name: "Lucknow", group: "Red", price: 220, housePrice: 150, rents: { 0: 18, 1: 90, 2: 250, 2.5: 500, 3: 700, 4: 875, 5: 1050 } },
-            { name: "Chandigarh", group: "Red", price: 220, housePrice: 150, rents: { 0: 18, 1: 90, 2: 250, 2.5: 500, 3: 700, 4: 875, 5: 1050 } },
-            { name: "Jaipur", group: "Red", price: 240, housePrice: 150, rents: { 0: 20, 1: 100, 2: 300, 2.5: 550, 3: 750, 4: 925, 5: 1100 } },
-            { name: "Pune", group: "Yellow", price: 260, housePrice: 150, rents: { 0: 22, 1: 110, 2: 330, 2.5: 600, 3: 800, 4: 975, 5: 1150 } },
-            { name: "Hyderabad", group: "Yellow", price: 260, housePrice: 150, rents: { 0: 22, 1: 110, 2: 330, 2.5: 600, 3: 800, 4: 975, 5: 1150 } },
-            { name: "Ahmedabad", group: "Yellow", price: 280, housePrice: 150, rents: { 0: 24, 1: 120, 2: 360, 2.5: 650, 3: 850, 4: 1025, 5: 1200 } },
-            { name: "Kolkata", group: "Green", price: 300, housePrice: 200, rents: { 0: 26, 1: 130, 2: 390, 2.5: 700, 3: 900, 4: 1100, 5: 1275 } },
-            { name: "Chennai", group: "Green", price: 300, housePrice: 200, rents: { 0: 26, 1: 130, 2: 390, 2.5: 700, 3: 900, 4: 1100, 5: 1275 } },
-            { name: "Bengaluru", group: "Green", price: 320, housePrice: 200, rents: { 0: 28, 1: 150, 2: 450, 2.5: 750, 3: 1000, 4: 1200, 5: 1400 } },
-            { name: "Delhi", group: "Dark Blue", price: 350, housePrice: 200, rents: { 0: 35, 1: 175, 2: 500, 2.5: 850, 3: 1100, 4: 1300, 5: 1500 } },
-            { name: "Mumbai", group: "Dark Blue", price: 400, housePrice: 200, rents: { 0: 50, 1: 200, 2: 600, 2.5: 1000, 3: 1400, 4: 1700, 5: 2000 } },
-            { name: "Station 1 (Chennai Central)", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
-            { name: "Station 2 (Howrah)", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
-            { name: "Station 3 (New Delhi)", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
-            { name: "Station 4 (CSMT)", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
-            { name: "Electric Company", group: "Utility", price: 150, housePrice: 0, rents: { 0: 20 } },
-            { name: "Water Works", group: "Utility", price: 150, housePrice: 0, rents: { 0: 20 } }
+        // COMPLETE 40-TILE INDIAN EDITION BOARD WITH POSITIONS 0-39
+        const BOARD_TILES = [
+            { index: 0, name: "Go", type: "go" },
+            { index: 1, name: "Guwahati", type: "prop", group: "Brown", price: 60, housePrice: 50, rents: { 0: 2, 1: 10, 2: 30, 2.5: 60, 3: 90, 4: 160, 5: 250 } },
+            { index: 2, name: "Community Chest 1", type: "community" },
+            { index: 3, name: "Bhubaneswar", type: "prop", group: "Brown", price: 60, housePrice: 50, rents: { 0: 4, 1: 20, 2: 60, 2.5: 120, 3: 180, 4: 320, 5: 450 } },
+            { index: 4, name: "Income Tax", type: "tax", amount: 200 },
+            { index: 5, name: "Station 1 (Chennai Central)", type: "prop", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
+            { index: 6, name: "Panaji", type: "prop", group: "Light Blue", price: 100, housePrice: 50, rents: { 0: 6, 1: 30, 2: 90, 2.5: 180, 3: 270, 4: 400, 5: 550 } },
+            { index: 7, name: "Chance 1", type: "chance" },
+            { index: 8, name: "Agra", type: "prop", group: "Light Blue", price: 100, housePrice: 50, rents: { 0: 6, 1: 30, 2: 90, 2.5: 180, 3: 270, 4: 400, 5: 550 } },
+            { index: 9, name: "Vadodara", type: "prop", group: "Light Blue", price: 120, housePrice: 50, rents: { 0: 8, 1: 40, 2: 100, 2.5: 200, 3: 300, 4: 450, 5: 600 } },
+            { index: 10, name: "Jail / Just Visiting", type: "jail" },
+            { index: 11, name: "Ludhiana", type: "prop", group: "Pink", price: 140, housePrice: 100, rents: { 0: 10, 1: 50, 2: 150, 2.5: 300, 3: 450, 4: 625, 5: 750 } },
+            { index: 12, name: "Electric Company", type: "prop", group: "Utility", price: 150, housePrice: 0, rents: { 0: 20 } },
+            { index: 13, name: "Patna", type: "prop", group: "Pink", price: 140, housePrice: 100, rents: { 0: 10, 1: 50, 2: 150, 2.5: 300, 3: 450, 4: 625, 5: 750 } },
+            { index: 14, name: "Bhopal", type: "prop", group: "Pink", price: 160, housePrice: 100, rents: { 0: 12, 1: 60, 2: 180, 2.5: 350, 3: 500, 4: 700, 5: 900 } },
+            { index: 15, name: "Station 2 (Howrah)", type: "prop", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
+            { index: 16, name: "Indore", type: "prop", group: "Orange", price: 180, housePrice: 100, rents: { 0: 14, 1: 70, 2: 200, 2.5: 400, 3: 550, 4: 750, 5: 950 } },
+            { index: 17, name: "Community Chest 2", type: "community" },
+            { index: 18, name: "Nagpur", type: "prop", group: "Orange", price: 180, housePrice: 100, rents: { 0: 14, 1: 70, 2: 200, 2.5: 400, 3: 550, 4: 750, 5: 950 } },
+            { index: 19, name: "Kochi", type: "prop", group: "Orange", price: 200, housePrice: 100, rents: { 0: 16, 1: 80, 2: 220, 2.5: 450, 3: 600, 4: 800, 5: 1000 } },
+            { index: 20, name: "Free Parking", type: "parking" },
+            { index: 21, name: "Lucknow", type: "prop", group: "Red", price: 220, housePrice: 150, rents: { 0: 18, 1: 90, 2: 250, 2.5: 500, 3: 700, 4: 875, 5: 1050 } },
+            { index: 22, name: "Chance 2", type: "chance" },
+            { index: 23, name: "Chandigarh", type: "prop", group: "Red", price: 220, housePrice: 150, rents: { 0: 18, 1: 90, 2: 250, 2.5: 500, 3: 700, 4: 875, 5: 1050 } },
+            { index: 24, name: "Jaipur", type: "prop", group: "Red", price: 240, housePrice: 150, rents: { 0: 20, 1: 100, 2: 300, 2.5: 550, 3: 750, 4: 925, 5: 1100 } },
+            { index: 25, name: "Station 3 (New Delhi)", type: "prop", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
+            { index: 26, name: "Pune", type: "prop", group: "Yellow", price: 260, housePrice: 150, rents: { 0: 22, 1: 110, 2: 330, 2.5: 600, 3: 800, 4: 975, 5: 1150 } },
+            { index: 27, name: "Hyderabad", type: "prop", group: "Yellow", price: 260, housePrice: 150, rents: { 0: 22, 1: 110, 2: 330, 2.5: 600, 3: 800, 4: 975, 5: 1150 } },
+            { index: 28, name: "Water Works", type: "prop", group: "Utility", price: 150, housePrice: 0, rents: { 0: 20 } },
+            { index: 29, name: "Ahmedabad", type: "prop", group: "Yellow", price: 280, housePrice: 150, rents: { 0: 24, 1: 120, 2: 360, 2.5: 650, 3: 850, 4: 1025, 5: 1200 } },
+            { index: 30, name: "Go to Jail", type: "go_to_jail" },
+            { index: 31, name: "Kolkata", type: "prop", group: "Green", price: 300, housePrice: 200, rents: { 0: 26, 1: 130, 2: 390, 2.5: 700, 3: 900, 4: 1100, 5: 1275 } },
+            { index: 32, name: "Chennai", type: "prop", group: "Green", price: 300, housePrice: 200, rents: { 0: 26, 1: 130, 2: 390, 2.5: 700, 3: 900, 4: 1100, 5: 1275 } },
+            { index: 33, name: "Community Chest 3", type: "community" },
+            { index: 34, name: "Bengaluru", type: "prop", group: "Green", price: 320, housePrice: 200, rents: { 0: 28, 1: 150, 2: 450, 2.5: 750, 3: 1000, 4: 1200, 5: 1400 } },
+            { index: 35, name: "Station 4 (CSMT)", type: "prop", group: "Station", price: 200, housePrice: 0, rents: { 0: 25 } },
+            { index: 36, name: "Chance 3", type: "chance" },
+            { index: 37, name: "Delhi", type: "prop", group: "Dark Blue", price: 350, housePrice: 200, rents: { 0: 35, 1: 175, 2: 500, 2.5: 850, 3: 1100, 4: 1300, 5: 1500 } },
+            { index: 38, name: "Super Tax", type: "tax", amount: 100 },
+            { index: 39, name: "Mumbai", type: "prop", group: "Dark Blue", price: 400, housePrice: 200, rents: { 0: 50, 1: 200, 2: 600, 2.5: 1000, 3: 1400, 4: 1700, 5: 2000 } }
         ];
 
-        let wakeLock = null;
-        async function requestWakeLock() {
-            try {
-                if ('wakeLock' in navigator) {
-                    wakeLock = await navigator.wakeLock.request('screen');
-                    document.getElementById('wakeLockBadge').classList.remove('hidden');
-                }
-            } catch (err) {}
-        }
-        requestWakeLock();
-        document.addEventListener('visibilitychange', () => {
-            if (wakeLock !== null && document.visibilityState === 'visible') requestWakeLock();
-        });
+        const BOARD_PROPERTIES = BOARD_TILES.filter(t => t.type === 'prop');
+
+        // Safe Initialization
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomCode = (urlParams.get('code') || '').toUpperCase();
+        const currentUser = urlParams.get('user') || '';
+
+        if (!roomCode) window.location.href = '../tracker.html';
+        else if (!currentUser) window.location.href = `../tracker.html?code=${encodeURIComponent(roomCode)}`;
+
+        document.getElementById('navRoomCode').textContent = roomCode;
 
         function getOrCreateDeviceId() {
             let id = localStorage.getItem('vip_device_id');
@@ -442,94 +538,23 @@
         }
 
         const deviceId = getOrCreateDeviceId();
-        const urlParams = new URLSearchParams(window.location.search);
-        const roomCode = (urlParams.get('code') || '').toUpperCase();
-        const currentUser = urlParams.get('user') || '';
-
-        document.getElementById('navRoomCode').textContent = roomCode;
-
         let roomData = null;
         let isMasterAdmin = false;
         let lastSeenTimestamp = Date.now();
 
-        const txActionType = document.getElementById('txActionType');
-        const txPlayerSelect = document.getElementById('txPlayerSelect');
-        const txPropertySelect = document.getElementById('txPropertySelect');
-        const txBuildingLevelSelect = document.getElementById('txBuildingLevelSelect');
-        const txTargetPlayerSelect = document.getElementById('txTargetPlayerSelect');
-        const txAmountInput = document.getElementById('txAmountInput');
-        const targetPropertyCol = document.getElementById('targetPropertyCol');
-        const targetBuildingCol = document.getElementById('targetBuildingCol');
-        const targetPlayerCol = document.getElementById('targetPlayerCol');
-        const myRoleSelect = document.getElementById('myRoleSelect');
-        const btnClaimRole = document.getElementById('btnClaimRole');
-        const userRoleBadge = document.getElementById('userRoleBadge');
-        const popupStackContainer = document.getElementById('popupStackContainer');
+        // Screen WakeLock
+        let wakeLock = null;
+        async function requestWakeLock() {
+            try {
+                if ('wakeLock' in navigator) {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                    document.getElementById('wakeLockBadge').classList.remove('hidden');
+                }
+            } catch (err) {}
+        }
+        requestWakeLock();
 
-        // Share & QR Modal Elements
-        const shareRoomModal = document.getElementById('shareRoomModal');
-        const btnOpenShareModal = document.getElementById('btnOpenShareModal');
-        const btnCloseShareModal = document.getElementById('btnCloseShareModal');
-        const shareModalCodeDisplay = document.getElementById('shareModalCodeDisplay');
-        const qrCodeContainer = document.getElementById('qrCodeContainer');
-        const btnCopyRoomLink = document.getElementById('btnCopyRoomLink');
-        const btnCopyShareText = document.getElementById('btnCopyShareText');
-
-        // Mobile menu toggle
-        const btnMobileMenuToggle = document.getElementById('btnMobileMenuToggle');
-        const mobileMenuDropdown = document.getElementById('mobileMenuDropdown');
-        const btnMobileShare = document.getElementById('btnMobileShare');
-        const btnMobileEndGame = document.getElementById('btnMobileEndGame');
-
-        btnMobileMenuToggle.onclick = (e) => {
-            e.stopPropagation();
-            mobileMenuDropdown.classList.toggle('hidden');
-        };
-
-        document.addEventListener('click', () => {
-            mobileMenuDropdown.classList.add('hidden');
-        });
-
-        btnMobileShare.onclick = () => {
-            mobileMenuDropdown.classList.add('hidden');
-            btnOpenShareModal.click();
-        };
-
-        btnMobileEndGame.onclick = () => {
-            mobileMenuDropdown.classList.add('hidden');
-            btnOpenEndGameModal.click();
-        };
-
-        btnOpenShareModal.onclick = () => {
-            const joinLink = `https://sepal-vip.github.io/vip-games/g-mono/tracker?code=${roomCode}`;
-            shareModalCodeDisplay.textContent = roomCode;
-
-            qrCodeContainer.innerHTML = '';
-            new QRCode(qrCodeContainer, {
-                text: joinLink,
-                width: 160,
-                height: 160,
-                colorDark: "#000000",
-                colorLight: "#ffffff",
-                correctLevel: QRCode.CorrectLevel.M
-            });
-
-            shareRoomModal.classList.remove('hidden');
-
-            btnCopyRoomLink.onclick = () => {
-                navigator.clipboard.writeText(joinLink);
-                alert("Room direct join link copied!");
-            };
-
-            btnCopyShareText.onclick = () => {
-                const text = `Join my Monopoly Referee table!\nRoom Code: ${roomCode}\nLink: ${joinLink}`;
-                navigator.clipboard.writeText(text);
-                alert("Share invitation message copied!");
-            };
-        };
-
-        btnCloseShareModal.onclick = () => shareRoomModal.classList.add('hidden');
-
+        // Audio Alerts
         function playBeep(freq = 600, duration = 0.15) {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
@@ -545,42 +570,330 @@
             } catch (e) {}
         }
 
-        function spawnTargetedPopup(title, message, icon = 'info', color = 'amber') {
-            const popup = document.createElement('div');
-            popup.className = `pointer-events-auto p-4 rounded-2xl glass-panel shadow-2xl border border-${color}-500/40 space-y-2 transform transition-all duration-300`;
-            popup.innerHTML = `
-                <div class="flex items-start justify-between gap-2">
-                    <div class="flex items-center gap-2 text-${color}-500 font-bold text-xs">
-                        <span class="material-icons text-sm">${icon}</span>
-                        <span>${title}</span>
-                    </div>
-                </div>
-                <p class="text-xs text-slate-800 dark:text-slate-200 font-medium">${message}</p>
-                <div class="flex justify-end pt-1">
-                    <button class="px-3 py-1 bg-${color}-500 hover:bg-${color}-400 text-slate-950 font-black rounded-lg text-[10px] transition">
-                        Got it / Done
-                    </button>
-                </div>
-            `;
-            popup.querySelector('button').onclick = () => popup.remove();
-            popupStackContainer.appendChild(popup);
+        // Element Selectors
+        const dicePlayerSelect = document.getElementById('dicePlayerSelect');
+        const die1Input = document.getElementById('die1Input');
+        const die2Input = document.getElementById('die2Input');
+        const dieSpeedInput = document.getElementById('dieSpeedInput');
+        const speedDieToggle = document.getElementById('speedDieToggle');
+        const speedDieCol = document.getElementById('speedDieCol');
+        const btnExecuteRoll = document.getElementById('btnExecuteRoll');
+        const btnPayJailBail = document.getElementById('btnPayJailBail');
+        const jailStatusIndicator = document.getElementById('jailStatusIndicator');
+        const manualTileSelect = document.getElementById('manualTileSelect');
+        const tileCategoryBadge = document.getElementById('tileCategoryBadge');
+        const turnPlayerStatus = document.getElementById('turnPlayerStatus');
+
+        const txActionType = document.getElementById('txActionType');
+        const txPlayerSelect = document.getElementById('txPlayerSelect');
+        const txPropertySelect = document.getElementById('txPropertySelect');
+        const txBuildingLevelSelect = document.getElementById('txBuildingLevelSelect');
+        const txTargetPlayerSelect = document.getElementById('txTargetPlayerSelect');
+        const targetPlayerLabel = document.getElementById('targetPlayerLabel');
+        const txAmountInput = document.getElementById('txAmountInput');
+        const targetPropertyCol = document.getElementById('targetPropertyCol');
+        const targetBuildingCol = document.getElementById('targetBuildingCol');
+        const targetPlayerCol = document.getElementById('targetPlayerCol');
+        const splitLoanPaymentToggle = document.getElementById('splitLoanPaymentToggle');
+        const splitPaymentRow = document.getElementById('splitPaymentRow');
+        const splitCashInput = document.getElementById('splitCashInput');
+        const splitLoanInput = document.getElementById('splitLoanInput');
+
+        // Populate Tile Override Selector
+        BOARD_TILES.forEach(tile => {
+            const opt = document.createElement('option');
+            opt.value = tile.index;
+            opt.textContent = `${tile.index}: ${tile.name}`;
+            manualTileSelect.appendChild(opt);
+        });
+
+        speedDieToggle.onchange = () => {
+            speedDieCol.classList.toggle('hidden', !speedDieToggle.checked);
+        };
+
+        // Split Payment Auto-Math
+        splitLoanPaymentToggle.onchange = () => {
+            splitPaymentRow.classList.toggle('hidden', !splitLoanPaymentToggle.checked);
+            updateSplitCalculations();
+        };
+
+        function updateSplitCalculations() {
+            if (!splitLoanPaymentToggle.checked) return;
+            const total = parseFloat(txAmountInput.value) || 0;
+            const cashPart = parseFloat(splitCashInput.value) || 0;
+            const loanPart = Math.max(0, total - cashPart);
+            splitLoanInput.value = loanPart;
         }
 
+        txAmountInput.addEventListener('input', updateSplitCalculations);
+        splitCashInput.addEventListener('input', updateSplitCalculations);
+
+        // Ownership Helper
         function getPropertyInfo(propName) {
             if (!roomData || !roomData.players) return null;
             for (const [playerName, data] of Object.entries(roomData.players)) {
                 const props = data.properties || [];
                 for (const p of props) {
-                    if (typeof p === 'string' && p === propName) {
-                        return { owner: playerName, level: 0 };
-                    } else if (typeof p === 'object' && p.name === propName) {
-                        return { owner: playerName, level: p.level !== undefined ? p.level : 0 };
-                    }
+                    if (typeof p === 'string' && p === propName) return { owner: playerName, level: 0 };
+                    else if (typeof p === 'object' && p.name === propName) return { owner: playerName, level: p.level || 0 };
                 }
             }
             return null;
         }
 
+        // Auto-Fill Action from Tile
+        function applyTileToReferee(player, tileIndex) {
+            const tile = BOARD_TILES[tileIndex];
+            txPlayerSelect.value = player;
+            manualTileSelect.value = tileIndex;
+            tileCategoryBadge.textContent = `${tile.index}: ${tile.name.toUpperCase()}`;
+
+            if (tile.type === 'prop') {
+                const info = getPropertyInfo(tile.name);
+                if (!info) {
+                    // Unowned -> Trigger BUY
+                    txActionType.value = 'buy';
+                    updatePropertyDropdown();
+                    txPropertySelect.value = tile.name;
+                    syncActionFields();
+                } else if (info.owner !== player) {
+                    // Owned by Opponent -> Trigger RENT
+                    txActionType.value = 'rent';
+                    updatePropertyDropdown();
+                    txPropertySelect.value = tile.name;
+                    syncActionFields();
+                } else {
+                    // Owned by Player -> Suggest BUILD
+                    txActionType.value = 'build';
+                    updatePropertyDropdown();
+                    txPropertySelect.value = tile.name;
+                    syncActionFields();
+                }
+            } else if (tile.type === 'tax') {
+                txActionType.value = 'pay_chance';
+                syncActionFields();
+                txAmountInput.value = tile.amount;
+            } else if (tile.type === 'community' || tile.type === 'chance') {
+                document.getElementById('cardModalTitle').textContent = `${tile.name} Draw`;
+                document.getElementById('communityCardModal').classList.remove('hidden');
+            } else if (tile.type === 'go') {
+                txActionType.value = 'salary';
+                syncActionFields();
+            }
+        }
+
+        // Board Movement Execution (Standard + Speed Die)
+        btnExecuteRoll.onclick = async () => {
+            const roller = dicePlayerSelect.value;
+            const p = roomData.players[roller];
+            if (!p) return;
+
+            const d1 = parseInt(die1Input.value);
+            const d2 = parseInt(die2Input.value);
+            const isDouble = d1 === d2;
+            const speedVal = speedDieToggle.checked ? dieSpeedInput.value : null;
+
+            let currentPos = p.position !== undefined ? p.position : 0;
+            let inJail = !!p.inJail;
+
+            // Jail Rules Handling
+            if (inJail) {
+                if (isDouble) {
+                    inJail = false;
+                    currentPos = 10;
+                    spawnTargetedPopup("Jail Release", `${roller} rolled doubles (${d1}-${d2}) and is freed!`, "lock_open", "emerald");
+                } else {
+                    alert(`${roller} is in Jail and did not roll doubles. Pay $100 bail or stay.`);
+                    return;
+                }
+            }
+
+            // Normal Dice Addition
+            let moveSteps = d1 + d2;
+            if (speedVal === '1' || speedVal === '2' || speedVal === '3') {
+                moveSteps += parseInt(speedVal);
+            }
+
+            // Calculate Destination
+            let newPos = (currentPos + moveSteps) % 40;
+
+            // Check if Passed GO ($200 Bonus)
+            if (newPos < currentPos && !inJail) {
+                p.cash += 200;
+                spawnTargetedPopup("Passed GO", `${roller} collected $200 for passing GO.`, "monetization_on", "emerald");
+            }
+
+            // Check GO TO JAIL Tile (Index 30)
+            if (newPos === 30) {
+                newPos = 10;
+                inJail = true;
+                spawnTargetedPopup("Arrested!", `${roller} landed on Go To Jail! Sent to Jail.`, "gavel", "rose");
+            }
+
+            // Handle Speed Die: Bus Ticket Options
+            if (speedVal === 'bus' && !inJail) {
+                renderBusTicketModal(roller, currentPos, d1, d2);
+            }
+
+            // Handle Speed Die: Mr. Monopoly
+            if (speedVal === 'mr_m' && !inJail) {
+                newPos = resolveMrMonopolyDestination(newPos);
+            }
+
+            // Update Player State
+            p.position = newPos;
+            p.inJail = inJail;
+
+            const updatedLogs = [{
+                time: new Date().toLocaleTimeString(),
+                text: `${roller} rolled ${d1}+${d2}${speedVal ? ` + Speed (${speedVal})` : ''} -> moved to ${BOARD_TILES[newPos].name}`,
+                actor: roller,
+                _ts: Date.now()
+            }, ...(roomData.logs || [])];
+
+            await updateDoc(roomRef, {
+                players: roomData.players,
+                logs: updatedLogs
+            });
+
+            applyTileToReferee(roller, newPos);
+            playBeep(880, 0.1);
+        };
+
+        // Mr. Monopoly Route Helper
+        function resolveMrMonopolyDestination(startPos) {
+            for (let i = 1; i <= 40; i++) {
+                const targetIdx = (startPos + i) % 40;
+                const tile = BOARD_TILES[targetIdx];
+                if (tile.type === 'prop' && !getPropertyInfo(tile.name)) {
+                    return targetIdx; // Found first unowned property
+                }
+            }
+            // If all owned, land on the next opponent property
+            for (let i = 1; i <= 40; i++) {
+                const targetIdx = (startPos + i) % 40;
+                const tile = BOARD_TILES[targetIdx];
+                if (tile.type === 'prop') return targetIdx;
+            }
+            return startPos;
+        }
+
+        // Bus Travel Modal Generator
+        function renderBusTicketModal(player, startPos, d1, d2) {
+            const modal = document.getElementById('busOptionsModal');
+            const list = document.getElementById('busChoicesList');
+            list.innerHTML = '';
+
+            const choices = [
+                { steps: d1, label: `Use Die 1 (${d1} steps)` },
+                { steps: d2, label: `Use Die 2 (${d2} steps)` },
+                { steps: d1 + d2, label: `Use Combined (${d1 + d2} steps)` }
+            ];
+
+            choices.forEach(ch => {
+                const targetIdx = (startPos + ch.steps) % 40;
+                const tile = BOARD_TILES[targetIdx];
+                const btn = document.createElement('button');
+                btn.className = "w-full p-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl text-left flex justify-between items-center text-xs";
+                btn.innerHTML = `<span>${ch.label} &rarr; <b class="text-sky-400">${tile.name}</b></span><span class="material-icons text-sm">arrow_forward</span>`;
+                btn.onclick = async () => {
+                    modal.classList.add('hidden');
+                    roomData.players[player].position = targetIdx;
+                    await updateDoc(roomRef, { players: roomData.players });
+                    applyTileToReferee(player, targetIdx);
+                };
+                list.appendChild(btn);
+            });
+
+            modal.classList.remove('hidden');
+        }
+
+        document.getElementById('btnCloseBusModal').onclick = () => {
+            document.getElementById('busOptionsModal').classList.add('hidden');
+        };
+
+        // Pay Jail Bail Handler
+        btnPayJailBail.onclick = async () => {
+            const player = dicePlayerSelect.value;
+            const p = roomData.players[player];
+            if (!p || !p.inJail) return;
+
+            p.cash -= 100;
+            p.inJail = false;
+
+            const updatedLogs = [{
+                time: new Date().toLocaleTimeString(),
+                text: `${player} paid $100 bail to get out of Jail`,
+                actor: player,
+                _ts: Date.now()
+            }, ...(roomData.logs || [])];
+
+            await updateDoc(roomRef, {
+                players: roomData.players,
+                logs: updatedLogs
+            });
+
+            jailStatusIndicator.classList.add('hidden');
+            btnPayJailBail.classList.add('hidden');
+            spawnTargetedPopup("Freed", `${player} paid $100 and is released from Jail.`, "lock_open", "emerald");
+        };
+
+        // Interactive Community/Chance Card Handlers
+        const communityModal = document.getElementById('communityCardModal');
+        document.getElementById('btnCardSalary').onclick = () => {
+            communityModal.classList.add('hidden');
+            txActionType.value = 'collect';
+            txAmountInput.value = 100;
+        };
+        document.getElementById('btnCardPayFee').onclick = () => {
+            communityModal.classList.add('hidden');
+            txActionType.value = 'pay_chance';
+            txAmountInput.value = 50;
+        };
+        document.getElementById('btnCardBirthday').onclick = () => {
+            communityModal.classList.add('hidden');
+            txActionType.value = 'collect_all';
+            txAmountInput.value = 10;
+        };
+        document.getElementById('btnCardRepairsA').onclick = () => {
+            communityModal.classList.add('hidden');
+            const player = txPlayerSelect.value;
+            const p = roomData.players[player];
+            let total = 0;
+            (p.properties || []).forEach(pr => {
+                const lvl = pr.level || 0;
+                if (lvl === 5) total += 100;
+                else if (lvl > 0) total += lvl * 20;
+            });
+            txActionType.value = 'repairs';
+            txAmountInput.value = total;
+        };
+        document.getElementById('btnCardRepairsB').onclick = () => {
+            communityModal.classList.add('hidden');
+            const player = txPlayerSelect.value;
+            const p = roomData.players[player];
+            let total = 0;
+            (p.properties || []).forEach(pr => {
+                const lvl = pr.level || 0;
+                if (lvl === 5) total += 115;
+                else if (lvl > 0) total += lvl * 23;
+            });
+            txActionType.value = 'repairs';
+            txAmountInput.value = total;
+        };
+
+        // Manual Tile Override Trigger
+        manualTileSelect.onchange = () => {
+            const player = dicePlayerSelect.value;
+            const tileIdx = parseInt(manualTileSelect.value);
+            if (roomData && roomData.players[player]) {
+                roomData.players[player].position = tileIdx;
+                updateDoc(roomRef, { players: roomData.players });
+                applyTileToReferee(player, tileIdx);
+            }
+        };
+
+        // Dropdown Builders
         function updatePropertyDropdown() {
             const action = txActionType.value;
             const actingPlayer = txPlayerSelect.value;
@@ -608,9 +921,7 @@
             if (filteredProperties.length === 0) {
                 const opt = document.createElement('option');
                 opt.value = "";
-                opt.textContent = action === 'buy' ? "-- No Unowned Properties Left --" :
-                                  action === 'rent' ? "-- No Rentable Properties --" :
-                                  action === 'build' ? "-- No Eligible Properties Owned --" : "-- None Available --";
+                opt.textContent = "-- None Available --";
                 opt.disabled = true;
                 txPropertySelect.appendChild(opt);
             } else {
@@ -618,17 +929,9 @@
                     const opt = document.createElement('option');
                     opt.value = prop.name;
                     const info = getPropertyInfo(prop.name);
-                    let label = `${prop.name}`;
-                    if (info) {
-                        const lvlText = info.level === 5 ? ' [Hotel]' : info.level === 2.5 ? ' [Motel]' : info.level > 0 ? ` [${info.level}H]` : '';
-                        label += ` (${info.owner}${lvlText})`;
-                    } else {
-                        label += ` ($${prop.price})`;
-                    }
-                    opt.textContent = label;
+                    opt.textContent = info ? `${prop.name} (${info.owner})` : `${prop.name} ($${prop.price})`;
                     txPropertySelect.appendChild(opt);
                 });
-
                 if (filteredProperties.some(p => p.name === previousSelection)) {
                     txPropertySelect.value = previousSelection;
                 }
@@ -651,6 +954,7 @@
                 targetPropertyCol.classList.remove('hidden');
                 targetBuildingCol.classList.add('hidden');
                 targetPlayerCol.classList.remove('hidden');
+                targetPlayerLabel.textContent = "Pay To (Landlord)";
 
                 const info = getPropertyInfo(selectedPropName);
                 if (info) {
@@ -659,16 +963,6 @@
                         txAmountInput.value = propObj.rents[info.level] !== undefined ? propObj.rents[info.level] : propObj.rents[0];
                     }
                 }
-            } else if (action === 'player_loan') {
-                targetPropertyCol.classList.add('hidden');
-                targetBuildingCol.classList.add('hidden');
-                targetPlayerCol.classList.remove('hidden');
-                txAmountInput.value = 100;
-            } else if (action === 'repay_player_loan') {
-                targetPropertyCol.classList.add('hidden');
-                targetBuildingCol.classList.add('hidden');
-                targetPlayerCol.classList.remove('hidden');
-                txAmountInput.value = 100;
             } else if (action === 'build') {
                 targetPropertyCol.classList.remove('hidden');
                 targetBuildingCol.classList.remove('hidden');
@@ -678,9 +972,13 @@
                 const info = getPropertyInfo(selectedPropName);
                 const currentLevel = info ? info.level : 0;
                 const levelDiff = Math.max(0.5, chosenLevel - currentLevel);
-                
                 const houseBase = propObj ? propObj.housePrice : 100;
                 txAmountInput.value = Math.round(levelDiff * houseBase);
+            } else if (action === 'player_loan' || action === 'repay_player_loan') {
+                targetPropertyCol.classList.add('hidden');
+                targetBuildingCol.classList.add('hidden');
+                targetPlayerCol.classList.remove('hidden');
+                targetPlayerLabel.textContent = action === 'player_loan' ? "Lender" : "Repay To";
             } else if (action === 'salary') {
                 targetPropertyCol.classList.add('hidden');
                 targetBuildingCol.classList.add('hidden');
@@ -691,16 +989,6 @@
                 targetBuildingCol.classList.add('hidden');
                 targetPlayerCol.classList.add('hidden');
                 txAmountInput.value = 100;
-            } else if (action === 'collect_all') {
-                targetPropertyCol.classList.add('hidden');
-                targetBuildingCol.classList.add('hidden');
-                targetPlayerCol.classList.add('hidden');
-                txAmountInput.value = 10;
-            } else if (action === 'repairs') {
-                targetPropertyCol.classList.add('hidden');
-                targetBuildingCol.classList.add('hidden');
-                targetPlayerCol.classList.add('hidden');
-                txAmountInput.value = 115;
             } else if (action === 'pay_chance') {
                 targetPropertyCol.classList.add('hidden');
                 targetBuildingCol.classList.add('hidden');
@@ -711,6 +999,8 @@
                 targetBuildingCol.classList.add('hidden');
                 targetPlayerCol.classList.add('hidden');
             }
+
+            updateSplitCalculations();
         }
 
         txActionType.addEventListener('change', updatePropertyDropdown);
@@ -718,19 +1008,104 @@
         txPropertySelect.addEventListener('change', syncActionFields);
         txBuildingLevelSelect.addEventListener('change', syncActionFields);
 
-        if (!roomCode) {
-            alert("No room code provided");
-            window.location.href = '../tracker.html';
-        }
+        // Transaction Commit with Split Cash/Loan Support
+        document.getElementById('btnSubmitTx').onclick = async () => {
+            const actingPlayer = txPlayerSelect.value;
+            const action = txActionType.value;
+            const targetProp = txPropertySelect.value;
+            const targetPayee = txTargetPlayerSelect.value;
+            const targetLevel = parseFloat(txBuildingLevelSelect.value) || 0;
+            const totalAmount = parseFloat(txAmountInput.value) || 0;
 
-        const roomRef = doc(db, "games", "Monopoly", "rooms", roomCode);
+            const isSplit = splitLoanPaymentToggle.checked;
+            const cashPayment = isSplit ? (parseFloat(splitCashInput.value) || 0) : totalAmount;
+            const loanAmount = isSplit ? (parseFloat(splitLoanInput.value) || 0) : 0;
 
-        onSnapshot(roomRef, (snapshot) => {
-            if (!snapshot.exists()) {
-                alert("Room no longer exists");
-                window.location.href = '../tracker.html';
-                return;
+            const updatedPlayers = { ...roomData.players };
+            const p = updatedPlayers[actingPlayer];
+            let logText = "";
+            let recipientTarget = "";
+
+            // Apply split loan liability if enabled
+            if (isSplit && loanAmount > 0) {
+                p.loans += loanAmount;
             }
+
+            if (action === 'buy') {
+                p.cash -= cashPayment;
+                p.properties = p.properties || [];
+                p.properties.push({ name: targetProp, level: 0 });
+                logText = `${actingPlayer} bought ${targetProp} for $${totalAmount}${isSplit ? ` ($${cashPayment} cash + $${loanAmount} loan)` : ''}`;
+            } else if (action === 'rent') {
+                p.cash -= cashPayment;
+                recipientTarget = targetPayee;
+                if (targetPayee && updatedPlayers[targetPayee]) {
+                    updatedPlayers[targetPayee].cash += totalAmount;
+                }
+                logText = `${actingPlayer} paid $${totalAmount} rent to ${targetPayee} for ${targetProp}`;
+            } else if (action === 'build') {
+                p.cash -= cashPayment;
+                p.properties = (p.properties || []).map(pr => {
+                    const name = typeof pr === 'string' ? pr : pr.name;
+                    if (name === targetProp) return { name, level: targetLevel };
+                    return typeof pr === 'string' ? { name: pr, level: 0 } : pr;
+                });
+                const lvlName = targetLevel === 5 ? 'Hotel' : targetLevel === 2.5 ? 'Motel' : `${targetLevel} Houses`;
+                logText = `${actingPlayer} upgraded ${targetProp} to ${lvlName} for $${totalAmount}`;
+            } else if (action === 'salary') {
+                p.cash += totalAmount;
+                logText = `${actingPlayer} collected $${totalAmount} salary`;
+            } else if (action === 'pay_chance') {
+                p.cash -= cashPayment;
+                logText = `${actingPlayer} paid $${totalAmount} fee`;
+            } else if (action === 'loan') {
+                p.cash += totalAmount;
+                p.loans += totalAmount;
+                logText = `${actingPlayer} took $${totalAmount} bank loan`;
+            } else if (action === 'repay') {
+                p.cash -= totalAmount;
+                p.loans = Math.max(0, p.loans - totalAmount);
+                logText = `${actingPlayer} repaid $${totalAmount} bank loan`;
+            } else if (action === 'player_loan') {
+                updatedPlayers[targetPayee].cash -= totalAmount;
+                p.cash += totalAmount;
+                p.loans += totalAmount;
+                logText = `${actingPlayer} borrowed $${totalAmount} from ${targetPayee}`;
+                recipientTarget = targetPayee;
+            } else if (action === 'repay_player_loan') {
+                p.cash -= totalAmount;
+                updatedPlayers[targetPayee].cash += totalAmount;
+                p.loans = Math.max(0, p.loans - totalAmount);
+                logText = `${actingPlayer} repaid $${totalAmount} loan to ${targetPayee}`;
+                recipientTarget = targetPayee;
+            } else if (action === 'repairs') {
+                p.cash -= cashPayment;
+                logText = `${actingPlayer} paid $${totalAmount} building repairs`;
+            }
+
+            const updatedLogs = [{
+                time: new Date().toLocaleTimeString(),
+                text: logText,
+                actor: actingPlayer,
+                action,
+                amount: totalAmount,
+                property: targetProp,
+                targetRecipient: recipientTarget,
+                _ts: Date.now()
+            }, ...(roomData.logs || [])];
+
+            await updateDoc(roomRef, {
+                players: updatedPlayers,
+                logs: updatedLogs
+            });
+
+            playBeep(880, 0.15);
+        };
+
+        // Real-Time Cloud Listener
+        const roomRef = doc(db, "games", "Monopoly", "rooms", roomCode);
+        onSnapshot(roomRef, (snapshot) => {
+            if (!snapshot.exists()) return;
 
             roomData = snapshot.data();
             const currentUid = auth.currentUser ? auth.currentUser.uid : null;
@@ -743,97 +1118,42 @@
             renderRoster();
             renderLogs();
             updatePropertyDropdown();
-            processTargetedAlerts();
+            syncDiceTurnState();
         });
 
-        function processTargetedAlerts() {
-            const logs = roomData.logs || [];
-            if (logs.length === 0) return;
+        function syncDiceTurnState() {
+            const activeRoller = dicePlayerSelect.value;
+            const p = roomData.players[activeRoller];
+            if (!p) return;
 
-            const latestLog = logs[0];
-            const logTime = new Date().getTime();
-            if (latestLog._ts && latestLog._ts <= lastSeenTimestamp) return;
-
-            const myRole = roomData.players[currentUser]?.role || 'Player';
-            const text = latestLog.text || '';
-            const targetRecipient = latestLog.targetRecipient || '';
-            const action = latestLog.action || '';
-
-            let shouldShow = false;
-            let title = "Table Notification";
-            let msg = text;
-            let icon = 'info';
-            let color = 'amber';
-
-            if (isMasterAdmin) {
-                shouldShow = true;
-                title = "Table Event Alert";
+            if (p.inJail) {
+                jailStatusIndicator.classList.remove('hidden');
+                btnPayJailBail.classList.remove('hidden');
+                turnPlayerStatus.textContent = `${activeRoller} is currently locked in Jail`;
+            } else {
+                jailStatusIndicator.classList.add('hidden');
+                btnPayJailBail.classList.add('hidden');
+                const tile = BOARD_TILES[p.position || 0];
+                turnPlayerStatus.textContent = `${activeRoller} is at tile ${tile.index}: ${tile.name}`;
             }
-
-            if (action === 'buy' && (myRole === 'Props Giver' || isMasterAdmin)) {
-                shouldShow = true;
-                title = "Hand Over Deed Card";
-                icon = 'style';
-                color = 'sky';
-            } else if (action === 'build' && (myRole === 'Builder' || isMasterAdmin)) {
-                shouldShow = true;
-                title = "Construction Placement";
-                icon = 'apartment';
-                color = 'amber';
-            } else if ((action === 'loan' || action === 'salary' || action === 'repairs') && (myRole === 'Banker' || isMasterAdmin)) {
-                shouldShow = true;
-                title = "Banker Treasury Action";
-                icon = 'account_balance';
-                color = 'emerald';
-            } else if (action === 'rent' && (targetRecipient === currentUser || isMasterAdmin)) {
-                shouldShow = true;
-                title = "Rent Received!";
-                msg = `Received $${latestLog.amount} rent from ${latestLog.actor} for ${latestLog.property}`;
-                icon = 'payments';
-                color = 'emerald';
-            }
-
-            if (shouldShow && latestLog.actor !== currentUser) {
-                spawnTargetedPopup(title, msg, icon, color);
-                playBeep(800, 0.2);
-            }
-
-            lastSeenTimestamp = logTime;
         }
 
+        dicePlayerSelect.onchange = () => {
+            syncDiceTurnState();
+            const p = roomData.players[dicePlayerSelect.value];
+            if (p) manualTileSelect.value = p.position || 0;
+        };
+
         function updateUIPermissions() {
-            const statusBadge = document.getElementById('userStatusBadge');
-            const alertForbidden = document.getElementById('writeForbiddenAlert');
-            const btnOverride = document.getElementById('btnOpenAdminOverride');
-            const playerData = roomData.players[currentUser] || {};
-
-            const myRole = playerData.role || 'Player';
+            const userRoleBadge = document.getElementById('userRoleBadge');
+            const myRole = roomData.players[currentUser]?.role || 'Player';
             userRoleBadge.textContent = `Role: ${myRole}`;
-            myRoleSelect.value = myRole;
 
-            const canWrite = isMasterAdmin || playerData.canWrite;
-
-            if (statusBadge) {
-                if (isMasterAdmin) {
-                    statusBadge.textContent = "Host / Master Device";
-                    statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-amber-500/15 border-amber-500/30 text-amber-600 dark:text-amber-400";
-                } else if (canWrite) {
-                    statusBadge.textContent = `${currentUser} (Authorized)`;
-                    statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-emerald-500/15 border-emerald-500/30 text-emerald-500";
-                } else {
-                    statusBadge.textContent = `${currentUser} (Read-Only)`;
-                    statusBadge.className = "text-[10px] font-bold px-2.5 py-1 rounded-full border bg-slate-500/15 border-slate-500/30 text-slate-400";
-                }
-            }
-            if (btnOverride) {
-                btnOverride.classList.toggle('hidden', !isMasterAdmin);
-            }
-            if (alertForbidden) {
-                alertForbidden.classList.toggle('hidden', isMasterAdmin || canWrite);
-            }
-
-            const eligiblePlayers = isMasterAdmin ? Object.keys(roomData.players) : [currentUser];
-            const prevSelectedPlayer = txPlayerSelect.value;
+            const playersList = Object.keys(roomData.players || {});
+            
+            // Populate action actor select
+            const eligiblePlayers = isMasterAdmin ? playersList : [currentUser];
+            const prevActor = txPlayerSelect.value;
             txPlayerSelect.innerHTML = '';
             eligiblePlayers.forEach(p => {
                 const opt = document.createElement('option');
@@ -841,12 +1161,22 @@
                 opt.textContent = p;
                 txPlayerSelect.appendChild(opt);
             });
-            if (eligiblePlayers.includes(prevSelectedPlayer)) {
-                txPlayerSelect.value = prevSelectedPlayer;
-            }
+            if (eligiblePlayers.includes(prevActor)) txPlayerSelect.value = prevActor;
 
+            // Populate dice roller select
+            const prevRoller = dicePlayerSelect.value;
+            dicePlayerSelect.innerHTML = '';
+            playersList.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p;
+                opt.textContent = p;
+                dicePlayerSelect.appendChild(opt);
+            });
+            if (playersList.includes(prevRoller)) dicePlayerSelect.value = prevRoller;
+
+            // Populate Pay To select
             txTargetPlayerSelect.innerHTML = '';
-            Object.keys(roomData.players).forEach(p => {
+            playersList.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p;
                 opt.textContent = p;
@@ -854,43 +1184,15 @@
             });
         }
 
-        btnClaimRole.onclick = async () => {
-            const chosenRole = myRoleSelect.value;
-            const updatedPlayers = { ...roomData.players };
-            if (!updatedPlayers[currentUser]) return;
-
-            updatedPlayers[currentUser].role = chosenRole;
-            const updatedLogs = [{ 
-                time: new Date().toLocaleTimeString(), 
-                text: `${currentUser} claimed role: ${chosenRole}`,
-                actor: currentUser,
-                _ts: Date.now()
-            }, ...(roomData.logs || [])];
-
-            await updateDoc(roomRef, {
-                players: updatedPlayers,
-                logs: updatedLogs
-            });
-
-            if (!isMasterAdmin) {
-                playBeep(750, 0.1);
-            }
-        };
-
         function renderStats() {
-            const defaultCash = roomData.startingCash !== undefined ? roomData.startingCash : 1500;
-            const me = roomData.players[currentUser] || { cash: defaultCash, loans: 0, properties: [] };
-            
+            const me = roomData.players[currentUser] || { cash: 1500, loans: 0, properties: [] };
             let propVal = 0;
             (me.properties || []).forEach(p => {
                 const pName = typeof p === 'string' ? p : p.name;
                 const pLevel = typeof p === 'object' ? p.level : 0;
                 const propDef = BOARD_PROPERTIES.find(b => b.name === pName);
-                if (propDef) {
-                    propVal += propDef.price + (pLevel * (propDef.housePrice || 0));
-                } else {
-                    propVal += 200;
-                }
+                if (propDef) propVal += propDef.price + (pLevel * (propDef.housePrice || 0));
+                else propVal += 200;
             });
 
             const net = me.cash + propVal - me.loans;
@@ -910,21 +1212,19 @@
                 const isMe = name === currentUser;
                 const props = p.properties || [];
                 const role = p.role || 'Player';
+                const pos = p.position || 0;
+                const tileName = BOARD_TILES[pos]?.name || 'Go';
 
                 let propVal = 0;
                 props.forEach(pr => {
                     const pName = typeof pr === 'string' ? pr : pr.name;
                     const pLevel = typeof pr === 'object' ? pr.level : 0;
                     const propDef = BOARD_PROPERTIES.find(b => b.name === pName);
-                    if (propDef) {
-                        propVal += propDef.price + (pLevel * (propDef.housePrice || 0));
-                    } else {
-                        propVal += 200;
-                    }
+                    if (propDef) propVal += propDef.price + (pLevel * (propDef.housePrice || 0));
+                    else propVal += 200;
                 });
 
                 const net = p.cash + propVal - p.loans;
-
                 const item = document.createElement('div');
                 item.className = `p-3 rounded-2xl border ${isMe ? 'bg-amber-500/10 border-amber-500/30' : 'bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800'} flex items-center justify-between shadow-sm`;
                 item.innerHTML = `
@@ -932,15 +1232,10 @@
                         <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                             <span>${name}</span>
                             <span class="text-[9px] px-2 py-0.5 rounded-full font-mono bg-white/60 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-amber-600 dark:text-amber-400 font-bold">${role}</span>
-                            ${p.canWrite ? '<span class="material-icons text-[12px] text-emerald-500">verified</span>' : ''}
+                            ${p.inJail ? '<span class="text-[9px] px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-400 font-bold">JAIL</span>' : ''}
                         </div>
-                        <div class="text-[10px] text-slate-400 font-mono mt-0.5 flex items-center gap-2">
-                            <button type="button" class="text-sky-500 hover:underline flex items-center gap-0.5" onclick="window.viewPlayerProperties('${name}')">
-                                <span>Props: ${props.length}</span>
-                                <span class="material-icons text-[10px]">open_in_new</span>
-                            </button>
-                            <span>|</span>
-                            <span>Loans: $${p.loans}</span>
+                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">
+                            Tile ${pos}: ${tileName} | Props: ${props.length} | Loans: $${p.loans}
                         </div>
                     </div>
                     <div class="text-right font-mono">
@@ -954,21 +1249,10 @@
 
         function formatHighlightedLog(rawText) {
             let formatted = rawText;
-            if (roomData && roomData.players) {
-                Object.keys(roomData.players).forEach(name => {
-                    const re = new RegExp(`\\b${name}\\b`, 'g');
-                    formatted = formatted.replace(re, `<span class="log-highlight-player">${name}</span>`);
-                });
-            }
-            const actions = ['paid', 'rent', 'to buy', 'upgraded', 'salary', 'loan', 'repaid', 'collected', 'jail'];
+            const actions = ['paid', 'rent', 'bought', 'upgraded', 'salary', 'loan', 'repaid', 'borrowed', 'moved to'];
             actions.forEach(act => {
                 const re = new RegExp(`\\b${act}\\b`, 'gi');
                 formatted = formatted.replace(re, `<span class="log-highlight-action">$&</span>`);
-            });
-            const buildings = ['Hotel', 'Motel', 'Houses', 'House'];
-            buildings.forEach(b => {
-                const re = new RegExp(`\\b${b}\\b`, 'gi');
-                formatted = formatted.replace(re, `<span class="log-highlight-prop">$&</span>`);
             });
             formatted = formatted.replace(/\$(\d[\d,]*)/g, `<span class="log-highlight-money">$$$1</span>`);
             return formatted;
@@ -988,393 +1272,50 @@
             });
         }
 
-        document.getElementById('btnSubmitTx').onclick = async () => {
-            const actingPlayer = txPlayerSelect.value;
-            const action = txActionType.value;
-            const targetProp = txPropertySelect.value;
-            const targetPayee = txTargetPlayerSelect.value;
-            const targetLevel = parseFloat(txBuildingLevelSelect.value) || 0;
-            const amount = parseFloat(txAmountInput.value) || 0;
+        // Share QR Modal Controls
+        document.getElementById('btnOpenShareModal').onclick = () => {
+            const joinLink = `https://sepal-vip.github.io/vip-games/g-mono/tracker?code=${roomCode}`;
+            document.getElementById('shareModalCodeDisplay').textContent = roomCode;
+            const qrContainer = document.getElementById('qrCodeContainer');
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, { text: joinLink, width: 160, height: 160 });
+            document.getElementById('shareRoomModal').classList.remove('hidden');
 
-            const playerData = roomData.players[currentUser];
-            if (!isMasterAdmin && (!playerData || !playerData.canWrite)) {
-                return alert("You do not have write permission.");
-            }
+            document.getElementById('btnCopyRoomLink').onclick = () => {
+                navigator.clipboard.writeText(joinLink);
+                alert("Copied join link!");
+            };
+            document.getElementById('btnCopyShareText').onclick = () => {
+                navigator.clipboard.writeText(`Join Monopoly Referee room: ${roomCode}\n${joinLink}`);
+                alert("Copied share message!");
+            };
+        };
+        document.getElementById('btnCloseShareModal').onclick = () => document.getElementById('shareRoomModal').classList.add('hidden');
 
-            const updatedPlayers = { ...roomData.players };
-            const p = updatedPlayers[actingPlayer];
-            let logText = "";
-            let recipientTarget = "";
+        // End Game & Archiving
+        document.getElementById('btnOpenEndGameModal').onclick = () => document.getElementById('endGameModal').classList.remove('hidden');
+        document.getElementById('btnCloseEndGameModal').onclick = () => document.getElementById('endGameModal').classList.add('hidden');
 
-            if (action === 'buy') {
-                p.cash -= amount;
-                p.properties = p.properties || [];
-                p.properties.push({ name: targetProp, level: 0 });
-                logText = `${actingPlayer} paid $${amount} to buy ${targetProp}`;
-            } else if (action === 'rent') {
-                p.cash -= amount;
-                recipientTarget = targetPayee;
-                if (targetPayee && updatedPlayers[targetPayee] && targetPayee !== actingPlayer) {
-                    updatedPlayers[targetPayee].cash += amount;
-                    logText = `${actingPlayer} paid $${amount} rent to ${targetPayee} for ${targetProp}`;
-                } else {
-                    logText = `${actingPlayer} paid $${amount} rent for ${targetProp}`;
-                }
-            } else if (action === 'pay_chance') {
-                p.cash -= amount;
-                logText = `${actingPlayer} paid $${amount} to Bank for Chance / Community card`;
-            } else if (action === 'player_loan') {
-                if (targetPayee && updatedPlayers[targetPayee] && targetPayee !== actingPlayer) {
-                    updatedPlayers[targetPayee].cash -= amount;
-                    p.cash += amount;
-                    p.loans += amount;
-                    recipientTarget = targetPayee;
-                    logText = `${actingPlayer} borrowed $${amount} loan from ${targetPayee}`;
-                } else {
-                    return alert('Please select which player is providing the loan.');
-                }
-            } else if (action === 'repay_player_loan') {
-                if (!targetPayee || !updatedPlayers[targetPayee] || targetPayee === actingPlayer) {
-                    return alert('Please select the player you are repaying.');
-                }
-                if (p.cash < amount) {
-                    return alert(`${actingPlayer} does not have enough cash to repay $${amount}.`);
-                }
+        document.getElementById('btnEndAndRecord').onclick = async () => {
+            if (!isMasterAdmin) return alert("Only the host can officially end matches.");
+            const today = new Date();
+            const matchDocId = `${today.getDate()}-${today.getMonth()+1}-${today.getFullYear()}-01`;
 
-                p.cash -= amount;
-                updatedPlayers[targetPayee].cash += amount;
-                p.loans = Math.max(0, p.loans - amount);
-                recipientTarget = targetPayee;
-                logText = `${actingPlayer} repaid $${amount} loan to ${targetPayee}`;
-            } else if (action === 'build') {
-                p.cash -= amount;
-                p.properties = (p.properties || []).map(pr => {
-                    const name = typeof pr === 'string' ? pr : pr.name;
-                    if (name === targetProp) {
-                        return { name, level: targetLevel };
-                    }
-                    return typeof pr === 'string' ? { name: pr, level: 0 } : pr;
-                });
-                const lvlName = targetLevel === 5 ? 'Hotel' : targetLevel === 2.5 ? 'Motel' : `${targetLevel} Houses`;
-                logText = `${actingPlayer} upgraded ${targetProp} to ${lvlName} for $${amount}`;
-            } else if (action === 'salary') {
-                p.cash += amount;
-                logText = `${actingPlayer} collected $${amount} salary`;
-            } else if (action === 'jail_fee') {
-                p.cash -= amount;
-                logText = `${actingPlayer} paid $${amount} to get out of jail`;
-            } else if (action === 'loan') {
-                p.cash += amount;
-                p.loans += amount;
-                logText = `${actingPlayer} took a loan of $${amount}`;
-            } else if (action === 'repay') {
-                p.cash -= amount;
-                p.loans = Math.max(0, p.loans - amount);
-                logText = `${actingPlayer} repaid $${amount} loan`;
-            } else if (action === 'collect') {
-                p.cash += amount;
-                logText = `${actingPlayer} collected $${amount} (Chance / Community)`;
-            } else if (action === 'collect_all') {
-                let total = 0;
-                Object.keys(updatedPlayers).forEach(k => {
-                    if (k !== actingPlayer) {
-                        updatedPlayers[k].cash -= amount;
-                        total += amount;
-                    }
-                });
-                p.cash += total;
-                logText = `${actingPlayer} collected $${amount} from each player (+$${total})`;
-            } else if (action === 'repairs') {
-                p.cash -= amount;
-                logText = `${actingPlayer} paid $${amount} for building repairs`;
-            }
-
-            const updatedLogs = [{ 
-                time: new Date().toLocaleTimeString(), 
-                text: logText,
-                actor: actingPlayer,
-                action: action,
-                amount: amount,
-                property: targetProp,
-                targetRecipient: recipientTarget,
-                _ts: Date.now()
-            }, ...(roomData.logs || [])];
-
-            await updateDoc(roomRef, {
-                players: updatedPlayers,
-                logs: updatedLogs
+            await setDoc(doc(db, "games", "Monopoly", "matches", matchDocId), {
+                roomCode,
+                date: today.toISOString(),
+                location: document.getElementById('endGameVenueInput').value,
+                players: roomData.players
             });
+            await setDoc(doc(db, "games", "Monopoly", "archived_rooms", roomCode), { ...roomData, status: "Completed" });
+            await deleteDoc(roomRef);
+            window.location.href = "archive.html";
         };
 
-        // Properties Inspector Modal Handlers
-        const propsModal = document.getElementById('propsModal');
-        const propsListContainer = document.getElementById('propsListContainer');
-        const propsModalTitle = document.getElementById('propsModalTitle');
-        const propsModalSubtitle = document.getElementById('propsModalSubtitle');
-
-        document.getElementById('boxMyProps').onclick = () => window.viewPlayerProperties(currentUser);
-        document.getElementById('btnClosePropsModal').onclick = () => propsModal.classList.add('hidden');
-
-        window.viewPlayerProperties = function(playerName) {
-            const playerObj = roomData?.players?.[playerName];
-            if (!playerObj) return;
-
-            propsModalTitle.innerHTML = `<span class="material-icons text-sky-500 text-base">domain</span> ${playerName}'s Properties`;
-            propsListContainer.innerHTML = '';
-
-            const props = playerObj.properties || [];
-            propsModalSubtitle.textContent = `Portfolio Size: ${props.length} Properties Claimed`;
-
-            if (props.length === 0) {
-                propsListContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No properties owned by this player yet.</p>`;
-            } else {
-                props.forEach(p => {
-                    const pName = typeof p === 'string' ? p : p.name;
-                    const pLevel = typeof p === 'object' ? p.level : 0;
-                    const propDef = BOARD_PROPERTIES.find(b => b.name === pName) || { price: 200, group: "General", rents: { 0: 25 } };
-                    
-                    const levelBadge = pLevel === 5 ? '<span class="px-2 py-0.5 rounded bg-rose-500/20 text-rose-500 font-bold text-[10px]">Hotel (5H)</span>' :
-                                       pLevel === 2.5 ? '<span class="px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 font-bold text-[10px]">Motel (2.5)</span>' :
-                                       pLevel > 0 ? `<span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-500 font-bold text-[10px]">${pLevel} Houses</span>` :
-                                       '<span class="px-2 py-0.5 rounded bg-slate-500/20 text-slate-400 text-[10px]">Unimproved</span>';
-
-                    const currentRent = propDef.rents ? (propDef.rents[pLevel] !== undefined ? propDef.rents[pLevel] : propDef.rents[0]) : 0;
-
-                    const row = document.createElement('div');
-                    row.className = "bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3 rounded-2xl flex items-center justify-between shadow-sm";
-                    row.innerHTML = `
-                        <div>
-                            <div class="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
-                                <span>${pName}</span>
-                                ${levelBadge}
-                            </div>
-                            <div class="text-[10px] text-slate-400 font-mono mt-0.5">Base: $${propDef.price} | Set: ${propDef.group}</div>
-                        </div>
-                        <div class="text-right font-mono">
-                            <span class="text-[10px] text-slate-400 uppercase block">Current Rent</span>
-                            <span class="text-xs font-bold text-amber-500">$${currentRent}</span>
-                        </div>
-                    `;
-                    propsListContainer.appendChild(row);
-                });
-            }
-
-            propsModal.classList.remove('hidden');
-        };
-
-        // Admin Override Modal Handlers
-        const adminModal = document.getElementById('adminModal');
-        const adminPlayerSelect = document.getElementById('adminPlayerSelect');
-        const adminRoleSelect = document.getElementById('adminRoleSelect');
-
-        document.getElementById('btnOpenAdminOverride').onclick = () => {
-            adminPlayerSelect.innerHTML = '';
-            Object.keys(roomData.players).forEach(name => {
-                const opt = document.createElement('option');
-                opt.value = name;
-                opt.textContent = name;
-                adminPlayerSelect.appendChild(opt);
-            });
-            loadAdminForm(adminPlayerSelect.value);
-            adminModal.classList.remove('hidden');
-        };
-
-        adminPlayerSelect.onchange = () => loadAdminForm(adminPlayerSelect.value);
-
-        function loadAdminForm(name) {
-            const p = roomData.players[name];
-            document.getElementById('adminCashInput').value = p.cash;
-            document.getElementById('adminLoansInput').value = p.loans;
-            
-            const propsStr = (p.properties || []).map(pr => {
-                if (typeof pr === 'string') return `${pr}:0`;
-                return `${pr.name}:${pr.level || 0}`;
-            }).join(', ');
-            
-            document.getElementById('adminPropsInput').value = propsStr;
-            adminRoleSelect.value = p.role || 'Player';
-            document.getElementById('adminAllowWriteCheckbox').checked = !!p.canWrite;
-        }
-
-        document.getElementById('btnCloseAdminModal').onclick = () => adminModal.classList.add('hidden');
-
-        document.getElementById('btnSaveAdminOverride').onclick = async () => {
-            const name = adminPlayerSelect.value;
-            const updatedPlayers = { ...roomData.players };
-            const p = updatedPlayers[name];
-
-            p.cash = parseFloat(document.getElementById('adminCashInput').value) || 0;
-            p.loans = parseFloat(document.getElementById('adminLoansInput').value) || 0;
-            
-            const rawProps = document.getElementById('adminPropsInput').value.split(',').map(s => s.trim()).filter(Boolean);
-            p.properties = rawProps.map(item => {
-                if (item.includes(':')) {
-                    const [propName, lvl] = item.split(':');
-                    return { name: propName.trim(), level: parseFloat(lvl) || 0 };
-                }
-                return { name: item, level: 0 };
-            });
-
-            p.role = adminRoleSelect.value;
-            p.canWrite = document.getElementById('adminAllowWriteCheckbox').checked;
-
-            const updatedLogs = [{ 
-                time: new Date().toLocaleTimeString(), 
-                text: `[ADMIN OVERRIDE] Updated stats and assigned role (${p.role}) to ${name}`,
-                actor: 'Admin',
-                _ts: Date.now()
-            }, ...(roomData.logs || [])];
-
-            await updateDoc(roomRef, {
-                players: updatedPlayers,
-                logs: updatedLogs
-            });
-
-            adminModal.classList.add('hidden');
-        };
-
-        // End Game / Archiving Handlers
-        const endGameModal = document.getElementById('endGameModal');
-        const btnOpenEndGameModal = document.getElementById('btnOpenEndGameModal');
-        const btnCloseEndGameModal = document.getElementById('btnCloseEndGameModal');
-        const btnEndAndRecord = document.getElementById('btnEndAndRecord');
-        const btnSaveForLater = document.getElementById('btnSaveForLater');
-        const endGameVenueInput = document.getElementById('endGameVenueInput');
-
-        btnOpenEndGameModal.onclick = () => endGameModal.classList.remove('hidden');
-        btnCloseEndGameModal.onclick = () => endGameModal.classList.add('hidden');
-
-        function generatePlayerCountUrl(playerName) {
-            const p = roomData.players[playerName];
-            if (!p) return "../count.html";
-
-            const params = new URLSearchParams();
-            const propPairs = [];
-
-            (p.properties || []).forEach(item => {
-                const propName = typeof item === 'string' ? item : item.name;
-                const level = typeof item === 'object' ? item.level : 0;
-                const idx = BOARD_PROPERTIES.findIndex(b => b.name === propName);
-                if (idx !== -1) propPairs.push(idx, level);
-            });
-
-            if (propPairs.length > 0) params.set('props', propPairs.join(','));
-            params.set('cash_total', p.cash || 0);
-            if (p.loans > 0) params.set('debts', p.loans);
-
-            return `../count.html?${params.toString()}`;
-        }
-
-        btnEndAndRecord.onclick = async () => {
-            if (!isMasterAdmin) return alert("Only the host or master device can officially end and record matches.");
-            if (!confirm("Are you sure you want to finalize this game? Results will be permanently logged to match archives.")) return;
-
-            btnEndAndRecord.disabled = true;
-            btnEndAndRecord.textContent = "Processing Record...";
-
-            try {
-                const today = new Date();
-                const dd = String(today.getDate()).padStart(2, '0');
-                const mm = String(today.getMonth() + 1).padStart(2, '0');
-                const yyyy = today.getFullYear();
-                const formattedDate = `${dd}-${mm}-${yyyy}`;
-
-                const matchesSnap = await getDocs(collection(db, "games", "Monopoly", "matches"));
-                let countSameDate = 0;
-                matchesSnap.forEach(d => {
-                    if (d.id.startsWith(formattedDate)) countSameDate++;
-                });
-                const matchDocId = `${formattedDate}-${String(countSameDate + 1).padStart(2, '0')}`;
-
-                let highestNet = -Infinity;
-                const compiledPlayers = Object.entries(roomData.players).map(([name, p]) => {
-                    let propVal = 0;
-                    let citiesCount = 0;
-                    let stationsCount = 0;
-
-                    (p.properties || []).forEach(item => {
-                        const propName = typeof item === 'string' ? item : item.name;
-                        const level = typeof item === 'object' ? item.level : 0;
-                        const def = BOARD_PROPERTIES.find(b => b.name === propName);
-                        if (def) {
-                            propVal += def.price + (level * (def.housePrice || 0));
-                            if (def.group === 'Station' || def.group === 'Utility') stationsCount++;
-                            else citiesCount++;
-                        }
-                    });
-
-                    const netScore = p.cash + propVal - p.loans;
-                    if (netScore > highestNet) highestNet = netScore;
-
-                    return {
-                        name,
-                        isMember: true,
-                        isGuest: false,
-                        cash: p.cash,
-                        earnings: netScore,
-                        loans: p.loans,
-                        cities: citiesCount,
-                        stations: stationsCount,
-                        scoreUrl: generatePlayerCountUrl(name),
-                        ownedCities: (p.properties || []).map(pr => typeof pr === 'string' ? pr : pr.name)
-                    };
-                });
-
-                const finalPlayersData = compiledPlayers.map(p => ({
-                    ...p,
-                    isWinner: p.earnings === highestNet
-                }));
-
-                const officialMatchData = {
-                    gameId: matchDocId,
-                    date: `${yyyy}-${mm}-${dd}`,
-                    location: endGameVenueInput.value.trim() || "Living Room",
-                    players: finalPlayersData,
-                    roomCode: roomCode,
-                    createdAt: new Date().toISOString()
-                };
-                await setDoc(doc(db, "games", "Monopoly", "matches", matchDocId), officialMatchData);
-
-                await setDoc(doc(db, "games", "Monopoly", "archived_rooms", roomCode), {
-                    ...roomData,
-                    status: "Completed",
-                    officialMatchId: matchDocId,
-                    archivedAt: new Date().toISOString()
-                });
-
-                await deleteDoc(roomRef);
-
-                alert(`Match permanently saved to archives as ID: ${matchDocId}`);
-                window.location.href = `../view.html?game=${encodeURIComponent(matchDocId)}`;
-            } catch (err) {
-                alert("Failed to archive match: " + err.message);
-                btnEndAndRecord.disabled = false;
-                btnEndAndRecord.textContent = "Settle & Record Official Match";
-            }
-        };
-
-        btnSaveForLater.onclick = async () => {
-            if (!isMasterAdmin) return alert("Only the host or master device can save this session.");
-            if (!confirm("Save this game to resume later? Current table will be placed in saved storage.")) return;
-
-            btnSaveForLater.disabled = true;
-            btnSaveForLater.textContent = "Saving Session...";
-
-            try {
-                await setDoc(doc(db, "games", "Monopoly", "saved_games", roomCode), {
-                    ...roomData,
-                    status: "Saved / Paused",
-                    savedAt: new Date().toISOString()
-                });
-
-                await deleteDoc(roomRef);
-                alert("Session paused and saved! You can resume it anytime from the Archives tab.");
-                window.location.href = "archive.html";
-            } catch (err) {
-                alert("Failed to save session: " + err.message);
-                btnSaveForLater.disabled = false;
-                btnSaveForLater.textContent = "Save & Pause Session";
-            }
+        document.getElementById('btnSaveForLater').onclick = async () => {
+            await setDoc(doc(db, "games", "Monopoly", "saved_games", roomCode), { ...roomData, status: "Saved / Paused" });
+            await deleteDoc(roomRef);
+            window.location.href = "archive.html";
         };
     </script>
 </body>
