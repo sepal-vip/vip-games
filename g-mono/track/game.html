@@ -117,91 +117,100 @@
             </div>
         </div>
 
-        <!-- DICE DISPATCHER & BOARD TRACKER CARD -->
         <div class="glass-panel rounded-3xl p-5 shadow-xl border border-amber-500/30 space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center">
-                        <span class="material-icons text-lg">casino</span>
-                    </div>
-                    <div>
-                        <h2 class="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">Smart Board Dice &amp; Position Engine</h2>
-                        <span id="turnPlayerStatus" class="text-[10px] text-slate-400">Select player and record roll</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-3">
-                    <div class="flex items-center gap-1.5 bg-white/40 dark:bg-slate-900 px-2.5 py-1 rounded-xl border border-slate-200 dark:border-slate-800 text-[10px] font-bold">
-                        <span>Speed Die:</span>
-                        <input type="checkbox" id="speedDieToggle" class="accent-amber-500 rounded cursor-pointer" checked>
-                    </div>
-                    <div id="jailStatusIndicator" class="hidden px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-400 text-[10px] font-bold border border-rose-500/30">
-                        In Jail
-                    </div>
-                </div>
+    <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-500 flex items-center justify-center">
+                <span class="material-icons text-lg">casino</span>
             </div>
-
-            <!-- Dice Controls Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 items-end">
-                <div>
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Rolling Player</label>
-                    <select id="dicePlayerSelect" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold focus:outline-none focus:border-amber-500"></select>
-                </div>
-
-                <div>
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Die 1 (White)</label>
-                    <select id="die1Input" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-mono font-bold focus:outline-none focus:border-amber-500">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Die 2 (White)</label>
-                    <select id="die2Input" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-mono font-bold focus:outline-none focus:border-amber-500">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                        <option value="6">6</option>
-                    </select>
-                </div>
-
-                <div id="speedDieCol">
-                    <label class="block text-[9px] font-bold text-amber-500 uppercase mb-1">Speed Die</label>
-                    <select id="dieSpeedInput" class="w-full bg-white/50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-2.5 py-2 text-xs font-bold text-amber-500 focus:outline-none focus:border-amber-500">
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="bus">Bus</option>
-                        <option value="mr_m">Mr. Monopoly</option>
-                    </select>
-                </div>
-
-                <div class="col-span-2 flex gap-2">
-                    <button id="btnExecuteRoll" class="flex-1 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md shadow-amber-500/20 flex items-center justify-center gap-1.5">
-                        <span class="material-icons text-sm">navigation</span> Roll &amp; Move
-                    </button>
-                    <button id="btnPayJailBail" class="hidden py-2.5 px-3 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition shadow-sm" title="Pay $100 Bail to release player">
-                        Pay $100 Bail
-                    </button>
-                </div>
-            </div>
-
-            <!-- Current Position Manual Override -->
-            <div class="flex items-center justify-between text-[11px] pt-1 text-slate-400 border-t border-slate-200/40 dark:border-slate-800/40">
-                <div class="flex items-center gap-1.5">
-                    <span>Current Board Tile:</span>
-                    <select id="manualTileSelect" class="bg-transparent border-b border-dashed border-slate-400 text-slate-200 font-bold text-xs focus:outline-none py-0.5"></select>
-                </div>
-                <span id="tileCategoryBadge" class="font-mono text-[10px] text-amber-500 font-bold">START: GO ($200)</span>
+            <div>
+                <h2 class="text-xs font-black uppercase tracking-wider text-slate-900 dark:text-white">Quick-Tap Dice Keypad</h2>
+                <span id="turnPlayerStatus" class="text-[10px] text-slate-400">Select player and tap dice values</span>
             </div>
         </div>
 
+        <div class="flex items-center gap-2">
+            <!-- Speed Die Purchase / Status Toggle -->
+            <button type="button" id="btnTogglePlayerSpeedDie" class="px-2.5 py-1 rounded-xl text-[10px] font-bold border transition flex items-center gap-1 bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400">
+                <span class="material-icons text-[12px]">speed</span>
+                <span id="speedDieStatusLabel">Speed Die: Locked ($1000)</span>
+            </button>
+            <div id="jailStatusIndicator" class="hidden px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-400 text-[10px] font-bold border border-rose-500/30">
+                In Jail
+            </div>
+            <button id="btnPayJailBail" class="hidden py-1 px-2.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-[10px] transition shadow-sm">
+                Pay $100 Bail
+            </button>
+        </div>
+    </div>
+
+            <!-- Active Dice Values Display -->
+    <div class="flex items-center justify-between gap-2 bg-white/40 dark:bg-slate-900/60 p-3 rounded-2xl border border-slate-200 dark:border-slate-800">
+        <div class="flex items-center gap-2">
+            <label class="text-[10px] font-bold text-slate-400 uppercase">Roller:</label>
+            <select id="dicePlayerSelect" class="bg-transparent font-bold text-xs text-amber-500 focus:outline-none"></select>
+        </div>
+
+        <div class="flex items-center gap-2 font-mono">
+            <div id="slotDie1" class="w-9 h-9 rounded-xl border-2 border-amber-500/40 bg-amber-500/10 flex items-center justify-center font-black text-sm text-slate-100">
+                -
+            </div>
+            <span class="text-slate-500 font-bold">+</span>
+            <div id="slotDie2" class="w-9 h-9 rounded-xl border-2 border-slate-700 bg-slate-800/40 flex items-center justify-center font-black text-sm text-slate-100">
+                -
+            </div>
+            <div id="slotSpeedDieWrap" class="hidden items-center gap-1">
+                <span class="text-amber-500 font-bold">+</span>
+                <div id="slotDieSpeed" class="px-2.5 h-9 rounded-xl border-2 border-amber-500/60 bg-amber-500/20 flex items-center justify-center font-black text-xs text-amber-400">
+                    -
+                </div>
+            </div>
+            <button id="btnResetKeypadRoll" class="p-1 text-slate-500 hover:text-rose-400 transition ml-2" title="Reset Numpad">
+                <span class="material-icons text-base">refresh</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Step 1 & 2: Primary Numbers Keypad (1 - 6) -->
+    <div id="numpadStandardSection" class="space-y-1.5">
+        <div class="flex justify-between items-center text-[10px] text-slate-400 font-bold px-1">
+            <span id="numpadInstructionLabel">Tap number for DIE 1</span>
+            <span class="font-mono text-slate-500">Step 1 of 2</span>
+        </div>
+        <div class="grid grid-cols-6 gap-2">
+            <button type="button" class="btn-dice-val py-3 rounded-2xl bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-black font-mono hover:border-amber-500 hover:bg-amber-500/10 transition active:scale-95" data-val="1">1</button>
+            <button type="button" class="btn-dice-val py-3 rounded-2xl bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-black font-mono hover:border-amber-500 hover:bg-amber-500/10 transition active:scale-95" data-val="2">2</button>
+            <button type="button" class="btn-dice-val py-3 rounded-2xl bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-black font-mono hover:border-amber-500 hover:bg-amber-500/10 transition active:scale-95" data-val="3">3</button>
+            <button type="button" class="btn-dice-val py-3 rounded-2xl bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-black font-mono hover:border-amber-500 hover:bg-amber-500/10 transition active:scale-95" data-val="4">4</button>
+            <button type="button" class="btn-dice-val py-3 rounded-2xl bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-black font-mono hover:border-amber-500 hover:bg-amber-500/10 transition active:scale-95" data-val="5">5</button>
+            <button type="button" class="btn-dice-val py-3 rounded-2xl bg-white/60 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-black font-mono hover:border-amber-500 hover:bg-amber-500/10 transition active:scale-95" data-val="6">6</button>
+        </div>
+    </div>
+
+    <!-- Step 3: Speed Die Keypad (Visible only if player unlocked it) -->
+    <div id="numpadSpeedSection" class="hidden space-y-1.5 pt-1 border-t border-slate-800">
+        <div class="flex justify-between items-center text-[10px] text-amber-400 font-bold px-1">
+            <span>Tap Speed Die Value</span>
+            <span class="font-mono text-amber-500/60">Speed Die Active</span>
+        </div>
+        <div class="grid grid-cols-5 gap-2">
+            <button type="button" class="btn-speed-val py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono font-black text-xs hover:bg-amber-500 hover:text-slate-950 transition active:scale-95" data-val="1">1</button>
+            <button type="button" class="btn-speed-val py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono font-black text-xs hover:bg-amber-500 hover:text-slate-950 transition active:scale-95" data-val="2">2</button>
+            <button type="button" class="btn-speed-val py-2.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono font-black text-xs hover:bg-amber-500 hover:text-slate-950 transition active:scale-95" data-val="3">3</button>
+            <button type="button" class="btn-speed-val py-2.5 rounded-2xl bg-sky-500/10 border border-sky-500/30 text-sky-400 font-black text-xs hover:bg-sky-500 hover:text-slate-950 transition active:scale-95" data-val="bus">Bus</button>
+            <button type="button" class="btn-speed-val py-2.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400 font-black text-xs hover:bg-rose-500 hover:text-white transition active:scale-95" data-val="mr_m">Mr. M</button>
+        </div>
+    </div>
+
+    <!-- Board Position Info & Direct Jump Override -->
+    <div class="flex items-center justify-between text-[11px] pt-1 text-slate-400 border-t border-slate-200/40 dark:border-slate-800/40">
+        <div class="flex items-center gap-1.5">
+            <span>Tile:</span>
+            <select id="manualTileSelect" class="bg-transparent border-b border-dashed border-slate-400 text-slate-200 font-bold text-xs focus:outline-none py-0.5"></select>
+        </div>
+        <span id="tileCategoryBadge" class="font-mono text-[10px] text-amber-500 font-bold">START: GO ($200)</span>
+    </div>
+</div>
         <!-- ACTION LOGGING CARD (AUTO-PREFILLED) -->
         <div id="transactionControlCard" class="glass-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl">
             <div class="flex flex-wrap items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 gap-2">
@@ -607,9 +616,11 @@
             manualTileSelect.appendChild(opt);
         });
 
-        speedDieToggle.onchange = () => {
-            speedDieCol.classList.toggle('hidden', !speedDieToggle.checked);
-        };
+        if (speedDieToggle) {
+            speedDieToggle.onchange = () => {
+                if (speedDieCol) speedDieCol.classList.toggle('hidden', !speedDieToggle.checked);
+            };
+        }
 
         // Split Payment Auto-Math
         splitLoanPaymentToggle.onchange = () => {
@@ -683,7 +694,7 @@
         }
 
         // Board Movement Execution (Standard + Speed Die)
-        btnExecuteRoll.onclick = async () => {
+        if (btnExecuteRoll) btnExecuteRoll.onclick = async () => {
             const roller = dicePlayerSelect.value;
             const p = roomData.players[roller];
             if (!p) return;
@@ -691,7 +702,7 @@
             const d1 = parseInt(die1Input.value);
             const d2 = parseInt(die2Input.value);
             const isDouble = d1 === d2;
-            const speedVal = speedDieToggle.checked ? dieSpeedInput.value : null;
+            const speedVal = speedDieToggle && speedDieToggle.checked && dieSpeedInput ? dieSpeedInput.value : null;
 
             let currentPos = p.position !== undefined ? p.position : 0;
             let inJail = !!p.inJail;
@@ -837,6 +848,121 @@
             btnPayJailBail.classList.add('hidden');
             spawnTargetedPopup("Freed", `${player} paid $100 and is released from Jail.`, "lock_open", "emerald");
         };
+
+        // Sequential Numpad State
+        let rollStep = 1; // 1 = waiting for Die 1, 2 = waiting for Die 2, 3 = waiting for Speed Die
+        let currentDie1 = null;
+        let currentDie2 = null;
+        let currentSpeedVal = null;
+
+        const slotDie1 = document.getElementById('slotDie1');
+        const slotDie2 = document.getElementById('slotDie2');
+        const slotDieSpeed = document.getElementById('slotDieSpeed');
+        const slotSpeedDieWrap = document.getElementById('slotSpeedDieWrap');
+        const numpadInstructionLabel = document.getElementById('numpadInstructionLabel');
+        const numpadSpeedSection = document.getElementById('numpadSpeedSection');
+        const btnResetKeypadRoll = document.getElementById('btnResetKeypadRoll');
+        const btnTogglePlayerSpeedDie = document.getElementById('btnTogglePlayerSpeedDie');
+        const speedDieStatusLabel = document.getElementById('speedDieStatusLabel');
+
+        function resetKeypad() {
+            rollStep = 1;
+            currentDie1 = currentDie2 = currentSpeedVal = null;
+            slotDie1.textContent = slotDie2.textContent = slotDieSpeed.textContent = '-';
+            slotDie1.className = 'w-9 h-9 rounded-xl border-2 border-amber-500/60 bg-amber-500/10 flex items-center justify-center font-black text-sm text-slate-100';
+            slotDie2.className = 'w-9 h-9 rounded-xl border-2 border-slate-700 bg-slate-800/40 flex items-center justify-center font-black text-sm text-slate-100';
+            numpadInstructionLabel.textContent = 'Tap number for DIE 1';
+            numpadSpeedSection.classList.add('hidden');
+        }
+
+        function updateSpeedDieUnlockButton() {
+            const p = roomData?.players?.[dicePlayerSelect.value];
+            if (!p) return;
+            const active = !!p.hasSpeedDie;
+            speedDieStatusLabel.textContent = active ? 'Speed Die: ACTIVE (Remove $1000)' : 'Unlock Speed Die ($1000)';
+            btnTogglePlayerSpeedDie.className = active
+                ? 'px-2.5 py-1 rounded-xl text-[10px] font-bold border transition flex items-center gap-1 bg-amber-500/20 border-amber-500/40 text-amber-400'
+                : 'px-2.5 py-1 rounded-xl text-[10px] font-bold border transition flex items-center gap-1 bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-400';
+            slotSpeedDieWrap.classList.toggle('hidden', !active);
+        }
+
+        btnResetKeypadRoll.onclick = resetKeypad;
+        btnTogglePlayerSpeedDie.onclick = async () => {
+            const name = dicePlayerSelect.value;
+            const p = roomData?.players?.[name];
+            if (!p) return;
+            const enabling = !p.hasSpeedDie;
+            if (!confirm(`${enabling ? 'Unlock' : 'Revoke'} Speed Die for ${name}? This deducts $1,000 cash.`)) return;
+            p.cash -= 1000;
+            p.hasSpeedDie = enabling;
+            await updateDoc(roomRef, { players: roomData.players });
+            updateSpeedDieUnlockButton();
+            resetKeypad();
+        };
+
+        document.querySelectorAll('.btn-dice-val').forEach(btn => btn.onclick = () => {
+            const value = parseInt(btn.dataset.val);
+            playBeep(650, 0.08);
+            if (rollStep === 1) {
+                currentDie1 = value;
+                slotDie1.textContent = value;
+                slotDie1.className = 'w-9 h-9 rounded-xl border-2 border-emerald-500/60 bg-emerald-500/20 flex items-center justify-center font-black text-sm text-emerald-400';
+                slotDie2.className = 'w-9 h-9 rounded-xl border-2 border-amber-500/60 bg-amber-500/10 flex items-center justify-center font-black text-sm text-slate-100';
+                numpadInstructionLabel.textContent = 'Tap number for DIE 2';
+                rollStep = 2;
+            } else if (rollStep === 2) {
+                currentDie2 = value;
+                slotDie2.textContent = value;
+                slotDie2.className = 'w-9 h-9 rounded-xl border-2 border-emerald-500/60 bg-emerald-500/20 flex items-center justify-center font-black text-sm text-emerald-400';
+                const p = roomData?.players?.[dicePlayerSelect.value];
+                if (p?.hasSpeedDie && !p.inJail) {
+                    rollStep = 3;
+                    numpadInstructionLabel.textContent = 'Choose Speed Die Option';
+                    numpadSpeedSection.classList.remove('hidden');
+                } else {
+                    executeTurnMovement(dicePlayerSelect.value, currentDie1, currentDie2, null);
+                    resetKeypad();
+                }
+            }
+        });
+
+        document.querySelectorAll('.btn-speed-val').forEach(btn => btn.onclick = () => {
+            currentSpeedVal = btn.dataset.val;
+            slotDieSpeed.textContent = currentSpeedVal.toUpperCase();
+            playBeep(850, 0.1);
+            executeTurnMovement(dicePlayerSelect.value, currentDie1, currentDie2, currentSpeedVal);
+            resetKeypad();
+        });
+
+        async function executeTurnMovement(roller, d1, d2, speedVal) {
+            const p = roomData?.players?.[roller];
+            if (!p) return;
+            const isDouble = d1 === d2;
+            let currentPos = p.position ?? 0;
+            let inJail = !!p.inJail;
+            if (inJail && !isDouble) return alert(`${roller} is in Jail and did not roll doubles.`);
+            if (inJail) { inJail = false; currentPos = 10; }
+            let moveSteps = d1 + d2 + ((speedVal >= '1' && speedVal <= '3') ? parseInt(speedVal) : 0);
+            const firstStopPos = (currentPos + moveSteps) % 40;
+            if (firstStopPos < currentPos && !inJail) p.cash += 200;
+            if (firstStopPos === 30) {
+                p.position = 10; p.inJail = true;
+                await updateDoc(roomRef, { players: roomData.players });
+                applyTileToReferee(roller, 10);
+                return;
+            }
+            p.position = firstStopPos; p.inJail = inJail;
+            const log = { time: new Date().toLocaleTimeString(), text: `${roller} rolled ${d1}+${d2}${speedVal ? ` + Speed (${speedVal})` : ''} -> stopped at ${BOARD_TILES[firstStopPos].name}`, actor: roller, _ts: Date.now() };
+            await updateDoc(roomRef, { players: roomData.players, logs: [log, ...(roomData.logs || [])] });
+            applyTileToReferee(roller, firstStopPos);
+            if (speedVal === 'bus' && !inJail) renderBusTicketModal(roller, currentPos, d1, d2);
+            if (speedVal === 'mr_m' && !inJail) {
+                const next = resolveMrMonopolyDestination(firstStopPos);
+                p.position = next;
+                await updateDoc(roomRef, { players: roomData.players });
+                applyTileToReferee(roller, next);
+            }
+        }
 
         // Interactive Community/Chance Card Handlers
         const communityModal = document.getElementById('communityCardModal');
