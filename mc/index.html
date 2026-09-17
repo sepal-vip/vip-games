@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Hub - Server &amp; Land Registry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.2); border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="glass-panel sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../games.html" class="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1 text-xs">
+                    <span class="material-icons text-sm">arrow_back</span>
+                    <span class="hidden sm:inline">Games Portal</span>
+                </a>
+                <div class="flex items-center gap-2">
+                    <span id="overallStatusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500 animate-pulse"></span>
+                    <span class="font-mono font-bold text-xs uppercase tracking-wider text-slate-400">Active World:</span>
+                    <span id="navActiveWorldName" class="font-mono font-black text-emerald-400 text-xs tracking-wider">Loading...</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <a href="join.html" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-sm">
+                    <span class="material-icons text-xs">play_arrow</span> Auto-Join
+                </a>
+                <a href="admin.html" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 font-bold rounded-xl text-xs transition flex items-center gap-1 shadow-sm">
+                    <span class="material-icons text-xs text-emerald-400">tune</span> Admin
+                </a>
+                <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors">
+                    <span class="material-icons text-base" id="themeIcon">light_mode</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
+        <!-- Live Server Status & Daemons Banner -->
+        <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-2xl border border-emerald-500/20 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="space-y-1.5">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span id="badgeServerProc" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 border border-slate-700">
+                        MC: Checking...
+                    </span>
+                    <span id="badgePlayitProc" class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-400 border border-slate-700">
+                        Playit: Checking...
+                    </span>
+                    <h1 id="bannerServerName" class="text-lg font-black text-white ml-1">Minecraft Server</h1>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 text-xs font-mono text-slate-300">
+                    <span>Host:</span>
+                    <span id="bannerHost" class="text-amber-400 font-bold">play.sepal.vip</span>
+                    <span class="text-slate-600">|</span>
+                    <span>Port:</span>
+                    <span id="bannerPort" class="text-sky-400 font-bold">19132</span>
+                    <button id="btnCopyAddress" class="p-1 text-slate-400 hover:text-white" title="Copy Address">
+                        <span class="material-icons text-xs">content_copy</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <a href="join.html" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5 w-full md:w-auto">
+                    <span class="material-icons text-sm">sports_esports</span> Launch Bedrock Now
+                </a>
+            </div>
+        </div>
+
+        <!-- Metric Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-0.5 shadow-sm">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Currently Loaded</span>
+                <div id="statActiveWorld" class="text-sm font-black text-emerald-400 font-mono truncate">Loading...</div>
+            </div>
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-0.5 shadow-sm">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">State Category</span>
+                <div id="statStateType" class="text-xs font-black text-sky-400 font-mono pt-1">Active World</div>
+            </div>
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-0.5 shadow-sm">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Claimed Land Plots</span>
+                <div id="statTotalPlots" class="text-xl font-black text-amber-400 font-mono">1</div>
+            </div>
+            <div class="glass-panel rounded-2xl p-4 text-center space-y-0.5 shadow-sm">
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-wider block">Public Common Land</span>
+                <div class="text-xs font-black text-rose-400 font-mono pt-1">50 x 50 Spawn</div>
+            </div>
+        </div>
+
+        <!-- World States & Restored Backups -->
+        <div class="glass-panel rounded-3xl p-5 sm:p-6 space-y-6 shadow-xl border border-slate-800">
+            <!-- Normal Active Worlds Section -->
+            <div class="space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                        <span class="material-icons text-emerald-400 text-sm">public</span> Worlds (Create &amp; Manage)
+                    </h2>
+                    <button id="btnCreateWorld" class="text-[10px] font-bold text-emerald-400 hover:underline flex items-center gap-0.5">
+                        <span class="material-icons text-xs">add</span> New World
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="normalWorldsContainer"></div>
+            </div>
+
+            <!-- Restored Backup States Section -->
+            <div class="space-y-3 pt-2">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <h2 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                        <span class="material-icons text-amber-400 text-sm">history</span> Restored Backups
+                    </h2>
+                    <span class="text-[10px] font-mono text-slate-400">Snapshot recovery states</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3" id="restoredWorldsContainer"></div>
+            </div>
+        </div>
+
+        <!-- Split View: Land Claims & Player Telemetry -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left: Land Claims -->
+            <div class="lg:col-span-2 glass-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl border border-slate-800">
+                <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
+                    <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                        <span class="material-icons text-sky-400 text-sm">fence</span> Land Claims &amp; Town Plots
+                    </h2>
+                    <button id="btnOpenClaimModal" class="px-3 py-1.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1">
+                        <span class="material-icons text-xs">add_location_alt</span> Claim Land Plot
+                    </button>
+                </div>
+                <div class="space-y-2.5" id="plotsListContainer"></div>
+            </div>
+
+            <!-- Right: Playtime Telemetry -->
+            <div class="glass-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl border border-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                        <span class="material-icons text-amber-400 text-sm">timer</span> Player Playtime
+                    </h2>
+                    <span class="text-[10px] font-mono text-emerald-400">Daemon Synced</span>
+                </div>
+                <div id="telemetryPlayersContainer" class="space-y-2 max-h-80 overflow-y-auto custom-scroll pr-1">
+                    <p class="text-xs text-slate-500 text-center py-4">Waiting for host server logs...</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CLAIM PLOT MODAL -->
+    <div id="claimPlotModal" class="hidden fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="glass-panel rounded-3xl max-w-md w-full p-6 space-y-4 shadow-2xl border border-sky-500/30">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-xs font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
+                    <span class="material-icons text-sky-400 text-sm">terrain</span> Claim Custom Land Plot
+                </h3>
+                <button type="button" id="btnCloseClaimModal" class="text-slate-400 hover:text-white">
+                    <span class="material-icons text-base">close</span>
+                </button>
+            </div>
+            <form id="savePlotForm" class="space-y-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Plot Name</label>
+                    <input type="text" id="plotTitle" required placeholder="e.g. Iron Foundry" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Owner Name</label>
+                    <input type="text" id="plotOwner" required placeholder="Player name" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-400 focus:outline-none focus:border-sky-500">
+                </div>
+                <div class="grid grid-cols-2 gap-2 font-mono">
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Corner 1 (X1, Z1)</label>
+                        <input type="text" id="plotCorner1" required placeholder="100, 250" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Corner 2 (X2, Z2)</label>
+                        <input type="text" id="plotCorner2" required placeholder="150, 300" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-sky-500">
+                    </div>
+                </div>
+                <p class="text-[10px] text-slate-400 leading-tight">
+                    * Public Plaza from <code class="text-amber-400">-25, -25</code> to <code class="text-amber-400">25, 25</code> is permanently protected for common use.
+                </p>
+                <button type="submit" class="w-full py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-md">
+                    Claim Land Coordinates
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, doc, onSnapshot, setDoc, updateDoc } from "../web-info/firebase.js";
+
+        const PUBLIC_SPAWN_PLOT = {
+            id: "public_spawn_sanctuary",
+            name: "Central Spawn Plaza & Public Hub",
+            owner: "Public (All Members)",
+            isPublic: true,
+            c1: "-25, -25",
+            c2: "25, 25",
+            ySpan: "0 to 100",
+            notes: "Non-claimable public commons area."
+        };
+
+        const serverConfigRef = doc(db, "games", "Minecraft", "config", "server");
+        const mcStateRef = doc(db, "games", "Minecraft", "data", "state");
+        const telemetryRef = doc(db, "games", "Minecraft", "data", "telemetry");
+
+        let currentServerConfig = {};
+        let currentMcData = {
+            activeWorld: "World 1",
+            worlds: ["World 1", "World 2"],
+            restoredWorlds: ["World 1 (restored to 10-09-2026 backup)"],
+            plots: []
+        };
+
+        // Listen for Server Config
+        onSnapshot(serverConfigRef, (snap) => {
+            if (snap.exists()) currentServerConfig = snap.data();
+            document.getElementById('bannerServerName').textContent = currentServerConfig.serverName || "VIP Minecraft Server";
+            document.getElementById('bannerHost').textContent = currentServerConfig.host || "play.sepal.vip";
+            document.getElementById('bannerPort').textContent = currentServerConfig.port || 19132;
+        });
+
+        // Listen for Daemon Status & Worlds
+        onSnapshot(mcStateRef, (snap) => {
+            if (snap.exists()) {
+                currentMcData = snap.data();
+                if (!currentMcData.worlds) currentMcData.worlds = ["World 1", "World 2"];
+                if (!currentMcData.restoredWorlds) currentMcData.restoredWorlds = [];
+            }
+            renderDaemonStatus(currentMcData.status);
+            renderWorldSections();
+            renderPlots();
+        });
+
+        // Listen for Telemetry Playtime
+        onSnapshot(telemetryRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            renderTelemetry(data.players || {});
+        });
+
+        function renderDaemonStatus(status) {
+            const dot = document.getElementById('overallStatusDot');
+            const mcBadge = document.getElementById('badgeServerProc');
+            const playitBadge = document.getElementById('badgePlayitProc');
+
+            if (!status) {
+                dot.className = "w-2.5 h-2.5 rounded-full bg-slate-500";
+                return;
+            }
+
+            dot.className = status.overallHealthy 
+                ? "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" 
+                : "w-2.5 h-2.5 rounded-full bg-rose-500";
+
+            mcBadge.className = status.serverOnline 
+                ? "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                : "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30";
+            mcBadge.textContent = status.serverOnline ? "MC: ONLINE" : "MC: OFFLINE";
+
+            playitBadge.className = status.playitOnline 
+                ? "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                : "px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-400 border border-rose-500/30";
+            playitBadge.textContent = status.playitOnline ? "Playit: CONNECTED" : "Playit: OFFLINE";
+        }
+
+        function renderWorldSections() {
+            const activeWorld = currentMcData.activeWorld || "World 1";
+            const isRestored = (currentMcData.restoredWorlds || []).includes(activeWorld);
+
+            document.getElementById('navActiveWorldName').textContent = activeWorld;
+            document.getElementById('statActiveWorld').textContent = activeWorld;
+            document.getElementById('statStateType').textContent = isRestored ? "Restored Backup" : "Standard World";
+            document.getElementById('statStateType').className = isRestored 
+                ? "text-xs font-black text-amber-400 font-mono pt-1" 
+                : "text-xs font-black text-emerald-400 font-mono pt-1";
+
+            // 1. Normal Worlds Container
+            const nContainer = document.getElementById('normalWorldsContainer');
+            nContainer.innerHTML = '';
+            (currentMcData.worlds || []).forEach(name => {
+                const isActive = name === activeWorld;
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-2xl border ${isActive ? 'bg-emerald-500/15 border-emerald-500 text-emerald-300' : 'bg-slate-900 border-slate-800 text-slate-300'} flex flex-col justify-between space-y-3`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[9px] uppercase font-bold tracking-wider ${isActive ? 'text-emerald-400' : 'text-slate-500'}">
+                                ${isActive ? '● Active' : 'Available'}
+                            </span>
+                            <div class="text-xs font-bold text-white leading-tight">${name}</div>
+                        </div>
+                        <button class="btn-del-world text-slate-500 hover:text-rose-400 transition" title="Delete World">
+                            <span class="material-icons text-xs">delete</span>
+                        </button>
+                    </div>
+                    ${!isActive ? `
+                        <button class="btn-activate-world w-full py-1.5 bg-slate-800 hover:bg-emerald-500 hover:text-slate-950 font-bold rounded-xl text-[10px] text-slate-300 transition">
+                            Switch to This
+                        </button>
+                    ` : '<div class="text-[10px] font-mono font-bold text-emerald-400 text-center py-1">Currently Loaded</div>'}
+                `;
+
+                if (!isActive) {
+                    card.querySelector('.btn-activate-world').onclick = async () => {
+                        await updateDoc(mcStateRef, { activeWorld: name });
+                    };
+                }
+                card.querySelector('.btn-del-world').onclick = async () => {
+                    if (!confirm(`Delete world "${name}"?`)) return;
+                    const next = currentMcData.worlds.filter(w => w !== name);
+                    await updateDoc(mcStateRef, { worlds: next });
+                };
+                nContainer.appendChild(card);
+            });
+
+            // 2. Restored Worlds Container
+            const rContainer = document.getElementById('restoredWorldsContainer');
+            rContainer.innerHTML = '';
+            (currentMcData.restoredWorlds || []).forEach(name => {
+                const isActive = name === activeWorld;
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-2xl border ${isActive ? 'bg-amber-500/15 border-amber-500 text-amber-300' : 'bg-slate-900 border-slate-800 text-slate-400'} flex flex-col justify-between space-y-3`;
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="text-[9px] uppercase font-bold tracking-wider text-amber-400">
+                                ${isActive ? '● Loaded Backup' : 'Restored Snapshot'}
+                            </span>
+                            <div class="text-xs font-bold text-white leading-tight">${name}</div>
+                        </div>
+                        <button class="btn-del-restored text-slate-500 hover:text-rose-400 transition" title="Delete Restored State">
+                            <span class="material-icons text-xs">delete</span>
+                        </button>
+                    </div>
+                    ${!isActive ? `
+                        <button class="btn-activate-world w-full py-1.5 bg-slate-800 hover:bg-amber-500 hover:text-slate-950 font-bold rounded-xl text-[10px] text-slate-300 transition">
+                            Load Restored State
+                        </button>
+                    ` : '<div class="text-[10px] font-mono font-bold text-amber-400 text-center py-1">Currently Loaded</div>'}
+                `;
+
+                if (!isActive) {
+                    card.querySelector('.btn-activate-world').onclick = async () => {
+                        await updateDoc(mcStateRef, { activeWorld: name });
+                    };
+                }
+                card.querySelector('.btn-del-restored').onclick = async () => {
+                    if (!confirm(`Remove restored state "${name}"?`)) return;
+                    const next = currentMcData.restoredWorlds.filter(w => w !== name);
+                    await updateDoc(mcStateRef, { restoredWorlds: next });
+                };
+                rContainer.appendChild(card);
+            });
+        }
+
+        function renderPlots() {
+            const container = document.getElementById('plotsListContainer');
+            container.innerHTML = '';
+            const allPlots = [PUBLIC_SPAWN_PLOT, ...(currentMcData.plots || [])];
+            document.getElementById('statTotalPlots').textContent = allPlots.length;
+
+            allPlots.forEach((p, idx) => {
+                const card = document.createElement('div');
+                card.className = `p-3.5 rounded-2xl border ${p.isPublic ? 'bg-rose-500/10 border-rose-500/30' : 'bg-slate-900 border-slate-800'} flex items-center justify-between gap-2`;
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-black text-white">${p.name}</span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${p.isPublic ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'bg-sky-500/20 text-sky-300 border border-sky-500/30'} font-mono">
+                                ${p.owner}
+                            </span>
+                        </div>
+                        <div class="text-[11px] font-mono text-slate-400 mt-0.5">
+                            Bounds: (${p.c1}) &rarr; (${p.c2})
+                        </div>
+                    </div>
+                    ${p.isPublic ? '<span class="text-[9px] font-bold text-rose-400 uppercase tracking-wider font-mono">Protected</span>' : `
+                        <button class="btn-del-plot text-slate-500 hover:text-rose-400 p-1 transition">
+                            <span class="material-icons text-sm">delete</span>
+                        </button>
+                    `}
+                `;
+                if (!p.isPublic) {
+                    card.querySelector('.btn-del-plot').onclick = async () => {
+                        if (!confirm(`Delete plot "${p.name}"?`)) return;
+                        const next = currentMcData.plots.filter((_, i) => i !== (idx - 1));
+                        await updateDoc(mcStateRef, { plots: next });
+                    };
+                }
+                container.appendChild(card);
+            });
+        }
+
+        function renderTelemetry(players) {
+            const container = document.getElementById('telemetryPlayersContainer');
+            container.innerHTML = '';
+            const list = Object.entries(players);
+            if (list.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">No player logs detected yet.</p>`;
+                return;
+            }
+
+            list.forEach(([name, data]) => {
+                const hours = Math.floor((data.playTimeMinutes || 0) / 60);
+                const mins = (data.playTimeMinutes || 0) % 60;
+                const row = document.createElement('div');
+                row.className = "p-2.5 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between text-xs";
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full ${data.online ? 'bg-emerald-500 animate-pulse' : 'bg-slate-600'}"></span>
+                        <span class="font-bold text-white">${name}</span>
+                    </div>
+                    <div class="text-right font-mono">
+                        <span class="text-emerald-400 font-bold">${hours}h ${mins}m</span>
+                        <span class="text-[10px] text-slate-500 block">${data.sessions || 0} sessions</span>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // World Creation Prompt
+        document.getElementById('btnCreateWorld').onclick = async () => {
+            const name = prompt("Enter new World name:");
+            if (!name) return;
+            const existing = currentMcData.worlds || [];
+            if (!existing.includes(name)) {
+                await updateDoc(mcStateRef, { worlds: [...existing, name] });
+            }
+        };
+
+        // Plot Form Submission
+        document.getElementById('savePlotForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('plotTitle').value.trim();
+            const owner = document.getElementById('plotOwner').value.trim();
+            const c1 = document.getElementById('plotCorner1').value.trim();
+            const c2 = document.getElementById('plotCorner2').value.trim();
+
+            const newPlot = { name, owner, c1, c2, isPublic: false, createdAt: new Date().toISOString() };
+            const existing = currentMcData.plots || [];
+            await updateDoc(mcStateRef, { plots: [...existing, newPlot] });
+
+            document.getElementById('savePlotForm').reset();
+            document.getElementById('claimPlotModal').classList.add('hidden');
+        };
+
+        document.getElementById('btnOpenClaimModal').onclick = () => document.getElementById('claimPlotModal').classList.remove('hidden');
+        document.getElementById('btnCloseClaimModal').onclick = () => document.getElementById('claimPlotModal').classList.add('hidden');
+
+        document.getElementById('btnCopyAddress').onclick = () => {
+            const str = `${currentServerConfig.host || 'play.sepal.vip'}:${currentServerConfig.port || 19132}`;
+            navigator.clipboard.writeText(str);
+            alert("Copied address: " + str);
+        };
+    </script>
+</body>
+</html>

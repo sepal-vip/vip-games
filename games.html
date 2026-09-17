@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VIP Games - Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
+    <link rel="stylesheet" href="web-info/global-style.css">
+    <script src="web-info/theme.js"></script>
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="glass-panel sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="index.html" class="flex items-center gap-2 text-slate-600 dark:text-slate-300 hover:text-white text-sm font-medium transition">
+                <span class="material-icons text-base">arrow_back</span> Home
+            </a>
+            <div class="flex items-center gap-2">
+                <a href="admin/master.html" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                    <span class="material-icons text-xs">admin_panel_settings</span> Master Admin
+                </a>
+                <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-amber-500 transition-colors">
+                    <span class="material-icons text-base" id="themeIcon">light_mode</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-10 space-y-8 relative z-10">
+        <div class="text-center space-y-2 max-w-lg mx-auto">
+            <div class="w-14 h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center mx-auto shadow-sm">
+                <span class="material-icons text-3xl">sports_esports</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">VIP Games Portal</h1>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">Select a game to open live referee tracking, server connections, and match ledgers.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- 1. Monopoly Card -->
+            <div class="glass-panel p-6 sm:p-7 rounded-3xl border border-amber-500/20 hover:border-amber-500/50 transition flex flex-col justify-between space-y-5 shadow-xl">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-amber-500 flex items-center justify-center">
+                            <span class="material-icons text-2xl">casino</span>
+                        </div>
+                        <span class="text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                            Board Engine
+                        </span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-black text-white">Monopoly Referee Suite</h2>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                            Live synchronized banker, keypad dice roller, 40-tile Indian board logic, text-to-game compiler, and match video replays.
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+                    <a href="g-mono/tracker.html" class="py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs text-center transition shadow-md shadow-amber-500/20">
+                        Host / Join Table
+                    </a>
+                    <a href="g-mono/g-mono.html" class="py-2.5 bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-200 font-bold rounded-xl text-xs text-center hover:text-white transition">
+                        Suite Overview
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2. Minecraft Card -->
+            <div class="glass-panel p-6 sm:p-7 rounded-3xl border border-emerald-500/20 hover:border-emerald-500/50 transition flex flex-col justify-between space-y-5 shadow-xl">
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="w-12 h-12 rounded-2xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+                            <span class="material-icons text-2xl">view_in_ar</span>
+                        </div>
+                        <span class="text-[10px] font-mono font-bold uppercase px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Bedrock Realm
+                        </span>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-black text-white">Minecraft Server &amp; Claims</h2>
+                        <p class="text-xs text-slate-400 mt-1 leading-relaxed">
+                            Active world &amp; backup switcher, one-tap Bedrock auto-join protocol, username gamertag whitelisting, and territory plot registry.
+                        </p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800">
+                    <a href="g-mc/join.html" class="py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs text-center transition shadow-md shadow-emerald-500/20">
+                        One-Tap Auto-Join
+                    </a>
+                    <a href="g-mc/index.html" class="py-2.5 bg-white/40 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-200 font-bold rounded-xl text-xs text-center hover:text-white transition">
+                        World &amp; Plots Hub
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft Admin Console</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.2); border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="glass-panel sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1 text-xs">
+                    <span class="material-icons text-sm">arrow_back</span> Hub
+                </a>
+                <span class="font-mono font-black text-emerald-400 text-sm tracking-wider">MC Dedicated Admin</span>
+            </div>
+            <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors">
+                <span class="material-icons text-base" id="themeIcon">light_mode</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
+        <!-- 1. Server Network Parameters -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-emerald-500/20 space-y-4">
+            <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <span class="material-icons text-sm">dns</span> Server Network Parameters
+            </h2>
+            <form id="serverForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Server Name</label>
+                    <input type="text" id="srvName" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Host / Domain</label>
+                    <input type="text" id="srvHost" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-amber-400 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Port</label>
+                    <input type="number" id="srvPort" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-sky-400 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div class="sm:col-span-3 flex justify-end pt-1">
+                    <button type="submit" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md">
+                        Update Server Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 2. Worlds & Restored States Lifecycle Manager -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
+            <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                <span class="material-icons text-emerald-400 text-sm">public</span> World Lifecycle &amp; Restored States
+            </h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Create New Standard World</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newStandardWorldInput" placeholder="e.g. World 3" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
+                        <button type="button" id="btnAddStandardWorld" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition">Add</button>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-amber-400 uppercase">Add Restored Backup Entry</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newRestoredInput" placeholder="e.g. World 1 (restored to 10-09-2026 backup)" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 focus:outline-none focus:border-amber-500">
+                        <button type="button" id="btnAddRestoredState" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Hourly Host Backups Log -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-3">
+            <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                <span class="material-icons text-amber-400 text-sm">backup</span> Host Machine Hourly Backups
+            </h2>
+            <div id="backupsListContainer" class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-1 font-mono text-xs">
+                <p class="text-slate-500 text-center py-4">No backups recorded by daemon yet.</p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, doc, onSnapshot, setDoc, updateDoc } from "../web-info/firebase.js";
+
+        const serverRef = doc(db, "games", "Minecraft", "config", "server");
+        const stateRef = doc(db, "games", "Minecraft", "data", "state");
+
+        onSnapshot(serverRef, (snap) => {
+            if (!snap.exists()) return;
+            const d = snap.data();
+            document.getElementById('srvName').value = d.serverName || "";
+            document.getElementById('srvHost').value = d.host || "";
+            document.getElementById('srvPort').value = d.port || 19132;
+        });
+
+        document.getElementById('serverForm').onsubmit = async (e) => {
+            e.preventDefault();
+            await setDoc(serverRef, {
+                serverName: document.getElementById('srvName').value.trim(),
+                host: document.getElementById('srvHost').value.trim(),
+                port: parseInt(document.getElementById('srvPort').value) || 19132
+            }, { merge: true });
+            alert("Updated connection settings.");
+        };
+
+        onSnapshot(stateRef, (snap) => {
+            if (!snap.exists()) return;
+            const d = snap.data();
+
+            // Render Backups
+            const bContainer = document.getElementById('backupsListContainer');
+            const backups = d.backups || [];
+            if (backups.length === 0) {
+                bContainer.innerHTML = `<p class="text-slate-500 text-center py-4">No backups recorded yet.</p>`;
+                return;
+            }
+
+            bContainer.innerHTML = backups.map(b => `
+                <div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                    <div>
+                        <span class="text-white font-bold block">${b.filename}</span>
+                        <span class="text-[10px] text-slate-500">${b.timestamp} | ${(b.sizeBytes / 1024 / 1024).toFixed(2)} MB</span>
+                    </div>
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Saved</span>
+                </div>
+            `).join('');
+        });
+
+        // Add Standard World
+        document.getElementById('btnAddStandardWorld').onclick = async () => {
+            const input = document.getElementById('newStandardWorldInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
+            const data = snap.exists() ? snap.data() : {};
+            const existing = data.worlds || [];
+            if (!existing.includes(name)) {
+                await updateDoc(stateRef, { worlds: [...existing, name] });
+                input.value = '';
+            }
+        };
+
+        // Add Restored State
+        document.getElementById('btnAddRestoredState').onclick = async () => {
+            const input = document.getElementById('newRestoredInput');
+            const name = input.value.trim();
+            if (!name) return;
+
+            const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
+            const data = snap.exists() ? snap.data() : {};
+            const existing = data.restoredWorlds || [];
+            if (!existing.includes(name)) {
+                await updateDoc(stateRef, { restoredWorlds: [...existing, name] });
+                input.value = '';
+            }
+        };
+    </script>
+</body>
+</html>

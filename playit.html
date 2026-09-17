@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playit.gg Tunnel Diagnostics - Minecraft Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
+    <link rel="stylesheet" href="web-info/global-style.css">
+    <script src="web-info/theme.js"></script>
+
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.2); border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Navigation Header -->
+    <nav class="glass-panel sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="mc/index.html" class="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1 text-xs">
+                    <span class="material-icons text-sm">arrow_back</span>
+                    <span class="hidden sm:inline">Minecraft Hub</span>
+                </a>
+                <div class="flex items-center gap-2">
+                    <span id="navStatusDot" class="w-2.5 h-2.5 rounded-full bg-slate-500 animate-pulse"></span>
+                    <span class="font-mono font-bold text-xs uppercase tracking-wider text-slate-400">Playit Status:</span>
+                    <span id="navStatusText" class="font-mono font-black text-emerald-400 text-xs">Checking...</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="btnRecheck" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-300 font-bold rounded-xl text-xs transition flex items-center gap-1">
+                    <span class="material-icons text-xs">refresh</span> Re-check
+                </button>
+                <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors">
+                    <span class="material-icons text-base" id="themeIcon">light_mode</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-8 space-y-6 relative z-10">
+        <!-- Status Hero Banner -->
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 shadow-2xl border border-emerald-500/20 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="space-y-1">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 block font-mono">Tunnel Diagnostics</span>
+                    <h1 class="text-2xl font-black text-white flex items-center gap-2">
+                        <span class="material-icons text-emerald-400 text-2xl">cable</span> Playit.gg Network Health
+                    </h1>
+                    <p class="text-xs text-slate-400">Real-time connectivity status of the Playit host client and Firebase sync.</p>
+                </div>
+                <div id="overallHealthBadge" class="px-4 py-2 rounded-2xl bg-slate-900 border border-slate-800 font-mono text-xs font-bold text-slate-400 text-center">
+                    Awaiting Probe
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnostic Probe Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- 1. Local Daemon Probe -->
+            <div class="glass-panel rounded-3xl p-5 space-y-3 shadow-xl border border-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                    <span class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                        <span class="material-icons text-sm text-sky-400">lan</span> Localhost Probe (127.0.0.1)
+                    </span>
+                    <span id="localProbeTag" class="text-[10px] font-mono font-bold text-slate-500">Idle</span>
+                </div>
+                <p class="text-xs text-slate-400">Tests if the Playit client web daemon is running locally on port 8585 on this machine.</p>
+                <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 font-mono text-xs space-y-1">
+                    <div class="text-slate-500 text-[10px] uppercase">Target Endpoint</div>
+                    <div class="text-sky-400 font-bold">http://127.0.0.1:8585</div>
+                </div>
+                <button id="btnTestLocal" class="w-full py-2 bg-slate-900 hover:bg-slate-800 border border-slate-700 text-slate-200 font-bold rounded-xl text-xs transition">
+                    Test Local Client
+                </button>
+            </div>
+
+            <!-- 2. Firebase Synced State Probe -->
+            <div class="glass-panel rounded-3xl p-5 space-y-3 shadow-xl border border-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                    <span class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                        <span class="material-icons text-sm text-emerald-400">cloud_sync</span> Cloud Daemon Telemetry
+                    </span>
+                    <span id="cloudProbeTag" class="text-[10px] font-mono font-bold text-slate-500">Listening</span>
+                </div>
+                <p class="text-xs text-slate-400">Status pushed by <code class="text-amber-400 font-mono">host_daemon.py</code> to Firestore.</p>
+                <div class="p-3 bg-slate-900 rounded-2xl border border-slate-800 font-mono text-xs space-y-1">
+                    <div class="text-slate-500 text-[10px] uppercase">Last Host Heartbeat</div>
+                    <div id="cloudHeartbeatTime" class="text-emerald-400 font-bold">Waiting for daemon...</div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-center text-xs font-mono">
+                    <div id="statusBoxServer" class="p-2 bg-slate-900 border border-slate-800 rounded-xl">
+                        <span class="text-[9px] text-slate-500 block uppercase">MC Server</span>
+                        <span id="textServerStatus" class="font-bold text-slate-400">--</span>
+                    </div>
+                    <div id="statusBoxPlayit" class="p-2 bg-slate-900 border border-slate-800 rounded-xl">
+                        <span class="text-[9px] text-slate-500 block uppercase">Playit Client</span>
+                        <span id="textPlayitStatus" class="font-bold text-slate-400">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Parameters Card -->
+        <div class="glass-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl border border-slate-800">
+            <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                <span class="material-icons text-amber-400 text-sm">settings_ethernet</span> Active Endpoint Settings
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 font-mono text-xs">
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl">
+                    <span class="text-[10px] text-slate-500 block uppercase">Target Hostname</span>
+                    <span id="endpointHost" class="text-amber-400 font-bold">play.sepal.vip</span>
+                </div>
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl">
+                    <span class="text-[10px] text-slate-500 block uppercase">Assigned Port</span>
+                    <span id="endpointPort" class="text-sky-400 font-bold">19132</span>
+                </div>
+                <div class="p-3 bg-slate-900 border border-slate-800 rounded-2xl">
+                    <span class="text-[10px] text-slate-500 block uppercase">Protocol</span>
+                    <span class="text-emerald-400 font-bold">Bedrock UDP (19132)</span>
+                </div>
+            </div>
+            <div class="pt-2 flex justify-end">
+                <a href="mc/join.html" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1.5 shadow-md shadow-emerald-500/20">
+                    <span class="material-icons text-sm">open_in_new</span> Test Connect via Bedrock
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, doc, onSnapshot } from "./web-info/firebase.js";
+
+        const stateRef = doc(db, "games", "Minecraft", "data", "state");
+        const serverConfigRef = doc(db, "games", "Minecraft", "config", "server");
+
+        const navDot = document.getElementById('navStatusDot');
+        const navText = document.getElementById('navStatusText');
+        const healthBadge = document.getElementById('overallHealthBadge');
+        const cloudHeartbeat = document.getElementById('cloudHeartbeatTime');
+        const textServerStatus = document.getElementById('textServerStatus');
+        const textPlayitStatus = document.getElementById('textPlayitStatus');
+        const endpointHost = document.getElementById('endpointHost');
+        const endpointPort = document.getElementById('endpointPort');
+
+        // 1. Sync Live Endpoint from Firebase
+        onSnapshot(serverConfigRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            endpointHost.textContent = data.host || "play.sepal.vip";
+            endpointPort.textContent = data.port || 19132;
+        });
+
+        // 2. Sync Daemon State from Firebase
+        onSnapshot(stateRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            const status = data.status;
+
+            if (!status) {
+                navDot.className = "w-2.5 h-2.5 rounded-full bg-slate-500";
+                navText.textContent = "No Data";
+                healthBadge.textContent = "No Daemon Data";
+                return;
+            }
+
+            // Heartbeat
+            if (status.lastHeartbeat) {
+                const d = new Date(status.lastHeartbeat);
+                cloudHeartbeat.textContent = d.toLocaleTimeString() + " (" + d.toLocaleDateString() + ")";
+            }
+
+            // Server process
+            textServerStatus.textContent = status.serverOnline ? "RUNNING" : "STOPPED";
+            textServerStatus.className = status.serverOnline ? "font-bold text-emerald-400" : "font-bold text-rose-500";
+
+            // Playit client
+            textPlayitStatus.textContent = status.playitOnline ? "CONNECTED" : "OFFLINE";
+            textPlayitStatus.className = status.playitOnline ? "font-bold text-emerald-400" : "font-bold text-rose-500";
+
+            // Overall
+            if (status.overallHealthy) {
+                navDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse";
+                navText.textContent = "ONLINE";
+                healthBadge.className = "px-4 py-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 font-mono text-xs font-bold text-emerald-400 text-center";
+                healthBadge.textContent = "TUNNEL HEALTHY";
+            } else {
+                navDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500";
+                navText.textContent = "DEGRADED";
+                healthBadge.className = "px-4 py-2 rounded-2xl bg-rose-500/20 border border-rose-500/30 font-mono text-xs font-bold text-rose-400 text-center";
+                healthBadge.textContent = "TUNNEL OFFLINE";
+            }
+        });
+
+        // 3. Localhost Browser Probe (Tests http://127.0.0.1:8585 if viewed on the host PC)
+        async function runLocalProbe() {
+            const tag = document.getElementById('localProbeTag');
+            tag.textContent = "Probing...";
+            tag.className = "text-[10px] font-mono font-bold text-amber-400";
+
+            try {
+                const res = await fetch("http://127.0.0.1:8585", { method: "GET", mode: "no-cors" });
+                tag.textContent = "Reachable";
+                tag.className = "text-[10px] font-mono font-bold text-emerald-400";
+            } catch (err) {
+                tag.textContent = "Unreachable (Expected if non-host client)";
+                tag.className = "text-[10px] font-mono font-bold text-slate-500";
+            }
+        }
+
+        document.getElementById('btnTestLocal').onclick = runLocalProbe;
+        document.getElementById('btnRecheck').onclick = () => {
+            runLocalProbe();
+        };
+
+        runLocalProbe();
+    </script>
+</body>
+</html>
