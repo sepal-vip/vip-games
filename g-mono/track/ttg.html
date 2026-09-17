@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly Suite - Text-To-Game (TTG)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
+    <link rel="stylesheet" href="../../web-info/global-style.css">
+    <script src="../../web-info/theme.js"></script>
+
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        code, pre, textarea, input.cmd { font-family: 'JetBrains Mono', monospace; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 6px; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Navigation Header -->
+    <nav class="glass-panel sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-2.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <a id="btnBackToGame" href="#" class="p-1.5 rounded-xl border border-slate-200 dark:border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1 text-xs">
+                    <span class="material-icons text-sm">arrow_back</span>
+                    <span class="hidden sm:inline">Back to Table</span>
+                </a>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
+                    <span class="font-mono font-bold text-xs uppercase tracking-wider text-slate-400">TTG Sync:</span>
+                    <span id="navRoomCode" class="font-mono font-black text-amber-500 text-sm tracking-wider">----</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-amber-500 transition-colors">
+                    <span class="material-icons text-base" id="themeIcon">light_mode</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-5 relative z-10">
+        <!-- Header & Tab Navigation -->
+        <header class="glass-panel rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <h1 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <span class="material-icons text-amber-500">terminal</span> Text-To-Game (TTG) Compiler
+                </h1>
+                <p class="text-xs text-slate-400 mt-0.5">Parse shorthand game logs or LLM match outputs directly into the live board state.</p>
+            </div>
+            <div class="flex bg-white/40 dark:bg-slate-900/80 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold w-full sm:w-auto">
+                <button id="tabBatchBtn" class="flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-500 text-slate-950 transition shadow-sm">
+                    Batch Engine
+                </button>
+                <button id="tabRulesBtn" class="flex-1 sm:flex-none px-4 py-2 rounded-xl text-slate-400 hover:text-white transition">
+                    Format &amp; Syntax Rules
+                </button>
+            </div>
+        </header>
+
+        <!-- TAB 1: BATCH INPUT ENGINE -->
+        <div id="tabBatchSection" class="space-y-4">
+            <div class="glass-panel rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl border border-amber-500/20">
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 dark:border-slate-800 pb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-300">Command Input Stream</span>
+                        <span id="lineCountBadge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-800 text-amber-400 border border-slate-700">0 lines</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btnLoadExample" class="px-2.5 py-1 text-[11px] font-bold rounded-xl border border-slate-700 text-slate-400 hover:text-white hover:border-slate-600 transition">
+                            Load Demo Run
+                        </button>
+                        <button id="btnClearInput" class="px-2.5 py-1 text-[11px] font-bold rounded-xl border border-rose-500/30 text-rose-400 hover:bg-rose-500/10 transition">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Textarea -->
+                <div class="relative">
+                    <textarea id="bulkTextInput" rows="14" spellcheck="false" placeholder="// Enter commands line-by-line:
+r m 4 5
+b m vadodara 50
+p m d 150
+h m agra 5
+pl d m 300
+c m 200" 
+                        class="w-full bg-slate-950/80 border border-slate-800 rounded-2xl p-4 text-xs text-amber-400 leading-relaxed font-mono focus:outline-none focus:border-amber-500 custom-scroll shadow-inner resize-y"></textarea>
+                </div>
+
+                <!-- Execution Controls -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 pt-1">
+                    <button id="btnDryRun" class="w-full sm:w-1/3 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition border border-slate-700 flex items-center justify-center gap-1.5">
+                        <span class="material-icons text-sm">visibility</span> Test &amp; Preview Parse
+                    </button>
+                    <button id="btnCommitBatch" class="w-full sm:w-2/3 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-lg shadow-amber-500/20 flex items-center justify-center gap-1.5">
+                        <span class="material-icons text-sm">bolt</span> Compile &amp; Commit to Room
+                    </button>
+                </div>
+            </div>
+
+            <!-- Validation / Preview Results Card -->
+            <div id="previewCard" class="hidden glass-panel rounded-3xl p-5 space-y-3 shadow-xl border border-slate-800">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-1.5">
+                        <span class="material-icons text-emerald-400 text-sm">check_circle</span> Execution Preview
+                    </span>
+                    <span id="previewStats" class="text-[10px] font-mono text-slate-400">0 Valid Actions</span>
+                </div>
+                <div id="previewLogContainer" class="space-y-1.5 max-h-56 overflow-y-auto custom-scroll font-mono text-[11px]"></div>
+            </div>
+        </div>
+
+        <!-- TAB 2: FORMATTING RULES & AI PROMPTS -->
+        <div id="tabRulesSection" class="hidden space-y-5">
+            <!-- AI Prompt Exporter Box -->
+            <div class="glass-panel rounded-3xl p-6 shadow-xl border border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-transparent space-y-3">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div>
+                        <h2 class="text-sm font-black text-amber-400 flex items-center gap-1.5">
+                            <span class="material-icons text-base">smart_toy</span> Prompt Format for AI Assistants
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-0.5">Use this prompt to instruct ChatGPT/Claude/Gemini to output turns directly in TTG syntax.</p>
+                    </div>
+                    <button id="btnCopyAiRules" class="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center gap-1.5 shrink-0">
+                        <span class="material-icons text-sm">content_copy</span> Copy Rules for AI
+                    </button>
+                </div>
+            </div>
+
+            <!-- Syntax Reference Table -->
+            <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
+                <div class="border-b border-slate-800 pb-3">
+                    <h3 class="text-xs font-black uppercase tracking-wider text-slate-200">Grammar &amp; Syntax Reference</h3>
+                    <p class="text-xs text-slate-400 mt-0.5">Lines starting with <code class="text-amber-400">//</code> or <code class="text-amber-400">#</code> are ignored as comments.</p>
+                </div>
+
+                <div class="overflow-x-auto custom-scroll">
+                    <table class="w-full text-left text-xs border-collapse font-mono">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-slate-400 text-[10px] uppercase">
+                                <th class="py-2.5 pr-4">Command</th>
+                                <th class="py-2.5 pr-4">Syntax</th>
+                                <th class="py-2.5 pr-4">Example</th>
+                                <th class="py-2.5">Behavior</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800/60 text-slate-300">
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Roll &amp; Move</td>
+                                <td><code>r &lt;player&gt; &lt;d1&gt; &lt;d2&gt; [speed]</code></td>
+                                <td><code>r m 4 5 bus</code></td>
+                                <td class="text-slate-400">Moves token 9 steps. Speed accepts 1-3, bus, mr_m.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Buy Property</td>
+                                <td><code>b &lt;player&gt; &lt;prop&gt; [cashPaid]</code></td>
+                                <td><code>b m vadodara 50</code></td>
+                                <td class="text-slate-400">Buys property. Remainder automatically becomes bank loan.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Pay Rent</td>
+                                <td><code>p &lt;payer&gt; &lt;receiver&gt; &lt;amt&gt;</code></td>
+                                <td><code>p m d 150</code></td>
+                                <td class="text-slate-400">Transfers rent cash directly between players.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Build House/Hotel</td>
+                                <td><code>h &lt;player&gt; &lt;prop&gt; &lt;lvl&gt;</code></td>
+                                <td><code>h m agra 5</code></td>
+                                <td class="text-slate-400">Upgrades deed: 1-4 (Houses), 2.5 (Motel), 5 (Hotel).</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Collect Bank</td>
+                                <td><code>c &lt;player&gt; &lt;amt&gt;</code></td>
+                                <td><code>c m 200</code></td>
+                                <td class="text-slate-400">Awards money from Bank (Salary / GO / Cards).</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Bank Loan</td>
+                                <td><code>l &lt;player&gt; &lt;amt&gt;</code></td>
+                                <td><code>l m 500</code></td>
+                                <td class="text-slate-400">Adds cash to player and records equal loan debt.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Repay Bank</td>
+                                <td><code>rl &lt;player&gt; &lt;amt&gt;</code></td>
+                                <td><code>rl m 500</code></td>
+                                <td class="text-slate-400">Clears cash and wipes out outstanding bank debt.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Player Borrow</td>
+                                <td><code>pl &lt;borrower&gt; &lt;lender&gt; &lt;amt&gt;</code></td>
+                                <td><code>pl m d 300</code></td>
+                                <td class="text-slate-400">Transfers cash from lender to borrower + records debt.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Repay Player</td>
+                                <td><code>rpl &lt;borrower&gt; &lt;lender&gt; &lt;amt&gt;</code></td>
+                                <td><code>rpl m d 300</code></td>
+                                <td class="text-slate-400">Returns cash to lender and clears borrower debt.</td>
+                            </tr>
+                            <tr>
+                                <td class="py-2.5 font-bold text-amber-400">Tax / Fee</td>
+                                <td><code>fee &lt;player&gt; &lt;amt&gt;</code></td>
+                                <td><code>fee m 100</code></td>
+                                <td class="text-slate-400">Deducts cash to Bank for jail, luxury tax, or card fines.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Fuzzy Matching Rules Callout -->
+            <div class="glass-panel rounded-3xl p-5 border border-slate-800 space-y-2 text-xs">
+                <span class="font-bold text-slate-200 uppercase tracking-wider block">Smart Abbreviation Matching:</span>
+                <p class="text-slate-400 leading-relaxed">
+                    You do not need to type exact full names. The compiler resolves the shortest unique prefix for players (<code class="text-amber-400">m</code> &rarr; Mitansh, <code class="text-amber-400">d</code> &rarr; Dhyana) and properties (<code class="text-amber-400">vado</code> &rarr; Vadodara, <code class="text-amber-400">csm</code> &rarr; Station 4 (CSMT), <code class="text-amber-400">elec</code> &rarr; Electric Company).
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, doc, getDoc, updateDoc } from "../../web-info/firebase.js";
+
+        // Full Indian Edition Board Registry
+        const BOARD_PROPERTIES = [
+            { index: 1, name: "Guwahati", group: "Brown", price: 60, housePrice: 50 },
+            { index: 3, name: "Bhubaneswar", group: "Brown", price: 60, housePrice: 50 },
+            { index: 5, name: "Station 1 (Chennai Central)", group: "Station", price: 200, housePrice: 0 },
+            { index: 6, name: "Panaji", group: "Light Blue", price: 100, housePrice: 50 },
+            { index: 8, name: "Agra", group: "Light Blue", price: 100, housePrice: 50 },
+            { index: 9, name: "Vadodara", group: "Light Blue", price: 120, housePrice: 50 },
+            { index: 11, name: "Ludhiana", group: "Pink", price: 140, housePrice: 100 },
+            { index: 12, name: "Electric Company", group: "Utility", price: 150, housePrice: 0 },
+            { index: 13, name: "Patna", group: "Pink", price: 140, housePrice: 100 },
+            { index: 14, name: "Bhopal", group: "Pink", price: 160, housePrice: 100 },
+            { index: 15, name: "Station 2 (Howrah)", group: "Station", price: 200, housePrice: 0 },
+            { index: 16, name: "Indore", group: "Orange", price: 180, housePrice: 100 },
+            { index: 18, name: "Nagpur", group: "Orange", price: 180, housePrice: 100 },
+            { index: 19, name: "Kochi", group: "Orange", price: 200, housePrice: 100 },
+            { index: 21, name: "Lucknow", group: "Red", price: 220, housePrice: 150 },
+            { index: 23, name: "Chandigarh", group: "Red", price: 220, housePrice: 150 },
+            { index: 24, name: "Jaipur", group: "Red", price: 240, housePrice: 150 },
+            { index: 25, name: "Station 3 (New Delhi)", group: "Station", price: 200, housePrice: 0 },
+            { index: 26, name: "Pune", group: "Yellow", price: 260, housePrice: 150 },
+            { index: 27, name: "Hyderabad", group: "Yellow", price: 260, housePrice: 150 },
+            { index: 28, name: "Water Works", group: "Utility", price: 150, housePrice: 0 },
+            { index: 29, name: "Ahmedabad", group: "Yellow", price: 280, housePrice: 150 },
+            { index: 31, name: "Kolkata", group: "Green", price: 300, housePrice: 200 },
+            { index: 32, name: "Chennai", group: "Green", price: 300, housePrice: 200 },
+            { index: 34, name: "Bengaluru", group: "Green", price: 320, housePrice: 200 },
+            { index: 35, name: "Station 4 (CSMT)", group: "Station", price: 200, housePrice: 0 },
+            { index: 37, name: "Delhi", group: "Dark Blue", price: 350, housePrice: 200 },
+            { index: 39, name: "Mumbai", group: "Dark Blue", price: 400, housePrice: 200 }
+        ];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const roomCode = (urlParams.get('code') || '').toUpperCase();
+        const currentUser = urlParams.get('user') || '';
+
+        if (!roomCode) {
+            alert("No room code specified in query params");
+            window.location.href = '../tracker.html';
+        }
+
+        document.getElementById('navRoomCode').textContent = roomCode;
+        document.getElementById('btnBackToGame').href = `game.html?code=${roomCode}&user=${encodeURIComponent(currentUser)}`;
+
+        const roomRef = doc(db, "games", "Monopoly", "rooms", roomCode);
+        let liveRoomData = null;
+
+        async function fetchRoom() {
+            const snap = await getDoc(roomRef);
+            if (!snap.exists()) {
+                alert("Room not found or archived.");
+                window.location.href = '../tracker.html';
+                return;
+            }
+            liveRoomData = snap.data();
+        }
+        fetchRoom();
+
+        // Tabs
+        const tabBatchBtn = document.getElementById('tabBatchBtn');
+        const tabRulesBtn = document.getElementById('tabRulesBtn');
+        const tabBatchSection = document.getElementById('tabBatchSection');
+        const tabRulesSection = document.getElementById('tabRulesSection');
+
+        tabBatchBtn.onclick = () => {
+            tabBatchBtn.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-500 text-slate-950 transition shadow-sm";
+            tabRulesBtn.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl text-slate-400 hover:text-white transition";
+            tabBatchSection.classList.remove('hidden');
+            tabRulesSection.classList.add('hidden');
+        };
+
+        tabRulesBtn.onclick = () => {
+            tabRulesBtn.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl bg-amber-500 text-slate-950 transition shadow-sm";
+            tabBatchBtn.className = "flex-1 sm:flex-none px-4 py-2 rounded-xl text-slate-400 hover:text-white transition";
+            tabRulesSection.classList.remove('hidden');
+            tabBatchSection.classList.add('hidden');
+        };
+
+        // Textarea line counter
+        const bulkTextInput = document.getElementById('bulkTextInput');
+        const lineCountBadge = document.getElementById('lineCountBadge');
+        bulkTextInput.addEventListener('input', () => {
+            const lines = bulkTextInput.value.split('\n').filter(l => l.trim().length > 0 && !l.trim().startsWith('//') && !l.trim().startsWith('#'));
+            lineCountBadge.textContent = `${lines.length} lines`;
+        });
+
+        // Demo Loader
+        document.getElementById('btnLoadExample').onclick = () => {
+            bulkTextInput.value = `// TTG Batch Demo Execution\nr m 3 5\nb m vadodara 120\nr d 4 4\np d m 40\nh m vadodara 1\npl d m 200\nc m 200`;
+            bulkTextInput.dispatchEvent(new Event('input'));
+        };
+
+        document.getElementById('btnClearInput').onclick = () => {
+            bulkTextInput.value = '';
+            bulkTextInput.dispatchEvent(new Event('input'));
+            document.getElementById('previewCard').classList.add('hidden');
+        };
+
+        // Fuzzy Matching
+        function matchPlayerName(prefix, players) {
+            if (!prefix) return null;
+            const target = prefix.toLowerCase();
+            return Object.keys(players).find(k => k.toLowerCase().startsWith(target)) || null;
+        }
+
+        function matchPropertyName(prefix) {
+            if (!prefix) return null;
+            const cleanTarget = prefix.toLowerCase().replace(/[^a-z0-9]/g, '');
+            return BOARD_PROPERTIES.find(p => p.name.toLowerCase().replace(/[^a-z0-9]/g, '').startsWith(cleanTarget)) || null;
+        }
+
+        // Compiler Pipeline
+        function parseBatchCommands(rawText, basePlayers) {
+            const lines = rawText.split('\n');
+            const players = JSON.parse(JSON.stringify(basePlayers));
+            const newLogs = [];
+            const previewItems = [];
+            let errorCount = 0;
+
+            lines.forEach((rawLine, idx) => {
+                const line = rawLine.trim();
+                if (!line || line.startsWith('//') || line.startsWith('#')) return;
+
+                const lineNum = idx + 1;
+                const parts = line.split(/\s+/);
+                const op = parts[0].toLowerCase();
+
+                try {
+                    // Roll
+                    if (op === 'r') {
+                        const player = matchPlayerName(parts[1], players);
+                        const d1 = parseInt(parts[2]);
+                        const d2 = parseInt(parts[3]);
+                        const speed = parts[4] || null;
+
+                        if (!player || isNaN(d1) || isNaN(d2)) throw new Error(`Invalid syntax. Use: r <player> <d1> <d2> [speed]`);
+                        
+                        let currentPos = players[player].position || 0;
+                        let steps = d1 + d2;
+                        if (speed && !isNaN(parseInt(speed))) steps += parseInt(speed);
+                        let nextPos = (currentPos + steps) % 40;
+                        
+                        if (nextPos < currentPos) players[player].cash += 200; // Passed GO
+                        if (nextPos === 30) { nextPos = 10; players[player].inJail = true; }
+                        players[player].position = nextPos;
+
+                        const log = `${player} rolled ${d1}+${d2} -> moved to tile ${nextPos}`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Buy
+                    else if (op === 'b') {
+                        const player = matchPlayerName(parts[1], players);
+                        const prop = matchPropertyName(parts[2]);
+                        if (!player || !prop) throw new Error(`Unrecognized player or property in: ${line}`);
+
+                        const cost = prop.price;
+                        const cashPaid = parts[3] !== undefined ? parseFloat(parts[3]) : cost;
+                        const loanAdded = Math.max(0, cost - cashPaid);
+
+                        players[player].cash -= cashPaid;
+                        players[player].loans = (players[player].loans || 0) + loanAdded;
+                        players[player].properties = players[player].properties || [];
+                        players[player].properties.push({ name: prop.name, level: 0 });
+
+                        const log = `${player} bought ${prop.name} for $${cost}` + (loanAdded > 0 ? ` ($${cashPaid} cash + $${loanAdded} loan)` : '');
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Pay Rent
+                    else if (op === 'p') {
+                        const payer = matchPlayerName(parts[1], players);
+                        const payee = matchPlayerName(parts[2], players);
+                        const amt = parseFloat(parts[3]);
+                        if (!payer || !payee || isNaN(amt)) throw new Error(`Invalid rent transfer: ${line}`);
+
+                        players[payer].cash -= amt;
+                        players[payee].cash += amt;
+                        const log = `${payer} paid $${amt} rent to ${payee}`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Build
+                    else if (op === 'h') {
+                        const player = matchPlayerName(parts[1], players);
+                        const prop = matchPropertyName(parts[2]);
+                        const lvl = parseFloat(parts[3]);
+                        if (!player || !prop || isNaN(lvl)) throw new Error(`Invalid build command: ${line}`);
+
+                        const cost = (prop.housePrice || 100) * (lvl === 2.5 ? 2.5 : lvl);
+                        players[player].cash -= cost;
+                        players[player].properties = (players[player].properties || []).map(pr => {
+                            const pName = typeof pr === 'string' ? pr : pr.name;
+                            return pName === prop.name ? { name: pName, level: lvl } : pr;
+                        });
+
+                        const log = `${player} upgraded ${prop.name} to level ${lvl} for $${cost}`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Collect
+                    else if (op === 'c') {
+                        const player = matchPlayerName(parts[1], players);
+                        const amt = parseFloat(parts[2]);
+                        if (!player || isNaN(amt)) throw new Error(`Invalid collect amount: ${line}`);
+
+                        players[player].cash += amt;
+                        const log = `${player} collected $${amt} from Bank`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Bank Loan
+                    else if (op === 'l') {
+                        const player = matchPlayerName(parts[1], players);
+                        const amt = parseFloat(parts[2]);
+                        if (!player || isNaN(amt)) throw new Error(`Invalid bank loan: ${line}`);
+
+                        players[player].cash += amt;
+                        players[player].loans = (players[player].loans || 0) + amt;
+                        const log = `${player} took $${amt} loan from Bank`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Repay Bank Loan
+                    else if (op === 'rl') {
+                        const player = matchPlayerName(parts[1], players);
+                        const amt = parseFloat(parts[2]);
+                        if (!player || isNaN(amt)) throw new Error(`Invalid loan repayment: ${line}`);
+
+                        players[player].cash -= amt;
+                        players[player].loans = Math.max(0, (players[player].loans || 0) - amt);
+                        const log = `${player} repaid $${amt} bank loan`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Player Loan
+                    else if (op === 'pl') {
+                        const borrower = matchPlayerName(parts[1], players);
+                        const lender = matchPlayerName(parts[2], players);
+                        const amt = parseFloat(parts[3]);
+                        if (!borrower || !lender || isNaN(amt)) throw new Error(`Invalid player loan: ${line}`);
+
+                        players[lender].cash -= amt;
+                        players[borrower].cash += amt;
+                        players[borrower].loans = (players[borrower].loans || 0) + amt;
+                        const log = `${borrower} borrowed $${amt} from ${lender}`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Repay Player Loan
+                    else if (op === 'rpl') {
+                        const borrower = matchPlayerName(parts[1], players);
+                        const lender = matchPlayerName(parts[2], players);
+                        const amt = parseFloat(parts[3]);
+                        if (!borrower || !lender || isNaN(amt)) throw new Error(`Invalid player loan repayment: ${line}`);
+
+                        players[borrower].cash -= amt;
+                        players[lender].cash += amt;
+                        players[borrower].loans = Math.max(0, (players[borrower].loans || 0) - amt);
+                        const log = `${borrower} repaid $${amt} loan to ${lender}`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    // Tax / Fee
+                    else if (op === 'fee') {
+                        const player = matchPlayerName(parts[1], players);
+                        const amt = parseFloat(parts[2]);
+                        if (!player || isNaN(amt)) throw new Error(`Invalid fee: ${line}`);
+
+                        players[player].cash -= amt;
+                        const log = `${player} paid $${amt} fee/tax`;
+                        newLogs.push(log);
+                        previewItems.push({ line: lineNum, text: log, valid: true });
+                    }
+                    else {
+                        throw new Error(`Unknown command keyword '${op}'`);
+                    }
+                } catch (err) {
+                    errorCount++;
+                    previewItems.push({ line: lineNum, text: `Error: ${err.message}`, valid: false });
+                }
+            });
+
+            return { players, newLogs, previewItems, errorCount };
+        }
+
+        // Preview dry run
+        document.getElementById('btnDryRun').onclick = async () => {
+            await fetchRoom();
+            if (!liveRoomData || !liveRoomData.players) return alert("Failed to fetch room state.");
+
+            const { previewItems, errorCount } = parseBatchCommands(bulkTextInput.value, liveRoomData.players);
+            const container = document.getElementById('previewLogContainer');
+            container.innerHTML = '';
+
+            previewItems.forEach(item => {
+                const row = document.createElement('div');
+                row.className = `p-1.5 rounded-lg border ${item.valid ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300' : 'bg-rose-500/10 border-rose-500/20 text-rose-300'} flex items-start gap-2`;
+                row.innerHTML = `<span class="opacity-50 text-[9px] mt-0.5 shrink-0">L${item.line}</span><span class="break-words">${item.text}</span>`;
+                container.appendChild(row);
+            });
+
+            document.getElementById('previewStats').textContent = `${previewItems.length - errorCount} Valid / ${errorCount} Errors`;
+            document.getElementById('previewCard').classList.remove('hidden');
+        };
+
+        // Commit to Firestore
+        document.getElementById('btnCommitBatch').onclick = async () => {
+            const raw = bulkTextInput.value.trim();
+            if (!raw) return alert("Please enter at least one command.");
+
+            await fetchRoom();
+            const { players, newLogs, errorCount } = parseBatchCommands(raw, liveRoomData.players);
+
+            if (errorCount > 0) {
+                if (!confirm(`Your input has ${errorCount} syntax error(s). Do you still want to execute the valid lines?`)) return;
+            }
+
+            if (newLogs.length === 0) return alert("No valid commands found to apply.");
+
+            const commitLogs = newLogs.map(text => ({
+                time: new Date().toLocaleTimeString(),
+                text: `[TTG] ${text}`,
+                actor: 'TTG-Batch',
+                _ts: Date.now()
+            }));
+
+            await updateDoc(roomRef, {
+                players: players,
+                logs: [...commitLogs, ...(liveRoomData.logs || [])]
+            });
+
+            alert(`Successfully executed ${newLogs.length} actions into room ${roomCode}!`);
+            window.location.href = `game.html?code=${roomCode}&user=${encodeURIComponent(currentUser)}`;
+        };
+
+        // One-Click "Copy Rules for AI" System Prompt
+        document.getElementById('btnCopyAiRules').onclick = () => {
+            const promptText = `You are a referee recording actions for a Monopoly game (Indian Edition board).
+Always output every game event as clean, compact Text-To-Game (TTG) commands, strictly one command per line. Do not output conversational filler.
+
+COMMAND SYNTAX:
+1. Roll & Move:
+   r <player> <die1> <die2> [speed_val]
+   (e.g., "r Mitansh 3 4" or "r Mitansh 4 5 bus")
+
+2. Buy Property:
+   b <player> <property_name> [cash_part]
+   (e.g., "b Mitansh vadodara" or "b Mitansh vadodara 50" if splitting cash/loan)
+
+3. Pay Rent:
+   p <payer> <landlord> <amount>
+   (e.g., "p Mitansh Dhyana 150")
+
+4. Build Houses / Motel / Hotel:
+   h <player> <property_name> <level: 1, 2, 2.5, 3, 4, 5>
+   (e.g., "h Mitansh agra 5" for Hotel, "h Mitansh agra 2.5" for Motel)
+
+5. Collect from Bank (Salary / Card Prize):
+   c <player> <amount>
+   (e.g., "c Mitansh 200")
+
+6. Take Bank Loan:
+   l <player> <amount>
+   (e.g., "l Mitansh 500")
+
+7. Repay Bank Loan:
+   rl <player> <amount>
+   (e.g., "rl Mitansh 500")
+
+8. Borrow Player Loan:
+   pl <borrower> <lender> <amount>
+   (e.g., "pl Mitansh Dhyana 300")
+
+9. Repay Player Loan:
+   rpl <borrower> <lender> <amount>
+   (e.g., "rpl Mitansh Dhyana 300")
+
+10. Tax or Jail Fine:
+    fee <player> <amount>
+    (e.g., "fee Mitansh 100")
+
+INDIAN EDITION BOARD VOCABULARY:
+- Brown: Guwahati, Bhubaneswar
+- Light Blue: Panaji, Agra, Vadodara
+- Pink: Ludhiana, Patna, Bhopal
+- Orange: Indore, Nagpur, Kochi
+- Red: Lucknow, Chandigarh, Jaipur
+- Yellow: Pune, Hyderabad, Ahmedabad
+- Green: Kolkata, Chennai, Bengaluru
+- Dark Blue: Delhi, Mumbai
+- Stations: Station 1 (Chennai Central), Station 2 (Howrah), Station 3 (New Delhi), Station 4 (CSMT)
+- Utilities: Electric Company, Water Works
+
+Short prefixes for player and property names are fully supported (e.g. 'vado' for Vadodara).`;
+
+            navigator.clipboard.writeText(promptText);
+            alert("Rules copied to clipboard! You can now paste this directly into ChatGPT, Claude, or Gemini.");
+        };
+    </script>
+</body>
+</html>

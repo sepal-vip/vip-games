@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monopoly Replay & Video Exporter</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
+    <link rel="stylesheet" href="../../web-info/global-style.css">
+    <script src="../../web-info/theme.js"></script>
+
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.25); border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-amber-500 selection:text-slate-950">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <!-- Top Navigation -->
+    <nav class="glass-panel sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-2.5 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="archive.html" class="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1 text-xs">
+                    <span class="material-icons text-sm">arrow_back</span>
+                    <span class="hidden sm:inline">Archives</span>
+                </a>
+                <div class="flex items-center gap-2">
+                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
+                    <span class="font-mono font-bold text-xs uppercase tracking-wider text-slate-400">Replay Match:</span>
+                    <span id="displayMatchId" class="font-mono font-black text-amber-500 text-sm tracking-wider">Loading...</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="recordStatusBadge" class="hidden text-[10px] font-mono px-2 py-0.5 rounded-md bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span> REC
+                </span>
+                <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-amber-500 transition-colors">
+                    <span class="material-icons text-base" id="themeIcon">light_mode</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+        <!-- Visual Board Canvas Box (Target for Video Capture) -->
+        <div class="lg:col-span-2 space-y-4">
+            <div class="glass-panel rounded-3xl p-4 shadow-2xl border border-slate-800 flex flex-col items-center justify-center">
+                <canvas id="replayCanvas" width="700" height="700" class="w-full max-w-[650px] aspect-square rounded-2xl bg-slate-900 border border-slate-800 shadow-inner"></canvas>
+            </div>
+
+            <!-- Playback Control Bar -->
+            <div class="glass-panel rounded-2xl p-4 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
+                <div class="flex items-center gap-2">
+                    <button id="btnPlayPause" class="w-10 h-10 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 flex items-center justify-center transition shadow-md">
+                        <span class="material-icons text-lg" id="playIcon">play_arrow</span>
+                    </button>
+                    <button id="btnStepPrev" class="p-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-300 transition" title="Previous Move">
+                        <span class="material-icons text-sm">skip_previous</span>
+                    </button>
+                    <button id="btnStepNext" class="p-2 rounded-xl border border-slate-800 hover:bg-slate-800 text-slate-300 transition" title="Next Move">
+                        <span class="material-icons text-sm">skip_next</span>
+                    </button>
+                    <div class="font-mono text-xs text-slate-400 pl-2">
+                        Turn <span id="currentTurnIndex" class="font-bold text-amber-500">0</span> / <span id="totalTurnCount">0</span>
+                    </div>
+                </div>
+
+                <!-- Progress Slider -->
+                <div class="flex-1 w-full px-2">
+                    <input type="range" id="replayProgress" min="0" max="0" value="0" class="w-full accent-amber-500 cursor-pointer">
+                </div>
+
+                <!-- Speed & Video Recorder Buttons -->
+                <div class="flex items-center gap-2">
+                    <select id="playbackSpeedSelect" class="bg-slate-900 border border-slate-800 text-slate-300 rounded-xl px-2 py-1.5 text-xs font-mono font-bold focus:outline-none">
+                        <option value="1">1.0x</option>
+                        <option value="1.5" selected>1.5x</option>
+                        <option value="2">2.0x</option>
+                        <option value="3">3.0x</option>
+                    </select>
+                    <button id="btnRecordVideo" class="px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5 shadow-md shadow-rose-600/20">
+                        <span class="material-icons text-sm">videocam</span> Record Video
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side: Turn Details & Live Scoreboard -->
+        <div class="space-y-4">
+            <!-- Event Callout -->
+            <div class="glass-panel rounded-3xl p-5 border border-slate-800 space-y-2">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Current Action</span>
+                <p id="currentEventText" class="text-sm font-bold text-amber-400 font-mono break-words leading-snug">
+                    Press Play or Step Forward to start replay.
+                </p>
+            </div>
+
+            <!-- Telemetry Standings -->
+            <div class="glass-panel rounded-3xl p-5 border border-slate-800 space-y-3">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                    <span class="text-xs font-black uppercase tracking-wider text-slate-200">Replay Standings</span>
+                    <span class="text-[10px] font-mono text-emerald-400">Net Value</span>
+                </div>
+                <div id="standingsContainer" class="space-y-2 max-h-56 overflow-y-auto custom-scroll pr-1"></div>
+            </div>
+
+            <!-- Event Ledger Feed -->
+            <div class="glass-panel rounded-3xl p-5 border border-slate-800 space-y-3">
+                <span class="text-xs font-black uppercase tracking-wider text-slate-200 block border-b border-slate-800 pb-2">Full Match Ledger</span>
+                <div id="fullLogContainer" class="space-y-1.5 max-h-52 overflow-y-auto custom-scroll font-mono text-[10px] text-slate-400"></div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, doc, getDoc } from "../../web-info/firebase.js";
+
+        // Full 40-Tile Board Data (Perimeter positions)
+        const BOARD_TILES = [
+            { index: 0, name: "GO", group: "Corner" },
+            { index: 1, name: "Guwahati", group: "Brown", price: 60 },
+            { index: 2, name: "Community 1", group: "Special" },
+            { index: 3, name: "Bhubaneswar", group: "Brown", price: 60 },
+            { index: 4, name: "Tax", group: "Tax" },
+            { index: 5, name: "Station 1", group: "Station", price: 200 },
+            { index: 6, name: "Panaji", group: "Light Blue", price: 100 },
+            { index: 7, name: "Chance 1", group: "Special" },
+            { index: 8, name: "Agra", group: "Light Blue", price: 100 },
+            { index: 9, name: "Vadodara", group: "Light Blue", price: 120 },
+            { index: 10, name: "JAIL", group: "Corner" },
+            { index: 11, name: "Ludhiana", group: "Pink", price: 140 },
+            { index: 12, name: "Electric", group: "Utility", price: 150 },
+            { index: 13, name: "Patna", group: "Pink", price: 140 },
+            { index: 14, name: "Bhopal", group: "Pink", price: 160 },
+            { index: 15, name: "Station 2", group: "Station", price: 200 },
+            { index: 16, name: "Indore", group: "Orange", price: 180 },
+            { index: 17, name: "Community 2", group: "Special" },
+            { index: 18, name: "Nagpur", group: "Orange", price: 180 },
+            { index: 19, name: "Kochi", group: "Orange", price: 200 },
+            { index: 20, name: "Parking", group: "Corner" },
+            { index: 21, name: "Lucknow", group: "Red", price: 220 },
+            { index: 22, name: "Chance 2", group: "Special" },
+            { index: 23, name: "Chandigarh", group: "Red", price: 220 },
+            { index: 24, name: "Jaipur", group: "Red", price: 240 },
+            { index: 25, name: "Station 3", group: "Station", price: 200 },
+            { index: 26, name: "Pune", group: "Yellow", price: 260 },
+            { index: 27, name: "Hyderabad", group: "Yellow", price: 260 },
+            { index: 28, name: "Water Works", group: "Utility", price: 150 },
+            { index: 29, name: "Ahmedabad", group: "Yellow", price: 280 },
+            { index: 30, name: "Go To Jail", group: "Corner" },
+            { index: 31, name: "Kolkata", group: "Green", price: 300 },
+            { index: 32, name: "Chennai", group: "Green", price: 300 },
+            { index: 33, name: "Community 3", group: "Special" },
+            { index: 34, name: "Bengaluru", group: "Green", price: 320 },
+            { index: 35, name: "Station 4", group: "Station", price: 200 },
+            { index: 36, name: "Chance 3", group: "Special" },
+            { index: 37, name: "Delhi", group: "Dark Blue", price: 350 },
+            { index: 38, name: "Super Tax", group: "Tax" },
+            { index: 39, name: "Mumbai", group: "Dark Blue", price: 400 }
+        ];
+
+        const COLOR_MAP = {
+            "Brown": "#8B4513", "Light Blue": "#38bdf8", "Pink": "#ec4899",
+            "Orange": "#f97316", "Red": "#ef4444", "Yellow": "#eab308",
+            "Green": "#22c55e", "Dark Blue": "#2563eb", "Station": "#64748b",
+            "Utility": "#a855f7", "Special": "#f59e0b", "Corner": "#1e293b", "Tax": "#64748b"
+        };
+
+        const PLAYER_COLORS = ["#f59e0b", "#38bdf8", "#10b981", "#ec4899", "#a855f7", "#ef4444"];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const matchId = (urlParams.get('match') || urlParams.get('code') || '').toUpperCase();
+        document.getElementById('displayMatchId').textContent = matchId || "Demo Room";
+
+        let matchHistory = [];
+        let simulationStates = [];
+        let currentStepIndex = 0;
+        let isPlaying = false;
+        let playbackTimer = null;
+
+        const canvas = document.getElementById('replayCanvas');
+        const ctx = canvas.getContext('2d');
+        const replayProgress = document.getElementById('replayProgress');
+        const currentTurnIndex = document.getElementById('currentTurnIndex');
+        const totalTurnCount = document.getElementById('totalTurnCount');
+        const currentEventText = document.getElementById('currentEventText');
+        const btnPlayPause = document.getElementById('btnPlayPause');
+        const playIcon = document.getElementById('playIcon');
+        const playbackSpeedSelect = document.getElementById('playbackSpeedSelect');
+
+        // Fetch Logs from Firestore Archive or Matches collection
+        async function loadMatchData() {
+            let snap = await getDoc(doc(db, "games", "Monopoly", "archived_rooms", matchId));
+            if (!snap.exists()) {
+                snap = await getDoc(doc(db, "games", "Monopoly", "saved_games", matchId));
+            }
+            if (!snap.exists()) {
+                snap = await getDoc(doc(db, "games", "Monopoly", "rooms", matchId));
+            }
+
+            let data = snap.exists() ? snap.data() : null;
+            let playersObj = data?.players || { "Mitansh": { cash: 1500 }, "Dhyana": { cash: 1500 } };
+            let rawLogs = data?.logs || [];
+
+            // Chronological order (oldest first)
+            matchHistory = [...rawLogs].reverse();
+            if (matchHistory.length === 0) {
+                matchHistory = [
+                    { time: "00:00", text: "Match initialized with Mitansh, Dhyana" },
+                    { time: "00:01", text: "Mitansh rolled 4+5 -> moved to Vadodara" },
+                    { time: "00:02", text: "Mitansh paid $120 to buy Vadodara" },
+                    { time: "00:03", text: "Dhyana rolled 3+3 -> moved to Panaji" },
+                    { time: "00:04", text: "Dhyana paid $100 to buy Panaji" },
+                    { time: "00:05", text: "Mitansh rolled 5+6 -> moved to Free Parking" },
+                    { time: "00:06", text: "Mitansh upgraded Vadodara to Hotel for $250" },
+                    { time: "00:07", text: "Dhyana rolled 4+5 -> moved to Vadodara" },
+                    { time: "00:08", text: "Dhyana paid $600 rent to Mitansh for Vadodara" }
+                ];
+            }
+
+            renderFullLogList();
+            compileStateSnapshots(playersObj);
+            totalTurnCount.textContent = simulationStates.length - 1;
+            replayProgress.max = simulationStates.length - 1;
+            renderFrame(0);
+        }
+
+        // Precompute board states turn-by-turn
+        function compileStateSnapshots(initialPlayers) {
+            simulationStates = [];
+            let state = {
+                players: {},
+                properties: {},
+                lastLog: "Game Initialized"
+            };
+
+            Object.keys(initialPlayers).forEach((p, idx) => {
+                state.players[p] = {
+                    cash: initialPlayers[p].cash !== undefined ? initialPlayers[p].cash : 1500,
+                    loans: 0,
+                    position: 0,
+                    color: PLAYER_COLORS[idx % PLAYER_COLORS.length]
+                };
+            });
+
+            simulationStates.push(JSON.parse(JSON.stringify(state)));
+
+            matchHistory.forEach(log => {
+                const text = log.text || '';
+                state.lastLog = text;
+
+                // Move matching
+                const moveMatch = text.match(/^(\w+)\s+rolled\s+(\d+)\+(\d+).*?moved to (.*)$/i);
+                if (moveMatch) {
+                    const [, actor, d1, d2, dest] = moveMatch;
+                    if (state.players[actor]) {
+                        const tileIdx = BOARD_TILES.findIndex(t => t.name.toLowerCase() === dest.toLowerCase().trim());
+                        if (tileIdx !== -1) state.players[actor].position = tileIdx;
+                        else state.players[actor].position = (state.players[actor].position + parseInt(d1) + parseInt(d2)) % 40;
+                    }
+                }
+
+                // Buy matching
+                const buyMatch = text.match(/^(\w+)\s+paid\s+\$(\d+)\s+to buy\s+(.*)$/i);
+                if (buyMatch) {
+                    const [, actor, amt, prop] = buyMatch;
+                    if (state.players[actor]) {
+                        state.players[actor].cash -= parseFloat(amt);
+                        state.properties[prop.trim()] = { owner: actor, level: 0 };
+                    }
+                }
+
+                // Rent matching
+                const rentMatch = text.match(/^(\w+)\s+paid\s+\$(\d+)\s+rent to\s+(\w+)/i);
+                if (rentMatch) {
+                    const [, payer, amt, payee] = rentMatch;
+                    if (state.players[payer]) state.players[payer].cash -= parseFloat(amt);
+                    if (state.players[payee]) state.players[payee].cash += parseFloat(amt);
+                }
+
+                // Building matching
+                const buildMatch = text.match(/^(\w+)\s+upgraded\s+(.*?)\s+to\s+(Hotel|Motel|\d+\s+Houses?)\s+for\s+\$(\d+)/i);
+                if (buildMatch) {
+                    const [, actor, prop, lvlStr, cost] = buildMatch;
+                    if (state.players[actor]) {
+                        state.players[actor].cash -= parseFloat(cost);
+                        const lvl = lvlStr.includes("Hotel") ? 5 : lvlStr.includes("Motel") ? 2.5 : parseInt(lvlStr) || 1;
+                        state.properties[prop.trim()] = { owner: actor, level: lvl };
+                    }
+                }
+
+                // Collect matching
+                const collectMatch = text.match(/^(\w+)\s+collected\s+\$(\d+)/i);
+                if (collectMatch) {
+                    const [, actor, amt] = collectMatch;
+                    if (state.players[actor]) state.players[actor].cash += parseFloat(amt);
+                }
+
+                simulationStates.push(JSON.parse(JSON.stringify(state)));
+            });
+        }
+
+        // Draw Board Perimeter on Canvas
+        function getTileCoordinates(index, width = 700, height = 700) {
+            const edgeTiles = 10;
+            const cornerSize = 85;
+            const regularSize = (width - (cornerSize * 2)) / (edgeTiles - 1);
+
+            if (index >= 0 && index <= 10) {
+                // Bottom edge (GO=0 to Jail=10) Right-to-Left
+                if (index === 0) return { x: width - cornerSize, y: height - cornerSize, w: cornerSize, h: cornerSize };
+                if (index === 10) return { x: 0, y: height - cornerSize, w: cornerSize, h: cornerSize };
+                return { x: width - cornerSize - (index * regularSize), y: height - cornerSize, w: regularSize, h: cornerSize };
+            } else if (index > 10 && index <= 20) {
+                // Left edge (11 to Free Parking=20) Bottom-to-Top
+                const i = index - 10;
+                if (index === 20) return { x: 0, y: 0, w: cornerSize, h: cornerSize };
+                return { x: 0, y: height - cornerSize - (i * regularSize), w: cornerSize, h: regularSize };
+            } else if (index > 20 && index <= 30) {
+                // Top edge (21 to Go To Jail=30) Left-to-Right
+                const i = index - 20;
+                if (index === 30) return { x: width - cornerSize, y: 0, w: cornerSize, h: cornerSize };
+                return { x: cornerSize + ((i - 1) * regularSize), y: 0, w: regularSize, h: cornerSize };
+            } else {
+                // Right edge (31 to 39) Top-to-Bottom
+                const i = index - 30;
+                return { x: width - cornerSize, y: cornerSize + ((i - 1) * regularSize), w: cornerSize, h: regularSize };
+            }
+        }
+
+        // Render Frame Canvas
+        function renderFrame(stepIndex) {
+            const state = simulationStates[stepIndex];
+            if (!state) return;
+
+            currentStepIndex = stepIndex;
+            replayProgress.value = stepIndex;
+            currentTurnIndex.textContent = stepIndex;
+            currentEventText.textContent = state.lastLog;
+
+            // Background
+            ctx.fillStyle = "#020617";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Inner Centerpiece
+            ctx.fillStyle = "#0f172a";
+            ctx.fillRect(85, 85, canvas.width - 170, canvas.height - 170);
+
+            // Center Branding & Telemetry Text
+            ctx.fillStyle = "#f59e0b";
+            ctx.font = "bold 20px 'Google Sans'";
+            ctx.textAlign = "center";
+            ctx.fillText("MONOPOLY REFEREE REPLAY", canvas.width / 2, canvas.height / 2 - 30);
+
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "12px 'JetBrains Mono'";
+            ctx.fillText(`MATCH: ${matchId}`, canvas.width / 2, canvas.height / 2 - 5);
+            ctx.fillText(`STEP ${stepIndex} OF ${simulationStates.length - 1}`, canvas.width / 2, canvas.height / 2 + 15);
+
+            // Draw Board Tiles
+            BOARD_TILES.forEach((tile) => {
+                const box = getTileCoordinates(tile.index, canvas.width, canvas.height);
+
+                ctx.fillStyle = "#1e293b";
+                ctx.strokeStyle = "#334155";
+                ctx.lineWidth = 1;
+                ctx.fillRect(box.x, box.y, box.w, box.h);
+                ctx.strokeRect(box.x, box.y, box.w, box.h);
+
+                // Group color banner
+                if (COLOR_MAP[tile.group]) {
+                    ctx.fillStyle = COLOR_MAP[tile.group];
+                    if (tile.index < 10) ctx.fillRect(box.x, box.y, box.w, 14);
+                    else if (tile.index < 20) ctx.fillRect(box.x + box.w - 14, box.y, 14, box.h);
+                    else if (tile.index < 30) ctx.fillRect(box.x, box.y + box.h - 14, box.w, 14);
+                    else ctx.fillRect(box.x, box.y, 14, box.h);
+                }
+
+                // Property Name Label
+                ctx.fillStyle = "#f8fafc";
+                ctx.font = "8px 'Google Sans'";
+                ctx.textAlign = "center";
+                ctx.fillText(tile.name.substring(0, 8), box.x + box.w / 2, box.y + box.h / 2);
+
+                // House / Hotel Indicator
+                const propInfo = state.properties[tile.name];
+                if (propInfo && propInfo.level > 0) {
+                    ctx.fillStyle = propInfo.level === 5 ? "#ef4444" : "#22c55e";
+                    ctx.beginPath();
+                    ctx.arc(box.x + box.w / 2, box.y + box.h / 2 + 14, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = "#ffffff";
+                    ctx.font = "bold 7px sans-serif";
+                    ctx.fillText(propInfo.level === 5 ? "H" : `${propInfo.level}`, box.x + box.w / 2, box.y + box.h / 2 + 16.5);
+                }
+            });
+
+            // Draw Player Tokens
+            Object.entries(state.players).forEach(([pName, pData], idx) => {
+                const box = getTileCoordinates(pData.position || 0, canvas.width, canvas.height);
+                const offsetX = (idx % 3) * 14 - 14;
+                const offsetY = Math.floor(idx / 3) * 14 - 7;
+
+                ctx.fillStyle = pData.color;
+                ctx.beginPath();
+                ctx.arc(box.x + box.w / 2 + offsetX, box.y + box.h / 2 + offsetY, 7, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = "#ffffff";
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "bold 7px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText(pName.substring(0, 2).toUpperCase(), box.x + box.w / 2 + offsetX, box.y + box.h / 2 + offsetY + 2.5);
+            });
+
+            updateScoreboard(state);
+        }
+
+        // Update HTML Standings
+        function updateScoreboard(state) {
+            const container = document.getElementById('standingsContainer');
+            container.innerHTML = '';
+
+            Object.entries(state.players).forEach(([pName, pData]) => {
+                const row = document.createElement('div');
+                row.className = "flex justify-between items-center bg-slate-900 p-2.5 rounded-xl border border-slate-800 text-xs";
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full" style="background:${pData.color}"></span>
+                        <span class="font-bold text-slate-200">${pName}</span>
+                    </div>
+                    <span class="font-mono font-bold text-emerald-400">$${pData.cash.toLocaleString()}</span>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function renderFullLogList() {
+            const container = document.getElementById('fullLogContainer');
+            container.innerHTML = '';
+            matchHistory.forEach((log, idx) => {
+                const row = document.createElement('div');
+                row.className = "cursor-pointer hover:text-amber-400 truncate";
+                row.textContent = `${idx + 1}. ${log.text}`;
+                row.onclick = () => renderFrame(idx + 1);
+                container.appendChild(row);
+            });
+        }
+
+        // Playback Controls
+        function togglePlay() {
+            isPlaying = !isPlaying;
+            playIcon.textContent = isPlaying ? "pause" : "play_arrow";
+
+            if (isPlaying) {
+                const speed = parseFloat(playbackSpeedSelect.value) || 1;
+                const interval = 1200 / speed;
+
+                playbackTimer = setInterval(() => {
+                    if (currentStepIndex >= simulationStates.length - 1) {
+                        togglePlay();
+                        return;
+                    }
+                    renderFrame(currentStepIndex + 1);
+                }, interval);
+            } else {
+                clearInterval(playbackTimer);
+            }
+        }
+
+        btnPlayPause.onclick = togglePlay;
+        playbackSpeedSelect.onchange = () => {
+            if (isPlaying) {
+                togglePlay();
+                togglePlay();
+            }
+        };
+
+        document.getElementById('btnStepNext').onclick = () => {
+            if (currentStepIndex < simulationStates.length - 1) renderFrame(currentStepIndex + 1);
+        };
+        document.getElementById('btnStepPrev').onclick = () => {
+            if (currentStepIndex > 0) renderFrame(currentStepIndex - 1);
+        };
+        replayProgress.oninput = (e) => renderFrame(parseInt(e.target.value));
+
+        // MediaRecorder: Record Canvas To Video File
+        let mediaRecorder = null;
+        let recordedChunks = [];
+        const btnRecordVideo = document.getElementById('btnRecordVideo');
+        const recordBadge = document.getElementById('recordStatusBadge');
+
+        btnRecordVideo.onclick = () => {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                // Stop recording
+                mediaRecorder.stop();
+                return;
+            }
+
+            recordedChunks = [];
+            const stream = canvas.captureStream(30); // 30 FPS stream
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) recordedChunks.push(e.data);
+            };
+
+            mediaRecorder.onstop = () => {
+                recordBadge.classList.add('hidden');
+                btnRecordVideo.innerHTML = `<span class="material-icons text-sm">videocam</span> Record Video`;
+                btnRecordVideo.className = "px-3 py-1.5 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5";
+
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Monopoly_Replay_${matchId}.webm`;
+                a.click();
+                URL.revokeObjectURL(url);
+                alert("Match video generated and downloaded successfully!");
+            };
+
+            // Start recording and autoplay simulation
+            mediaRecorder.start();
+            recordBadge.classList.remove('hidden');
+            btnRecordVideo.innerHTML = `<span class="material-icons text-sm">stop</span> Stop Recording`;
+            btnRecordVideo.className = "px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition flex items-center gap-1.5";
+
+            // Restart from turn 0 and play at 1.5x
+            renderFrame(0);
+            if (!isPlaying) togglePlay();
+        };
+
+        loadMatchData();
+    </script>
+</body>
+</html>

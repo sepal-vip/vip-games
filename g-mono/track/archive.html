@@ -100,41 +100,53 @@
                     const pNames = Object.keys(players).join(', ');
 
                     const card = document.createElement('div');
-                    card.className = "glass-panel p-5 rounded-3xl space-y-4 shadow-xl flex flex-col justify-between";
-                    card.innerHTML = `
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center gap-2">
-                                    <span class="font-mono font-black text-amber-500 text-sm">${code}</span>
-                                    <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-                                        ${data.status || (currentTab === "saved" ? "Paused" : "Archived")}
-                                    </span>
-                                </div>
-                                <span class="text-[10px] text-slate-500 font-mono">${date}</span>
-                            </div>
-                            <div class="text-xs font-semibold text-slate-800 dark:text-slate-200">
-                                Host: ${data.hostName || 'Unknown'}
-                            </div>
-                            <div class="text-[11px] text-slate-400">
-                                Players: <span class="text-slate-300 font-medium">${pNames || 'None'}</span>
-                            </div>
-                            ${data.officialMatchId ? `
-                                <div class="text-[10px] text-emerald-500 font-mono">
-                                    Logged to Official Matches: ${data.officialMatchId}
-                                </div>
-                            ` : ''}
-                        </div>
-                        <div class="pt-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2">
-                            <button class="btn-reactivate px-3.5 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1">
-                                <span class="material-icons text-sm">play_arrow</span> Reactivate Table
-                            </button>
-                            ${data.countUrl ? `
-                                <a href="${data.countUrl}" class="px-3 py-1.5 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 font-bold rounded-xl text-xs transition flex items-center gap-1">
-                                    <span class="material-icons text-sm">calculate</span> Scorecard
-                                </a>
-                            ` : ''}
-                        </div>
-                    `;
+                    card.className = "glass-panel p-5 rounded-3xl space-y-4 shadow-xl flex flex-col justify-between border border-slate-800";
+card.innerHTML = `
+    <div class="space-y-2.5">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="font-mono font-black text-amber-500 text-sm tracking-wider">${code}</span>
+                <span class="text-[9px] font-bold uppercase px-2 py-0.5 rounded-full border bg-white/40 dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-300">
+                    ${data.status || (currentTab === "saved" ? "Paused" : "Archived")}
+                </span>
+            </div>
+            <span class="text-[10px] text-slate-500 font-mono">${date}</span>
+        </div>
+
+        <div class="text-xs font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+            <span class="text-slate-400">Host:</span>
+            <span>${data.hostName || 'Unknown'}</span>
+        </div>
+
+        <div class="text-[11px] text-slate-400">
+            Players: <span class="text-slate-200 font-medium">${pNames || 'None'}</span>
+        </div>
+
+        ${data.officialMatchId ? `
+            <div class="text-[10px] text-emerald-400 font-mono bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded-lg">
+                Official Match ID: ${data.officialMatchId}
+            </div>
+        ` : ''}
+    </div>
+
+    <div class="pt-3 border-t border-slate-200 dark:border-slate-800/80 flex flex-wrap items-center justify-between gap-2">
+        <button class="btn-reactivate px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-sm flex items-center gap-1">
+            <span class="material-icons text-sm">play_arrow</span> Reactivate Table
+        </button>
+
+        <div class="flex items-center gap-1.5">
+            <a href="replay.html?code=${encodeURIComponent(code)}" class="px-2.5 py-1.5 bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500/20 font-bold rounded-xl text-xs transition flex items-center gap-1">
+                <span class="material-icons text-sm">videocam</span> Replay / Video
+            </a>
+
+            ${data.countUrl || data.officialMatchId ? `
+                <a href="${data.countUrl || `../view.html?game=${encodeURIComponent(data.officialMatchId)}`}" class="px-2.5 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 font-bold rounded-xl text-xs transition flex items-center gap-1">
+                    <span class="material-icons text-sm">calculate</span> Scorecard
+                </a>
+            ` : ''}
+        </div>
+    </div>
+`;
 
                     card.querySelector('.btn-reactivate').onclick = async () => {
                         if (!confirm(`Reactivate room ${code} back to live sessions?`)) return;
