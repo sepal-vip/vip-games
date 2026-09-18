@@ -8,7 +8,7 @@
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
     <link rel="stylesheet" href="../web-info/global-style.css">
@@ -44,8 +44,43 @@
     </nav>
 
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
-        <!-- 1. Server Network Parameters -->
+        <!-- Auth Bar Card -->
+        <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Admin Access Control</span>
+                <div id="authStatusText" class="text-xs font-mono text-amber-400 mt-0.5">Checking status...</div>
+            </div>
+            <div id="authControls" class="w-full sm:w-auto">
+                <button id="btnLogin" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition shadow-md flex items-center gap-1.5">
+                    <span class="material-icons text-xs">login</span> Sign In as Admin
+                </button>
+                <button id="btnLogout" class="hidden px-4 py-2 bg-slate-900 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 font-bold rounded-xl text-xs transition flex items-center gap-1.5">
+                    <span class="material-icons text-xs">logout</span> Log Out
+                </button>
+            </div>
+        </div>
+
+        <!-- Remote Command Dispatcher -->
         <div class="glass-panel rounded-3xl p-6 shadow-xl border border-emerald-500/20 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                    <span class="material-icons text-emerald-400 text-sm">terminal</span> Remote Server Terminal Dispatcher
+                </h2>
+                <span class="text-[10px] font-mono text-emerald-400">Daemon Synced</span>
+            </div>
+
+            <form id="remoteCmdForm" class="flex gap-2">
+                <input type="text" id="remoteCmdInput" placeholder="e.g. dir, op PlayerName, or custom script" required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+                <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-md">
+                    <span class="material-icons text-xs">send</span> Run
+                </button>
+            </form>
+
+            <div id="cmdOutputBox" class="hidden p-3 bg-black/60 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 max-h-48 overflow-y-auto custom-scroll whitespace-pre-wrap"></div>
+        </div>
+
+        <!-- 1. Server Network Parameters -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
             <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
                 <span class="material-icons text-sm">dns</span> Server Network Parameters
             </h2>
@@ -107,11 +142,65 @@
     </main>
 
     <script type="module">
-        import { db, doc, onSnapshot, setDoc, updateDoc } from "../web-info/firebase.js";
+        import { db, doc, onSnapshot, setDoc, updateDoc, collection, addDoc, auth } from "../web-info/firebase.js";
+        import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        let currentUser = null;
+        const statusText = document.getElementById("authStatusText");
+        const btnLogin = document.getElementById("btnLogin");
+        const btnLogout = document.getElementById("btnLogout");
+
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    statusText.className = "text-xs font-mono text-emerald-400 mt-0.5";
+                    statusText.textContent = `Authenticated: ${user.email || 'Admin'}`;
+                    btnLogin.classList.add("hidden");
+                    btnLogout.classList.remove("hidden");
+                } else {
+                    statusText.className = "text-xs font-mono text-rose-400 mt-0.5";
+                    statusText.textContent = "Unauthenticated - Writes and Commands Disabled";
+                    btnLogin.classList.remove("hidden");
+                    btnLogout.classList.add("hidden");
+                }
+            });
+        }
+
+        btnLogin.onclick = async () => {
+            const provider = new GoogleAuthProvider();
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                // Fallback prompt for email/password if popup sign-in isn't configured
+                const email = prompt("Enter Admin Email:");
+                if (!email) return;
+                const pass = prompt("Enter Password:");
+                if (!pass) return;
+                try {
+                    await signInWithEmailAndPassword(auth, email, pass);
+                } catch (e) {
+                    alert("Sign in failed: " + e.message);
+                }
+            }
+        };
+
+        btnLogout.onclick = async () => {
+            await signOut(auth);
+        };
+
+        function verifyAdminAuth(action = "perform this write operation") {
+            if (!currentUser) {
+                alert(`Access Denied: You must sign in as an Admin to ${action}.`);
+                return false;
+            }
+            return true;
+        }
 
         const serverRef = doc(db, "games", "Minecraft", "config", "server");
         const stateRef = doc(db, "games", "Minecraft", "data", "state");
 
+        // Listen for connection config
         onSnapshot(serverRef, (snap) => {
             if (!snap.exists()) return;
             const d = snap.data();
@@ -122,14 +211,21 @@
 
         document.getElementById('serverForm').onsubmit = async (e) => {
             e.preventDefault();
-            await setDoc(serverRef, {
-                serverName: document.getElementById('srvName').value.trim(),
-                host: document.getElementById('srvHost').value.trim(),
-                port: parseInt(document.getElementById('srvPort').value) || 19132
-            }, { merge: true });
-            alert("Updated connection settings.");
+            if (!verifyAdminAuth("update server network parameters")) return;
+
+            try {
+                await setDoc(serverRef, {
+                    serverName: document.getElementById('srvName').value.trim(),
+                    host: document.getElementById('srvHost').value.trim(),
+                    port: parseInt(document.getElementById('srvPort').value) || 19132
+                }, { merge: true });
+                alert("Updated connection settings.");
+            } catch (err) {
+                alert("Write failed: " + err.message);
+            }
         };
 
+        // Listen for backups & lifecycle
         onSnapshot(stateRef, (snap) => {
             if (!snap.exists()) return;
             const d = snap.data();
@@ -153,30 +249,80 @@
         });
 
         document.getElementById('btnAddStandardWorld').onclick = async () => {
+            if (!verifyAdminAuth("create a new world")) return;
             const input = document.getElementById('newStandardWorldInput');
             const name = input.value.trim();
             if (!name) return;
 
-            const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
-            const data = snap.exists() ? snap.data() : {};
-            const existing = data.worlds || [];
-            if (!existing.includes(name)) {
-                await updateDoc(stateRef, { worlds: [...existing, name] });
-                input.value = '';
+            try {
+                const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
+                const data = snap.exists() ? snap.data() : {};
+                const existing = data.worlds || [];
+                if (!existing.includes(name)) {
+                    await updateDoc(stateRef, { worlds: [...existing, name] });
+                    input.value = '';
+                }
+            } catch (err) {
+                alert("Write failed: " + err.message);
             }
         };
 
         document.getElementById('btnAddRestoredState').onclick = async () => {
+            if (!verifyAdminAuth("add a restored state entry")) return;
             const input = document.getElementById('newRestoredInput');
             const name = input.value.trim();
             if (!name) return;
 
-            const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
-            const data = snap.exists() ? snap.data() : {};
-            const existing = data.restoredWorlds || [];
-            if (!existing.includes(name)) {
-                await updateDoc(stateRef, { restoredWorlds: [...existing, name] });
-                input.value = '';
+            try {
+                const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
+                const data = snap.exists() ? snap.data() : {};
+                const existing = data.restoredWorlds || [];
+                if (!existing.includes(name)) {
+                    await updateDoc(stateRef, { restoredWorlds: [...existing, name] });
+                    input.value = '';
+                }
+            } catch (err) {
+                alert("Write failed: " + err.message);
+            }
+        };
+
+        // Remote Terminal Command Submitter
+        const cmdForm = document.getElementById('remoteCmdForm');
+        const cmdInput = document.getElementById('remoteCmdInput');
+        const cmdOutput = document.getElementById('cmdOutputBox');
+
+        cmdForm.onsubmit = async (e) => {
+            e.preventDefault();
+            if (!verifyAdminAuth("execute remote server commands")) return;
+
+            const command = cmdInput.value.trim();
+            if (!command) return;
+
+            cmdOutput.classList.remove('hidden');
+            cmdOutput.textContent = `[Sending]: ${command}\nWaiting for host execution...`;
+
+            try {
+                const commandsCol = collection(db, "games", "Minecraft", "data", "run", "commands");
+                const docRef = await addDoc(commandsCol, {
+                    command: command,
+                    state: "not",
+                    requestedBy: currentUser.email || "Admin",
+                    createdAt: new Date().toISOString()
+                });
+
+                cmdInput.value = '';
+
+                // Listen for execution completion
+                const unsub = onSnapshot(docRef, (snap) => {
+                    if (!snap.exists()) return;
+                    const cData = snap.data();
+                    if (cData.state === "completed") {
+                        cmdOutput.textContent = `[Command]: ${cData.command}\n[Executed At]: ${cData.executedAt || 'Done'}\n\n[Console Output]:\n${cData.output || '(No console output returned)'}`;
+                        unsub();
+                    }
+                });
+            } catch (err) {
+                cmdOutput.textContent = `[Error]: ${err.message}`;
             }
         };
     </script>

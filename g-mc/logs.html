@@ -33,6 +33,9 @@
                 <span class="font-mono font-black text-emerald-400 text-sm tracking-wider">Server Logs</span>
             </div>
             <div class="flex items-center gap-2">
+                <span id="authBadge" class="hidden sm:inline-block px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-mono text-slate-400">
+                    Checking Auth...
+                </span>
                 <a href="admin.html" class="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1 text-xs">
                     <span class="material-icons text-sm">settings</span> Admin
                 </a>
@@ -44,6 +47,7 @@
     </nav>
 
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
+        <!-- Live Log Viewer -->
         <div class="glass-panel rounded-3xl p-6 shadow-xl border border-emerald-500/20 space-y-4">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
                 <div class="flex items-center gap-2">
@@ -57,7 +61,7 @@
             </div>
 
             <!-- Terminal Output Window -->
-            <div id="logsTerminal" class="h-[520px] bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-y-auto custom-scroll font-mono text-xs leading-relaxed space-y-1">
+            <div id="logsTerminal" class="h-[480px] bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-y-auto custom-scroll font-mono text-xs leading-relaxed space-y-1">
                 <div class="text-slate-500 text-center py-10">Waiting for logs from telemetry document...</div>
             </div>
 
@@ -66,15 +70,58 @@
                 <span>Auto-refreshed via Firebase snapshot</span>
             </div>
         </div>
+
+        <!-- Inline Terminal Command Dispatcher -->
+        <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                    <span class="material-icons text-sky-400 text-sm">terminal</span> Run Command via Host Daemon
+                </h2>
+                <span id="cmdAuthLabel" class="text-[10px] font-mono text-slate-400">Requires Admin Sign-In</span>
+            </div>
+
+            <form id="remoteCmdForm" class="flex gap-2">
+                <input type="text" id="remoteCmdInput" placeholder="e.g. dir, op PlayerName, or script command" required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+                <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-md">
+                    <span class="material-icons text-xs">send</span> Run
+                </button>
+            </form>
+
+            <div id="cmdOutputBox" class="hidden p-3 bg-black/60 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 max-h-40 overflow-y-auto custom-scroll whitespace-pre-wrap"></div>
+        </div>
     </main>
 
     <script type="module">
-        import { db, doc, onSnapshot } from "../web-info/firebase.js";
+        import { db, doc, onSnapshot, collection, addDoc, auth } from "../web-info/firebase.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         const logsTerminal = document.getElementById("logsTerminal");
         const uploadBadge = document.getElementById("lastUploadBadge");
         const logCount = document.getElementById("logCount");
+        const authBadge = document.getElementById("authBadge");
+        const cmdAuthLabel = document.getElementById("cmdAuthLabel");
 
+        let currentUser = null;
+
+        // Track Auth State
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    authBadge.className = "hidden sm:inline-block px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400";
+                    authBadge.textContent = `Admin: ${user.email ? user.email.split('@')[0] : 'Signed in'}`;
+                    cmdAuthLabel.className = "text-[10px] font-mono text-emerald-400";
+                    cmdAuthLabel.textContent = "Authorized";
+                } else {
+                    authBadge.className = "hidden sm:inline-block px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-mono text-slate-400";
+                    authBadge.textContent = "Guest (Read-Only)";
+                    cmdAuthLabel.className = "text-[10px] font-mono text-slate-400";
+                    cmdAuthLabel.textContent = "Requires Admin Sign-In";
+                }
+            });
+        }
+
+        // Live Log Stream
         const telemRef = doc(db, "games", "Minecraft", "data", "telemetry");
 
         onSnapshot(telemRef, (snap) => {
@@ -86,7 +133,6 @@
 
             const data = snap.data();
 
-            // Format upload timestamp
             if (data.lastUploaded) {
                 const d = new Date(data.lastUploaded);
                 uploadBadge.innerText = `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
@@ -122,6 +168,48 @@
             logCount.innerText = `${logsToRender.length} lines`;
             logsTerminal.scrollTop = logsTerminal.scrollHeight;
         });
+
+        // Remote Command Submissions
+        const cmdForm = document.getElementById('remoteCmdForm');
+        const cmdInput = document.getElementById('remoteCmdInput');
+        const cmdOutput = document.getElementById('cmdOutputBox');
+
+        cmdForm.onsubmit = async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                alert("Access Denied: You must sign in as an Admin to execute remote terminal commands.\nPlease log in on the Admin page.");
+                return;
+            }
+
+            const command = cmdInput.value.trim();
+            if (!command) return;
+
+            cmdOutput.classList.remove('hidden');
+            cmdOutput.textContent = `[Sending]: ${command}\nWaiting for host execution...`;
+
+            try {
+                const commandsCol = collection(db, "games", "Minecraft", "data", "run", "commands");
+                const docRef = await addDoc(commandsCol, {
+                    command: command,
+                    state: "not",
+                    requestedBy: currentUser.email || "Admin",
+                    createdAt: new Date().toISOString()
+                });
+
+                cmdInput.value = '';
+
+                const unsub = onSnapshot(docRef, (snap) => {
+                    if (!snap.exists()) return;
+                    const cData = snap.data();
+                    if (cData.state === "completed") {
+                        cmdOutput.textContent = `[Command]: ${cData.command}\n[Executed At]: ${cData.executedAt || 'Done'}\n\n[Console Output]:\n${cData.output || '(No console output returned)'}`;
+                        unsub();
+                    }
+                });
+            } catch (err) {
+                cmdOutput.textContent = `[Error]: ${err.message}`;
+            }
+        };
 
         function escapeHtml(str) {
             return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

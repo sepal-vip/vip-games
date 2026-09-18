@@ -40,6 +40,9 @@
             </div>
 
             <div class="flex items-center gap-2">
+                <span id="authBadge" class="hidden sm:inline-block px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-mono text-slate-400">
+                    Checking Auth...
+                </span>
                 <a href="join.html" class="px-3 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-sm">
                     <span class="material-icons text-xs">play_arrow</span> Auto-Join
                 </a>
@@ -206,7 +209,33 @@
     </div>
 
     <script type="module">
-        import { db, doc, onSnapshot, setDoc, updateDoc } from "../web-info/firebase.js";
+        import { db, doc, onSnapshot, setDoc, updateDoc, auth } from "../web-info/firebase.js";
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        let currentUser = null;
+        const authBadge = document.getElementById("authBadge");
+
+        // Listen for Auth status
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    authBadge.className = "hidden sm:inline-block px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-mono text-emerald-400";
+                    authBadge.textContent = `Admin: ${user.email ? user.email.split('@')[0] : 'Logged in'}`;
+                } else {
+                    authBadge.className = "hidden sm:inline-block px-2.5 py-1 rounded-xl bg-slate-900 border border-slate-800 text-[10px] font-mono text-slate-400";
+                    authBadge.textContent = "Guest (Read-Only)";
+                }
+            });
+        }
+
+        function verifyAdminAuth(action = "perform this action") {
+            if (!currentUser) {
+                alert(`Access Denied: You must sign in as an Admin to ${action}.\nPlease go to the Admin page to log in.`);
+                return false;
+            }
+            return true;
+        }
 
         const PUBLIC_SPAWN_PLOT = {
             id: "public_spawn_sanctuary",
@@ -231,7 +260,6 @@
             plots: []
         };
 
-        // Listen for Server Config
         onSnapshot(serverConfigRef, (snap) => {
             if (snap.exists()) currentServerConfig = snap.data();
             document.getElementById('bannerServerName').textContent = currentServerConfig.serverName || "VIP Minecraft Server";
@@ -239,7 +267,6 @@
             document.getElementById('bannerPort').textContent = currentServerConfig.port || 19132;
         });
 
-        // Listen for Daemon Status & Worlds
         onSnapshot(mcStateRef, (snap) => {
             if (snap.exists()) {
                 currentMcData = snap.data();
@@ -251,7 +278,6 @@
             renderPlots();
         });
 
-        // Listen for Telemetry Playtime
         onSnapshot(telemetryRef, (snap) => {
             const container = document.getElementById('telemetryPlayersContainer');
             if (!snap.exists()) {
@@ -302,7 +328,6 @@
                 ? "text-xs font-black text-amber-400 font-mono pt-1" 
                 : "text-xs font-black text-emerald-400 font-mono pt-1";
 
-            // 1. Normal Worlds Container
             const nContainer = document.getElementById('normalWorldsContainer');
             nContainer.innerHTML = '';
             (currentMcData.worlds || []).forEach(name => {
@@ -330,18 +355,27 @@
 
                 if (!isActive) {
                     card.querySelector('.btn-activate-world').onclick = async () => {
-                        await updateDoc(mcStateRef, { activeWorld: name });
+                        if (!verifyAdminAuth("switch the active world")) return;
+                        try {
+                            await updateDoc(mcStateRef, { activeWorld: name });
+                        } catch (err) {
+                            alert("Write failed: " + err.message);
+                        }
                     };
                 }
                 card.querySelector('.btn-del-world').onclick = async () => {
+                    if (!verifyAdminAuth("delete a world")) return;
                     if (!confirm(`Delete world "${name}"?`)) return;
                     const next = currentMcData.worlds.filter(w => w !== name);
-                    await updateDoc(mcStateRef, { worlds: next });
+                    try {
+                        await updateDoc(mcStateRef, { worlds: next });
+                    } catch (err) {
+                        alert("Write failed: " + err.message);
+                    }
                 };
                 nContainer.appendChild(card);
             });
 
-            // 2. Restored Worlds Container
             const rContainer = document.getElementById('restoredWorldsContainer');
             rContainer.innerHTML = '';
             (currentMcData.restoredWorlds || []).forEach(name => {
@@ -369,13 +403,23 @@
 
                 if (!isActive) {
                     card.querySelector('.btn-activate-world').onclick = async () => {
-                        await updateDoc(mcStateRef, { activeWorld: name });
+                        if (!verifyAdminAuth("load a restored backup")) return;
+                        try {
+                            await updateDoc(mcStateRef, { activeWorld: name });
+                        } catch (err) {
+                            alert("Write failed: " + err.message);
+                        }
                     };
                 }
                 card.querySelector('.btn-del-restored').onclick = async () => {
+                    if (!verifyAdminAuth("remove a restored backup entry")) return;
                     if (!confirm(`Remove restored state "${name}"?`)) return;
                     const next = currentMcData.restoredWorlds.filter(w => w !== name);
-                    await updateDoc(mcStateRef, { restoredWorlds: next });
+                    try {
+                        await updateDoc(mcStateRef, { restoredWorlds: next });
+                    } catch (err) {
+                        alert("Write failed: " + err.message);
+                    }
                 };
                 rContainer.appendChild(card);
             });
@@ -410,9 +454,14 @@
                 `;
                 if (!p.isPublic) {
                     card.querySelector('.btn-del-plot').onclick = async () => {
+                        if (!verifyAdminAuth("delete a land claim")) return;
                         if (!confirm(`Delete plot "${p.name}"?`)) return;
                         const next = currentMcData.plots.filter((_, i) => i !== (idx - 1));
-                        await updateDoc(mcStateRef, { plots: next });
+                        try {
+                            await updateDoc(mcStateRef, { plots: next });
+                        } catch (err) {
+                            alert("Write failed: " + err.message);
+                        }
                     };
                 }
                 container.appendChild(card);
@@ -434,7 +483,6 @@
                 return;
             }
 
-            // Order by: currently online first, then highest playtime
             list.sort((a, b) => {
                 const aOnline = a[1]?.online ? 1 : 0;
                 const bOnline = b[1]?.online ? 1 : 0;
@@ -465,19 +513,24 @@
             });
         }
 
-        // World Creation Prompt
         document.getElementById('btnCreateWorld').onclick = async () => {
+            if (!verifyAdminAuth("create a world")) return;
             const name = prompt("Enter new World name:");
             if (!name) return;
             const existing = currentMcData.worlds || [];
             if (!existing.includes(name)) {
-                await updateDoc(mcStateRef, { worlds: [...existing, name] });
+                try {
+                    await updateDoc(mcStateRef, { worlds: [...existing, name] });
+                } catch (err) {
+                    alert("Write failed: " + err.message);
+                }
             }
         };
 
-        // Plot Form Submission
         document.getElementById('savePlotForm').onsubmit = async (e) => {
             e.preventDefault();
+            if (!verifyAdminAuth("claim a new land plot")) return;
+
             const name = document.getElementById('plotTitle').value.trim();
             const owner = document.getElementById('plotOwner').value.trim();
             const c1 = document.getElementById('plotCorner1').value.trim();
@@ -485,13 +538,19 @@
 
             const newPlot = { name, owner, c1, c2, isPublic: false, createdAt: new Date().toISOString() };
             const existing = currentMcData.plots || [];
-            await updateDoc(mcStateRef, { plots: [...existing, newPlot] });
-
-            document.getElementById('savePlotForm').reset();
-            document.getElementById('claimPlotModal').classList.add('hidden');
+            try {
+                await updateDoc(mcStateRef, { plots: [...existing, newPlot] });
+                document.getElementById('savePlotForm').reset();
+                document.getElementById('claimPlotModal').classList.add('hidden');
+            } catch (err) {
+                alert("Write failed: " + err.message);
+            }
         };
 
-        document.getElementById('btnOpenClaimModal').onclick = () => document.getElementById('claimPlotModal').classList.remove('hidden');
+        document.getElementById('btnOpenClaimModal').onclick = () => {
+            if (!verifyAdminAuth("claim a new land plot")) return;
+            document.getElementById('claimPlotModal').classList.remove('hidden');
+        };
         document.getElementById('btnCloseClaimModal').onclick = () => document.getElementById('claimPlotModal').classList.add('hidden');
 
         document.getElementById('btnCopyAddress').onclick = () => {
