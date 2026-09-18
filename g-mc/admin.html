@@ -32,9 +32,14 @@
                 </a>
                 <span class="font-mono font-black text-emerald-400 text-sm tracking-wider">MC Dedicated Admin</span>
             </div>
-            <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors">
-                <span class="material-icons text-base" id="themeIcon">light_mode</span>
-            </button>
+            <div class="flex items-center gap-2">
+                <a href="logs.html" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-emerald-400 font-bold text-xs flex items-center gap-1 transition">
+                    <span class="material-icons text-sm">terminal</span> Logs
+                </a>
+                <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors">
+                    <span class="material-icons text-base" id="themeIcon">light_mode</span>
+                </button>
+            </div>
         </div>
     </nav>
 
@@ -129,7 +134,6 @@
             if (!snap.exists()) return;
             const d = snap.data();
 
-            // Render Backups
             const bContainer = document.getElementById('backupsListContainer');
             const backups = d.backups || [];
             if (backups.length === 0) {
@@ -148,7 +152,6 @@
             `).join('');
         });
 
-        // Add Standard World
         document.getElementById('btnAddStandardWorld').onclick = async () => {
             const input = document.getElementById('newStandardWorldInput');
             const name = input.value.trim();
@@ -163,7 +166,6 @@
             }
         };
 
-        // Add Restored State
         document.getElementById('btnAddRestoredState').onclick = async () => {
             const input = document.getElementById('newRestoredInput');
             const name = input.value.trim();

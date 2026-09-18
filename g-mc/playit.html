@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playit.gg Gateway Monitor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
+    <link rel="stylesheet" href="../web-info/global-style.css">
+    <script src="../web-info/theme.js"></script>
+    <style>
+        body { font-family: 'Google Sans', sans-serif; }
+        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav class="glass-panel sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1 text-xs">
+                    <span class="material-icons text-sm">arrow_back</span> Hub
+                </a>
+                <span class="font-mono font-black text-emerald-400 text-sm tracking-wider">Playit.gg Gateway</span>
+            </div>
+            <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors">
+                <span class="material-icons text-base" id="themeIcon">light_mode</span>
+            </button>
+        </div>
+    </nav>
+
+    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
+        <!-- Status Indicator Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-2">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tunnel Interface</span>
+                <div class="flex items-center gap-2">
+                    <div id="playitDot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
+                    <span id="playitStatus" class="font-mono font-bold text-sm text-slate-300">Checking...</span>
+                </div>
+            </div>
+
+            <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-2">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Server Process</span>
+                <div class="flex items-center gap-2">
+                    <div id="serverDot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
+                    <span id="serverStatus" class="font-mono font-bold text-sm text-slate-300">Checking...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connection Details Card -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-emerald-500/20 space-y-4">
+            <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                <span class="material-icons text-sm">router</span> Direct Gateway Connection
+            </h2>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                <div>
+                    <span class="block text-[10px] font-bold text-slate-500 uppercase mb-0.5">Assigned Tunnel Address</span>
+                    <span id="tunnelAddress" class="font-mono text-sm text-amber-400 font-bold select-all">vip-bedrock.gl.at.ply.gg:19132</span>
+                </div>
+                <button id="btnCopy" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1.5 shadow-md">
+                    <span class="material-icons text-xs">content_copy</span> Copy Address
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs font-mono">
+                <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl flex justify-between items-center">
+                    <span class="text-slate-400">Agent Heartbeat:</span>
+                    <span id="heartbeatTime" class="text-slate-300">--:--:--</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl flex justify-between items-center">
+                    <span class="text-slate-400">Transport:</span>
+                    <span class="text-sky-400">RakNet UDP / 19132</span>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { db, doc, onSnapshot } from "../web-info/firebase.js";
+
+        const playitDot = document.getElementById("playitDot");
+        const playitStatus = document.getElementById("playitStatus");
+        const serverDot = document.getElementById("serverDot");
+        const serverStatus = document.getElementById("serverStatus");
+        const heartbeatTime = document.getElementById("heartbeatTime");
+        const btnCopy = document.getElementById("btnCopy");
+        const tunnelAddress = document.getElementById("tunnelAddress");
+
+        // Sync host and port from config/server
+        const serverConfigRef = doc(db, "games", "Minecraft", "config", "server");
+        onSnapshot(serverConfigRef, (snap) => {
+            if (!snap.exists()) return;
+            const d = snap.data();
+            if (d.host && d.port) {
+                tunnelAddress.innerText = `${d.host}:${d.port}`;
+            }
+        });
+
+        // Sync state from data/state
+        const stateRef = doc(db, "games", "Minecraft", "data", "state");
+        onSnapshot(stateRef, (snap) => {
+            if (!snap.exists()) return;
+            const d = snap.data();
+            const status = d.status || {};
+
+            // Playit Status
+            if (status.playitOnline) {
+                playitDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]";
+                playitStatus.innerText = "Tunnel Active";
+                playitStatus.className = "font-mono font-bold text-sm text-emerald-400";
+            } else {
+                playitDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]";
+                playitStatus.innerText = "Offline";
+                playitStatus.className = "font-mono font-bold text-sm text-rose-400";
+            }
+
+            // Minecraft Process Status
+            if (status.serverOnline) {
+                serverDot.className = "w-2.5 h-2.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]";
+                serverStatus.innerText = "Process Running";
+                serverStatus.className = "font-mono font-bold text-sm text-emerald-400";
+            } else {
+                serverDot.className = "w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.6)]";
+                serverStatus.innerText = "Stopped";
+                serverStatus.className = "font-mono font-bold text-sm text-rose-400";
+            }
+
+            if (status.lastHeartbeat) {
+                const d = new Date(status.lastHeartbeat);
+                heartbeatTime.innerText = d.toLocaleTimeString();
+            }
+        });
+
+        // Copy tunnel address
+        btnCopy.addEventListener("click", () => {
+            navigator.clipboard.writeText(tunnelAddress.innerText).then(() => {
+                const prev = btnCopy.innerHTML;
+                btnCopy.innerHTML = `<span class="material-icons text-xs">check</span> Copied!`;
+                setTimeout(() => { btnCopy.innerHTML = prev; }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
