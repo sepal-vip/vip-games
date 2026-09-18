@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIP Server Console & Logs</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 24px 16px;
+      background-color: #090d13;
+      color: #c9d1d9;
+      font-family: Consolas, "Courier New", monospace;
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 950px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid #21262d;
+      margin-bottom: 18px;
+    }
+    .title-area h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #58a6ff;
+    }
+    .title-area span {
+      font-size: 0.8rem;
+      color: #8b949e;
+    }
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    select {
+      background: #161b22;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      outline: none;
+    }
+    button {
+      background: #238636;
+      color: #ffffff;
+      border: 1px solid #2ea043;
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: background 0.15s ease;
+    }
+    button:hover:not(:disabled) {
+      background: #2ea043;
+    }
+    button:disabled {
+      background: #21262d;
+      color: #8b949e;
+      border-color: #30363d;
+      cursor: not-allowed;
+    }
+    .section {
+      margin-bottom: 16px;
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .section-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #8b949e;
+    }
+    .badge {
+      font-size: 0.75rem;
+      color: #58a6ff;
+    }
+    .terminal {
+      background: #03060a;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      overflow-y: auto;
+    }
+    .terminal.live {
+      min-height: 80px;
+      max-height: 110px;
+    }
+    .terminal.history {
+      min-height: 250px;
+      max-height: 480px;
+    }
+    .log-row {
+      white-space: pre-wrap;
+      word-break: break-all;
+      margin-bottom: 3px;
+    }
+    .log-time {
+      color: #58a6ff;
+      margin-right: 8px;
+    }
+    .log-join {
+      color: #7ee787;
+    }
+    .log-leave {
+      color: #f85149;
+    }
+    .log-warn {
+      color: #d29922;
+    }
+    .placeholder {
+      color: #484f58;
+      font-style: italic;
+    }
+  </style>
+
+  <!-- Firebase App & Firestore Modular SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      onSnapshot,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Replace these values with your Firebase Project Configuration
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const liveLogsEl = document.getElementById("live-logs");
+    const historyLogsEl = document.getElementById("history-logs");
+    const fetchBtn = document.getElementById("fetch-btn");
+    const lineSelect = document.getElementById("line-count");
+    const historyCountBadge = document.getElementById("history-count");
+
+    // 1. Listen in real-time to the last 3 logs from Firestore
+    onSnapshot(doc(db, "games", "Minecraft", "data", "telemetry"), (snap) => {
+      const data = snap.data();
+      const recent = data?.recentLogs || [];
+
+      if (recent.length === 0) {
+        liveLogsEl.innerHTML = `<div class="placeholder">Waiting for server logs...</div>`;
+        return;
+      }
+
+      liveLogsEl.innerHTML = "";
+      recent.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "log-row";
+
+        let colorClass = "";
+        if (/connected|joined/i.test(item.text)) colorClass = "log-join";
+        else if (/disconnected|left/i.test(item.text)) colorClass = "log-leave";
+        else if (/warn|error|fail/i.test(item.text)) colorClass = "log-warn";
+
+        row.innerHTML = `<span class="log-time">[${item.time}]</span><span class="${colorClass}">${escapeHtml(item.text)}</span>`;
+        liveLogsEl.appendChild(row);
+      });
+    });
+
+    // 2. Request historical lines from main.py
+    fetchBtn.addEventListener("click", async () => {
+      fetchBtn.disabled = true;
+      fetchBtn.innerText = "Querying Host...";
+      historyLogsEl.innerHTML = `<div class="placeholder">Request sent. Waiting for main.py to read chunk files...</div>`;
+
+      const requestedLines = parseInt(lineSelect.value, 10) || 150;
+      const reqId = "req_" + Date.now();
+
+      try {
+        await setDoc(doc(db, "games", "Minecraft", "data", "log_request"), {
+          status: "PENDING",
+          lines: requestedLines,
+          requestId: reqId
+        });
+      } catch (err) {
+        historyLogsEl.innerHTML = `<div class="log-row log-leave">Failed to send request: ${escapeHtml(err.message)}</div>`;
+        fetchBtn.disabled = false;
+        fetchBtn.innerText = "Load Archived History";
+      }
+    });
+
+    // 3. Listen for response returned by main.py
+    onSnapshot(doc(db, "games", "Minecraft", "data", "log_response"), (snap) => {
+      const data = snap.data();
+      if (!data || !data.logs) return;
+
+      historyLogsEl.innerHTML = "";
+      data.logs.forEach((line) => {
+        const row = document.createElement("div");
+        row.className = "log-row";
+
+        if (/connected|joined/i.test(line)) row.classList.add("log-join");
+        else if (/disconnected|left/i.test(line)) row.classList.add("log-leave");
+        else if (/warn|error|fail/i.test(line)) row.classList.add("log-warn");
+
+        row.textContent = line;
+        historyLogsEl.appendChild(row);
+      });
+
+      historyCountBadge.innerText = `${data.logs.length} lines shown (${data.totalAvailable || data.logs.length} total on host)`;
+      historyLogsEl.scrollTop = historyLogsEl.scrollHeight;
+
+      fetchBtn.disabled = false;
+      fetchBtn.innerText = "Refresh History";
+    });
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="title-area">
+        <h1>VIP Dedicated Server Console</h1>
+        <span>Live heartbeat & historical chunk viewer</span>
+      </div>
+      <div class="controls">
+        <select id="line-count">
+          <option value="50">Last 50 lines</option>
+          <option value="150" selected>Last 150 lines</option>
+          <option value="300">Last 300 lines</option>
+          <option value="500">Last 500 lines</option>
+        </select>
+        <button id="fetch-btn">Load Archived History</button>
+      </div>
+    </header>
+
+    <!-- Real-time tail: 3 logs -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Live Server Tail (Latest 3)</span>
+        <span class="badge">Realtime Stream</span>
+      </div>
+      <div id="live-logs" class="terminal live">
+        <div class="placeholder">Waiting for server logs...</div>
+      </div>
+    </div>
+
+    <!-- Historical log archive -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Archived History (On-Demand from Host)</span>
+        <span id="history-count" class="badge">0 lines</span>
+      </div>
+      <div id="history-logs" class="terminal history">
+        <div class="placeholder">Click "Load Archived History" above to fetch files from logs/ folder.</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

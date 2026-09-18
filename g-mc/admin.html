@@ -1,182 +1,425 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Admin Console</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
-    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700;800;900&family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <link rel="icon" type="image/png" href="https://sepal-vip.github.io/vip-games/monoploy-icon.png">
-    <link rel="stylesheet" href="../web-info/global-style.css">
-    <script src="../web-info/theme.js"></script>
-    <style>
-        body { font-family: 'Google Sans', sans-serif; }
-        code, pre, .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .custom-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(16, 185, 129, 0.2); border-radius: 4px; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VIP Server - Admin Control Panel</title>
+  <style>
+    :root {
+      --bg: #090d13;
+      --card-bg: #0d1117;
+      --border: #30363d;
+      --text-main: #c9d1d9;
+      --text-muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #238636;
+      --green-hover: #2ea043;
+      --red: #da3633;
+      --yellow: #d29922;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 1.4rem;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Grid Layout */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .card-title {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Status Badges */
+    .status-badge {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-online { background: rgba(35, 134, 54, 0.2); color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.4); }
+    .status-offline { background: rgba(218, 54, 51, 0.2); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.4); }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+
+    /* Buttons & Controls */
+    button {
+      background: var(--green);
+      color: #fff;
+      border: 1px solid var(--green-hover);
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    button:hover:not(:disabled) { background: var(--green-hover); }
+    button:disabled { background: #21262d; color: var(--text-muted); border-color: var(--border); cursor: not-allowed; }
+    
+    select {
+      background: #161b22;
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th {
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text-muted);
+    }
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #161b22;
+    }
+
+    /* Terminals */
+    .terminal {
+      background: #03060a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 0.82rem;
+      line-height: 1.5;
+      overflow-y: auto;
+    }
+    .terminal.live { min-height: 80px; max-height: 100px; }
+    .terminal.history { min-height: 250px; max-height: 420px; }
+    
+    .log-row { white-space: pre-wrap; word-break: break-all; margin-bottom: 3px; }
+    .log-time { color: var(--accent); margin-right: 8px; }
+    .log-join { color: #3fb950; }
+    .log-leave { color: #f85149; }
+    .log-warn { color: var(--yellow); }
+    .placeholder { color: var(--text-muted); font-style: italic; }
+  </style>
+
+  <!-- Modular Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore,
+      doc,
+      onSnapshot,
+      setDoc
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Replace with your Firebase Web Credentials
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_PROJECT_ID.appspot.com",
+      messagingSenderId: "YOUR_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // DOM Elements
+    const serverBadge = document.getElementById("server-status-badge");
+    const playitBadge = document.getElementById("playit-status-badge");
+    const heartbeatEl = document.getElementById("last-heartbeat");
+    const playersTable = document.getElementById("players-table-body");
+    const backupsTable = document.getElementById("backups-table-body");
+    const liveLogsEl = document.getElementById("live-logs");
+    const historyLogsEl = document.getElementById("history-logs");
+    const fetchHistoryBtn = document.getElementById("fetch-history-btn");
+    const historyLineCount = document.getElementById("history-line-count");
+    const historyStatusBadge = document.getElementById("history-status-badge");
+
+    // Helper: update status pill
+    function setBadge(el, isOnline) {
+      if (isOnline) {
+        el.className = "status-badge status-online";
+        el.innerHTML = '<span class="status-dot"></span> Online';
+      } else {
+        el.className = "status-badge status-offline";
+        el.innerHTML = '<span class="status-dot"></span> Offline';
+      }
+    }
+
+    // 1. Listen to State (Server/Playit status and backups)
+    onSnapshot(doc(db, "games", "Minecraft", "data", "state"), (snap) => {
+      const data = snap.data();
+      if (!data) return;
+
+      const status = data.status || {};
+      setBadge(serverBadge, status.serverOnline);
+      setBadge(playitBadge, status.playitOnline);
+
+      if (status.lastHeartbeat) {
+        const d = new Date(status.lastHeartbeat);
+        heartbeatEl.innerText = `Heartbeat: ${d.toLocaleTimeString()}`;
+      }
+
+      // Populate Backups List
+      const backups = data.backups || [];
+      backupsTable.innerHTML = "";
+      if (backups.length === 0) {
+        backupsTable.innerHTML = `<tr><td colspan="3" class="placeholder">No backup records found.</td></tr>`;
+      } else {
+        backups.slice(0, 10).forEach(b => {
+          const row = document.createElement("tr");
+          const sizeMb = (b.sizeBytes / (1024 * 1024)).toFixed(2);
+          const timeFormatted = b.timestamp ? new Date(b.timestamp).toLocaleString() : "Unknown";
+          row.innerHTML = `
+            <td><strong>${b.world || "Bedrock level"}</strong></td>
+            <td>${b.filename}<br><small style="color:var(--text-muted)">${sizeMb} MB</small></td>
+            <td>${timeFormatted}</td>
+          `;
+          backupsTable.appendChild(row);
+        });
+      }
+    });
+
+    // 2. Listen to Telemetry (Player stats & live 3 logs)
+    onSnapshot(doc(db, "games", "Minecraft", "data", "telemetry"), (snap) => {
+      const data = snap.data();
+      if (!data) return;
+
+      // Populate Players
+      const players = data.players || {};
+      playersTable.innerHTML = "";
+      const playerKeys = Object.keys(players);
+      if (playerKeys.length === 0) {
+        playersTable.innerHTML = `<tr><td colspan="4" class="placeholder">No players logged yet.</td></tr>`;
+      } else {
+        playerKeys.forEach(p => {
+          const pdata = players[p];
+          const row = document.createElement("tr");
+          const isOnline = pdata.online;
+          const statusHtml = isOnline 
+            ? '<span style="color:#3fb950; font-weight:bold;">● Active</span>' 
+            : '<span style="color:var(--text-muted)">Offline</span>';
+          
+          row.innerHTML = `
+            <td><strong>${p}</strong></td>
+            <td>${statusHtml}</td>
+            <td>${pdata.playTimeMinutes || 0} mins</td>
+            <td>${pdata.sessions || 0}</td>
+          `;
+          playersTable.appendChild(row);
+        });
+      }
+
+      // Populate Live 3 Logs
+      const recent = data.recentLogs || [];
+      liveLogsEl.innerHTML = "";
+      if (recent.length === 0) {
+        liveLogsEl.innerHTML = `<div class="placeholder">No logs in buffer...</div>`;
+      } else {
+        recent.forEach(item => {
+          const div = document.createElement("div");
+          div.className = "log-row";
+          let cls = "";
+          if (/connected|joined/i.test(item.text)) cls = "log-join";
+          else if (/disconnected|left/i.test(item.text)) cls = "log-leave";
+          div.innerHTML = `<span class="log-time">[${item.time}]</span><span class="${cls}">${escapeHtml(item.text)}</span>`;
+          liveLogsEl.appendChild(div);
+        });
+      }
+    });
+
+    // 3. Request Archived Logs via main.py
+    fetchHistoryBtn.addEventListener("click", async () => {
+      fetchHistoryBtn.disabled = true;
+      fetchHistoryBtn.innerText = "Querying Host...";
+      historyLogsEl.innerHTML = `<div class="placeholder">Request sent to host. Waiting for main.py to read log chunks...</div>`;
+
+      const lines = parseInt(historyLineCount.value, 10) || 150;
+      const reqId = "req_" + Date.now();
+
+      try {
+        await setDoc(doc(db, "games", "Minecraft", "data", "log_request"), {
+          status: "PENDING",
+          lines: lines,
+          requestId: reqId
+        });
+      } catch (err) {
+        historyLogsEl.innerHTML = `<div class="log-row log-leave">Request failed: ${err.message}</div>`;
+        fetchHistoryBtn.disabled = false;
+        fetchHistoryBtn.innerText = "Fetch Archive";
+      }
+    });
+
+    // 4. Receive Archived Log Lines
+    onSnapshot(doc(db, "games", "Minecraft", "data", "log_response"), (snap) => {
+      const res = snap.data();
+      if (!res || !res.logs) return;
+
+      historyLogsEl.innerHTML = "";
+      res.logs.forEach(line => {
+        const div = document.createElement("div");
+        div.className = "log-row";
+        if (/connected|joined/i.test(line)) div.classList.add("log-join");
+        else if (/disconnected|left/i.test(line)) div.classList.add("log-leave");
+        else if (/warn|error|fail/i.test(line)) div.classList.add("log-warn");
+        div.textContent = line;
+        historyLogsEl.appendChild(div);
+      });
+
+      historyStatusBadge.innerText = `${res.logs.length} lines (${res.totalAvailable || res.logs.length} total on disk)`;
+      historyLogsEl.scrollTop = historyLogsEl.scrollHeight;
+
+      fetchHistoryBtn.disabled = false;
+      fetchHistoryBtn.innerText = "Refresh Archive";
+    });
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col relative overflow-x-hidden selection:bg-emerald-500 selection:text-slate-950">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>VIP Server Admin Panel</h1>
+        <span class="subtitle" id="last-heartbeat">Heartbeat: Connecting...</span>
+      </div>
+      <div style="display: flex; gap: 12px; align-items: center;">
+        <div>Bedrock: <span id="server-status-badge" class="status-badge status-offline"><span class="status-dot"></span> Checking</span></div>
+        <div>Playit: <span id="playit-status-badge" class="status-badge status-offline"><span class="status-dot"></span> Checking</span></div>
+      </div>
+    </header>
 
-    <nav class="glass-panel sticky top-0 z-50">
-        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-            <div class="flex items-center gap-3">
-                <a href="index.html" class="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white transition flex items-center gap-1 text-xs">
-                    <span class="material-icons text-sm">arrow_back</span> Hub
-                </a>
-                <span class="font-mono font-black text-emerald-400 text-sm tracking-wider">MC Dedicated Admin</span>
-            </div>
-            <button id="themeToggle" class="p-1.5 text-slate-400 hover:text-emerald-400 transition-colors">
-                <span class="material-icons text-base" id="themeIcon">light_mode</span>
-            </button>
+    <!-- Top Row: Players and Recent Backups -->
+    <div class="grid-2">
+      <!-- Player Tracking -->
+      <div class="card">
+        <div class="card-title">
+          <span>Player Activity & Sessions</span>
         </div>
-    </nav>
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Status</th>
+              <th>Playtime</th>
+              <th>Sessions</th>
+            </tr>
+          </thead>
+          <tbody id="players-table-body">
+            <tr><td colspan="4" class="placeholder">Loading telemetry...</td></tr>
+          </tbody>
+        </table>
+      </div>
 
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
-        <!-- 1. Server Network Parameters -->
-        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-emerald-500/20 space-y-4">
-            <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
-                <span class="material-icons text-sm">dns</span> Server Network Parameters
-            </h2>
-            <form id="serverForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Server Name</label>
-                    <input type="text" id="srvName" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Host / Domain</label>
-                    <input type="text" id="srvHost" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-amber-400 focus:outline-none focus:border-emerald-500">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Port</label>
-                    <input type="number" id="srvPort" required class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-sky-400 focus:outline-none focus:border-emerald-500">
-                </div>
-                <div class="sm:col-span-3 flex justify-end pt-1">
-                    <button type="submit" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md">
-                        Update Server Settings
-                    </button>
-                </div>
-            </form>
+      <!-- Backups -->
+      <div class="card">
+        <div class="card-title">
+          <span>Latest Scheduled Backups</span>
         </div>
+        <table>
+          <thead>
+            <tr>
+              <th>World</th>
+              <th>Archive</th>
+              <th>Timestamp</th>
+            </tr>
+          </thead>
+          <tbody id="backups-table-body">
+            <tr><td colspan="3" class="placeholder">Loading backups...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
-        <!-- 2. Worlds & Restored States Lifecycle Manager -->
-        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
-            <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                <span class="material-icons text-emerald-400 text-sm">public</span> World Lifecycle &amp; Restored States
-            </h2>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="space-y-2">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase">Create New Standard World</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="newStandardWorldInput" placeholder="e.g. World 3" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500">
-                        <button type="button" id="btnAddStandardWorld" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-xs transition">Add</button>
-                    </div>
-                </div>
+    <!-- Live Console Tail (Latest 3) -->
+    <div class="card">
+      <div class="card-title">
+        <span>Live Server Tail (Latest 3 Lines)</span>
+        <span style="color:var(--accent); font-size:0.75rem;">Firestore Auto-Stream</span>
+      </div>
+      <div id="live-logs" class="terminal live">
+        <div class="placeholder">Connecting to telemetry stream...</div>
+      </div>
+    </div>
 
-                <div class="space-y-2">
-                    <label class="block text-[10px] font-bold text-amber-400 uppercase">Add Restored Backup Entry</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="newRestoredInput" placeholder="e.g. World 1 (restored to 10-09-2026 backup)" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 focus:outline-none focus:border-amber-500">
-                        <button type="button" id="btnAddRestoredState" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition">Add</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. Hourly Host Backups Log -->
-        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-3">
-            <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                <span class="material-icons text-amber-400 text-sm">backup</span> Host Machine Hourly Backups
-            </h2>
-            <div id="backupsListContainer" class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-1 font-mono text-xs">
-                <p class="text-slate-500 text-center py-4">No backups recorded by daemon yet.</p>
-            </div>
-        </div>
-    </main>
-
-    <script type="module">
-        import { db, doc, onSnapshot, setDoc, updateDoc } from "../web-info/firebase.js";
-
-        const serverRef = doc(db, "games", "Minecraft", "config", "server");
-        const stateRef = doc(db, "games", "Minecraft", "data", "state");
-
-        onSnapshot(serverRef, (snap) => {
-            if (!snap.exists()) return;
-            const d = snap.data();
-            document.getElementById('srvName').value = d.serverName || "";
-            document.getElementById('srvHost').value = d.host || "";
-            document.getElementById('srvPort').value = d.port || 19132;
-        });
-
-        document.getElementById('serverForm').onsubmit = async (e) => {
-            e.preventDefault();
-            await setDoc(serverRef, {
-                serverName: document.getElementById('srvName').value.trim(),
-                host: document.getElementById('srvHost').value.trim(),
-                port: parseInt(document.getElementById('srvPort').value) || 19132
-            }, { merge: true });
-            alert("Updated connection settings.");
-        };
-
-        onSnapshot(stateRef, (snap) => {
-            if (!snap.exists()) return;
-            const d = snap.data();
-
-            // Render Backups
-            const bContainer = document.getElementById('backupsListContainer');
-            const backups = d.backups || [];
-            if (backups.length === 0) {
-                bContainer.innerHTML = `<p class="text-slate-500 text-center py-4">No backups recorded yet.</p>`;
-                return;
-            }
-
-            bContainer.innerHTML = backups.map(b => `
-                <div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
-                    <div>
-                        <span class="text-white font-bold block">${b.filename}</span>
-                        <span class="text-[10px] text-slate-500">${b.timestamp} | ${(b.sizeBytes / 1024 / 1024).toFixed(2)} MB</span>
-                    </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Saved</span>
-                </div>
-            `).join('');
-        });
-
-        // Add Standard World
-        document.getElementById('btnAddStandardWorld').onclick = async () => {
-            const input = document.getElementById('newStandardWorldInput');
-            const name = input.value.trim();
-            if (!name) return;
-
-            const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
-            const data = snap.exists() ? snap.data() : {};
-            const existing = data.worlds || [];
-            if (!existing.includes(name)) {
-                await updateDoc(stateRef, { worlds: [...existing, name] });
-                input.value = '';
-            }
-        };
-
-        // Add Restored State
-        document.getElementById('btnAddRestoredState').onclick = async () => {
-            const input = document.getElementById('newRestoredInput');
-            const name = input.value.trim();
-            if (!name) return;
-
-            const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
-            const data = snap.exists() ? snap.data() : {};
-            const existing = data.restoredWorlds || [];
-            if (!existing.includes(name)) {
-                await updateDoc(stateRef, { restoredWorlds: [...existing, name] });
-                input.value = '';
-            }
-        };
-    </script>
+    <!-- Full Historical Log Retrieval -->
+    <div class="card">
+      <div class="card-title">
+        <span>Archived Log Reader (logs/DD-MM-YYYY-XXXX.log)</span>
+        <span id="history-status-badge" style="color:var(--text-muted); font-size:0.75rem;">0 lines loaded</span>
+      </div>
+      <div style="display:flex; gap:10px; margin-bottom:12px;">
+        <select id="history-line-count">
+          <option value="50">Last 50 lines</option>
+          <option value="150" selected>Last 150 lines</option>
+          <option value="300">Last 300 lines</option>
+          <option value="500">Last 500 lines</option>
+        </select>
+        <button id="fetch-history-btn">Fetch Archive</button>
+      </div>
+      <div id="history-logs" class="terminal history">
+        <div class="placeholder">Click "Fetch Archive" to read chunk files on the server host.</div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
