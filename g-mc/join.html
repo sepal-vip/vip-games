@@ -24,20 +24,24 @@
         </div>
 
         <div>
-            <h1 class="text-xl font-black text-white">Opening Minecraft</h1>
-            <p id="subStatus" class="text-xs text-slate-400 mt-1">Connecting to live server registry...</p>
+            <h1 class="text-xl font-black text-white">Connecting to Minecraft</h1>
+            <p id="subStatus" class="text-xs text-slate-400 mt-1">Fetching live server parameters...</p>
         </div>
 
         <div class="bg-slate-900/80 p-3.5 rounded-2xl border border-slate-800 text-xs font-mono space-y-1">
             <div class="text-slate-500 text-[10px] uppercase">Destination Server</div>
             <div id="displayServerName" class="text-emerald-400 font-bold">Fetching...</div>
             <div id="displayHostPort" class="text-slate-300 text-[11px]">----:-----</div>
+            <div id="displayProfile" class="text-[10px] text-sky-400 font-bold uppercase pt-1">Detecting Engine...</div>
         </div>
 
         <div class="pt-2 space-y-2">
             <a id="btnDirectProtocol" href="#" class="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2">
-                <span class="material-icons text-sm">open_in_new</span> Launch Bedrock Now
+                <span class="material-icons text-sm">open_in_new</span> Launch Minecraft Client
             </a>
+            <button id="btnCopyAddress" class="w-full py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 font-bold rounded-xl text-xs transition border border-slate-800 flex items-center justify-center gap-1">
+                <span class="material-icons text-xs">content_copy</span> Copy Server IP
+            </button>
             <a href="index.html" class="block text-xs text-slate-400 hover:text-white transition py-1">
                 Back to Server Dashboard
             </a>
@@ -50,29 +54,43 @@
         async function triggerJoin() {
             try {
                 const cfgRef = doc(db, "games", "Minecraft", "config", "server");
-                const snap = await getDoc(cfgRef);
-                const data = snap.exists() ? snap.data() : {
-                    serverName: "VIP Minecraft Server",
-                    host: "play.sepal.vip",
-                    port: 19132
-                };
+                const stateRef = doc(db, "games", "Minecraft", "data", "state");
 
-                const serverName = data.serverName || "VIP Minecraft Server";
-                const host = data.host || "127.0.0.1";
-                const port = data.port || 19132;
+                const [cfgSnap, stateSnap] = await Promise.all([getDoc(cfgRef), getDoc(stateRef)]);
+
+                const cfg = cfgSnap.exists() ? cfgSnap.data() : {};
+                const state = stateSnap.exists() ? stateSnap.data() : {};
+                const activeType = state.status?.activeType || "bedrock";
+
+                const serverName = cfg.serverName || "VIP Minecraft Server";
+                const host = cfg.host || "127.0.0.1";
+                const port = cfg.port || 19132;
 
                 document.getElementById('displayServerName').textContent = serverName;
                 document.getElementById('displayHostPort').textContent = `${host}:${port}`;
-                document.getElementById('subStatus').textContent = "Adding server to Minecraft...";
+                document.getElementById('displayProfile').textContent = `Engine: ${activeType.toUpperCase()}`;
+                document.getElementById('subStatus').textContent = "Adding server link...";
 
+                // Bedrock Protocol Handler
                 const bedrockUrl = `minecraft://?addExternalServer=${encodeURIComponent(serverName)}|${host}:${port}`;
-                document.getElementById('btnDirectProtocol').href = bedrockUrl;
+                const btnDirect = document.getElementById('btnDirectProtocol');
+                btnDirect.href = bedrockUrl;
 
-                setTimeout(() => {
-                    window.location.href = bedrockUrl;
-                }, 500);
+                document.getElementById('btnCopyAddress').onclick = () => {
+                    navigator.clipboard.writeText(`${host}:${port}`);
+                    alert(`Copied: ${host}:${port}`);
+                };
+
+                // Auto launch Bedrock if bedrock or bedcross flavor
+                if (activeType === "bedrock" || activeType === "bedcross") {
+                    setTimeout(() => {
+                        window.location.href = bedrockUrl;
+                    }, 600);
+                } else {
+                    document.getElementById('subStatus').textContent = "Pure Java Server active. Copy IP into Java multiplayer list.";
+                }
             } catch (err) {
-                document.getElementById('subStatus').textContent = "Failed to load server: " + err.message;
+                document.getElementById('subStatus').textContent = "Connection lookup failed: " + err.message;
             }
         }
 

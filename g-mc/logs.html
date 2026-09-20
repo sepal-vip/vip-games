@@ -52,17 +52,17 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
                 <div class="flex items-center gap-2">
                     <span class="material-icons text-emerald-400 text-base">receipt_long</span>
-                    <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400">Latest Console Upload</h2>
+                    <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400">Latest Console Output</h2>
                 </div>
                 <div class="flex items-center gap-2 font-mono text-[11px]">
-                    <span class="text-slate-400">Last Upload:</span>
+                    <span class="text-slate-400">Last Synced:</span>
                     <span id="lastUploadBadge" class="text-amber-400 font-bold">Connecting...</span>
                 </div>
             </div>
 
             <!-- Terminal Output Window -->
             <div id="logsTerminal" class="h-[480px] bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-y-auto custom-scroll font-mono text-xs leading-relaxed space-y-1">
-                <div class="text-slate-500 text-center py-10">Waiting for logs from telemetry document...</div>
+                <div class="text-slate-500 text-center py-10">Waiting for live events from daemon...</div>
             </div>
 
             <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono pt-1">
@@ -81,7 +81,7 @@
             </div>
 
             <form id="remoteCmdForm" class="flex gap-2">
-                <input type="text" id="remoteCmdInput" placeholder="e.g. dir, op PlayerName, or script command" required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+                <input type="text" id="remoteCmdInput" placeholder="e.g. list, op PlayerName, save-all" required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
                 <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-md">
                     <span class="material-icons text-xs">send</span> Run
                 </button>
@@ -121,7 +121,7 @@
             });
         }
 
-        // Live Log Stream
+        // Live Log Stream (reads telemetry recentLogs)
         const telemRef = doc(db, "games", "Minecraft", "data", "telemetry");
 
         onSnapshot(telemRef, (snap) => {
@@ -132,44 +132,38 @@
             }
 
             const data = snap.data();
-
-            if (data.lastUploaded) {
-                const d = new Date(data.lastUploaded);
-                uploadBadge.innerText = `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
-            } else if (data.lastUpdated) {
+            if (data.lastUpdated) {
                 const d = new Date(data.lastUpdated);
-                uploadBadge.innerText = `${d.toLocaleDateString()} ${d.toLocaleTimeString()}`;
+                uploadBadge.innerText = `${d.toLocaleTimeString()}`;
             } else {
-                uploadBadge.innerText = "Unknown";
+                uploadBadge.innerText = "Online";
             }
 
             const recent = data.recentLogs || [];
-            const batch = data.lastBatch || [];
-            const logsToRender = recent.length > 0 ? recent : batch;
 
-            if (logsToRender.length === 0) {
-                logsTerminal.innerHTML = `<div class="text-slate-500 text-center py-10">No log entries found in the last upload.</div>`;
+            if (recent.length === 0) {
+                logsTerminal.innerHTML = `<div class="text-slate-500 text-center py-10">No recent log entries detected.</div>`;
                 logCount.innerText = "0 lines";
                 return;
             }
 
-            logsTerminal.innerHTML = logsToRender.map(line => {
+            logsTerminal.innerHTML = recent.map(line => {
                 let text = typeof line === "string" ? line : (line.text || "");
                 let time = typeof line === "object" && line.time ? `[${line.time}] ` : "";
 
                 let color = "text-slate-300";
                 if (/connected|joined/i.test(text)) color = "text-emerald-400 font-bold";
                 else if (/disconnected|left/i.test(text)) color = "text-rose-400 font-bold";
-                else if (/warn|error|fail/i.test(text)) color = "text-amber-400";
+                else if (/warn|error|exception/i.test(text)) color = "text-amber-400";
 
                 return `<div class="break-all"><span class="text-slate-600">${escapeHtml(time)}</span><span class="${color}">${escapeHtml(text)}</span></div>`;
             }).join('');
 
-            logCount.innerText = `${logsToRender.length} lines`;
+            logCount.innerText = `${recent.length} lines`;
             logsTerminal.scrollTop = logsTerminal.scrollHeight;
         });
 
-        // Remote Command Submissions
+        // Remote Command Submissions via maincom/wm/messages
         const cmdForm = document.getElementById('remoteCmdForm');
         const cmdInput = document.getElementById('remoteCmdInput');
         const cmdOutput = document.getElementById('cmdOutputBox');
@@ -188,11 +182,12 @@
             cmdOutput.textContent = `[Sending]: ${command}\nWaiting for host execution...`;
 
             try {
-                const commandsCol = collection(db, "games", "Minecraft", "data", "run", "commands");
-                const docRef = await addDoc(commandsCol, {
-                    command: command,
-                    state: "not",
-                    requestedBy: currentUser.email || "Admin",
+                const wmCol = collection(db, "maincom", "wm", "messages");
+                const docRef = await addDoc(wmCol, {
+                    action: "RUN_COMMAND",
+                    payload: { command },
+                    adminEmail: currentUser.email || "Admin",
+                    status: "pending",
                     createdAt: new Date().toISOString()
                 });
 
@@ -201,8 +196,8 @@
                 const unsub = onSnapshot(docRef, (snap) => {
                     if (!snap.exists()) return;
                     const cData = snap.data();
-                    if (cData.state === "completed") {
-                        cmdOutput.textContent = `[Command]: ${cData.command}\n[Executed At]: ${cData.executedAt || 'Done'}\n\n[Console Output]:\n${cData.output || '(No console output returned)'}`;
+                    if (cData.status === "completed") {
+                        cmdOutput.textContent = `[Command]: ${command}\n[Executed]: ${cData.completedAt || 'Done'}\n\n[Console Response]:\n${cData.output || '(Command typed into host console)'}`;
                         unsub();
                     }
                 });

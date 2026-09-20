@@ -48,7 +48,7 @@
             </div>
 
             <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-2">
-                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Server Process</span>
+                <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Server Engine Process</span>
                 <div class="flex items-center gap-2">
                     <div id="serverDot" class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
                     <span id="serverStatus" class="font-mono font-bold text-sm text-slate-300">Checking...</span>
@@ -72,14 +72,18 @@
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-xs font-mono">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs font-mono">
                 <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl flex justify-between items-center">
-                    <span class="text-slate-400">Agent Heartbeat:</span>
+                    <span class="text-slate-400">Daemon Heartbeat:</span>
                     <span id="heartbeatTime" class="text-slate-300">--:--:--</span>
                 </div>
                 <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl flex justify-between items-center">
+                    <span class="text-slate-400">Mounted Profile:</span>
+                    <span id="flavorText" class="text-emerald-400 uppercase">--</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 border border-slate-800/80 rounded-xl flex justify-between items-center">
                     <span class="text-slate-400">Transport:</span>
-                    <span class="text-sky-400">RakNet UDP / 19132</span>
+                    <span id="transportProtocol" class="text-sky-400">RakNet UDP / 19132</span>
                 </div>
             </div>
         </div>
@@ -95,6 +99,8 @@
         const heartbeatTime = document.getElementById("heartbeatTime");
         const btnCopy = document.getElementById("btnCopy");
         const tunnelAddress = document.getElementById("tunnelAddress");
+        const flavorText = document.getElementById("flavorText");
+        const transportProtocol = document.getElementById("transportProtocol");
 
         // Sync host and port from config/server
         const serverConfigRef = doc(db, "games", "Minecraft", "config", "server");
@@ -135,9 +141,20 @@
                 serverStatus.className = "font-mono font-bold text-sm text-rose-400";
             }
 
+            if (status.activeType) {
+                flavorText.innerText = status.activeType;
+                if (status.activeType === "java") {
+                    transportProtocol.innerText = "TCP Java / 25565";
+                } else if (status.activeType === "bedcross") {
+                    transportProtocol.innerText = "Geyser Dual (25565 / 19132)";
+                } else {
+                    transportProtocol.innerText = "RakNet UDP / 19132";
+                }
+            }
+
             if (status.lastHeartbeat) {
-                const d = new Date(status.lastHeartbeat);
-                heartbeatTime.innerText = d.toLocaleTimeString();
+                const dt = new Date(status.lastHeartbeat);
+                heartbeatTime.innerText = dt.toLocaleTimeString();
             }
         });
 

@@ -60,23 +60,83 @@
             </div>
         </div>
 
-        <!-- Remote Command Dispatcher -->
+        <!-- 0. Live Host & Server Status Telemetry -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400 flex items-center gap-1.5">
+                    <span class="material-icons text-sm">monitor_heart</span> Host Telemetry & Health
+                </h2>
+                <span id="healthBadge" class="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30">OFFLINE</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono">
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block uppercase">Engine State</span>
+                    <span id="liveEngineStatus" class="text-rose-400 font-bold">Stopped</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block uppercase">Active Flavor</span>
+                    <span id="liveFlavorStatus" class="text-emerald-400 font-bold">--</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block uppercase">Mounted Slot</span>
+                    <span id="liveSlotStatus" class="text-sky-400 font-bold">--</span>
+                </div>
+                <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block uppercase">Last Heartbeat</span>
+                    <span id="liveHeartbeat" class="text-slate-300">--</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Remote Command Dispatcher (maincom/wm) -->
         <div class="glass-panel rounded-3xl p-6 shadow-xl border border-emerald-500/20 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
                     <span class="material-icons text-emerald-400 text-sm">terminal</span> Remote Server Terminal Dispatcher
                 </h2>
-                <span class="text-[10px] font-mono text-emerald-400">Daemon Synced</span>
+                <span class="text-[10px] font-mono text-emerald-400">maincom/wm bus</span>
             </div>
 
             <form id="remoteCmdForm" class="flex gap-2">
-                <input type="text" id="remoteCmdInput" placeholder="e.g. dir, op PlayerName, or custom script" required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
-                <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-md">
+                <input type="text" id="remoteCmdInput" placeholder="e.g. list, op PlayerName, say Hello World" required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+                <button type="submit" id="btnRunCmd" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-md">
                     <span class="material-icons text-xs">send</span> Run
                 </button>
             </form>
 
             <div id="cmdOutputBox" class="hidden p-3 bg-black/60 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 max-h-48 overflow-y-auto custom-scroll whitespace-pre-wrap"></div>
+        </div>
+
+        <!-- Environment & Slot Switcher (maincom/wm SWITCH_SERVER_TYPE) -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
+            <h2 class="text-xs font-black uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                <span class="material-icons text-sm">swap_horiz</span> Remote Flavor &amp; World Switcher
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Target Engine Flavor</label>
+                    <select id="switchFlavorSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+                        <option value="bedrock">Bedrock Dedicated Server (BDS)</option>
+                        <option value="bedcross">Bedcross (PaperMC + Geyser Standalone)</option>
+                        <option value="java">Pure Java Native (PaperMC)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Target World Slot</label>
+                    <select id="switchSlotSelect" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-sky-500">
+                        <option value="world1">Slot 1 (world1)</option>
+                        <option value="world2">Slot 2 (world2)</option>
+                        <option value="world3">Slot 3 (world3)</option>
+                        <option value="world4">Slot 4 (world4)</option>
+                        <option value="world5">Slot 5 (world5)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button type="button" id="btnTriggerSwitch" class="px-5 py-2.5 bg-sky-500 hover:bg-sky-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center gap-1.5">
+                    <span class="material-icons text-xs">restart_alt</span> Deploy &amp; Switch Server
+                </button>
+            </div>
         </div>
 
         <!-- 1. Server Network Parameters -->
@@ -105,7 +165,20 @@
             </form>
         </div>
 
-        <!-- 2. Worlds & Restored States Lifecycle Manager -->
+        <!-- 2. Online Players & Telemetry Card -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                    <span class="material-icons text-emerald-400 text-sm">group</span> Registered Players &amp; Playtime
+                </h2>
+                <span id="playerOnlineCount" class="text-[10px] font-mono text-slate-400">0 Online</span>
+            </div>
+            <div id="playerListContainer" class="space-y-2 max-h-48 overflow-y-auto custom-scroll pr-1 font-mono text-xs">
+                <p class="text-slate-500 text-center py-4">No active telemetry received yet.</p>
+            </div>
+        </div>
+
+        <!-- 3. Worlds & Restored States Lifecycle Manager -->
         <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
             <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
                 <span class="material-icons text-emerald-400 text-sm">public</span> World Lifecycle &amp; Restored States
@@ -123,14 +196,14 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-amber-400 uppercase">Add Restored Backup Entry</label>
                     <div class="flex gap-2">
-                        <input type="text" id="newRestoredInput" placeholder="e.g. World 1 (restored to 10-09-2026 backup)" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 focus:outline-none focus:border-amber-500">
+                        <input type="text" id="newRestoredInput" placeholder="e.g. World 1 (restored backup)" class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-amber-300 focus:outline-none focus:border-amber-500">
                         <button type="button" id="btnAddRestoredState" class="px-3.5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs transition">Add</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- 3. Hourly Host Backups Log -->
+        <!-- 4. Hourly Host Backups Log -->
         <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-3">
             <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
                 <span class="material-icons text-amber-400 text-sm">backup</span> Host Machine Hourly Backups
@@ -142,7 +215,7 @@
     </main>
 
     <script type="module">
-        import { db, doc, onSnapshot, setDoc, updateDoc, collection, addDoc, auth } from "../web-info/firebase.js";
+        import { db, doc, onSnapshot, setDoc, updateDoc, collection, addDoc, auth, getDoc } from "../web-info/firebase.js";
         import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         let currentUser = null;
@@ -172,7 +245,6 @@
             try {
                 await signInWithPopup(auth, provider);
             } catch (err) {
-                // Fallback prompt for email/password if popup sign-in isn't configured
                 const email = prompt("Enter Admin Email:");
                 if (!email) return;
                 const pass = prompt("Enter Password:");
@@ -199,8 +271,9 @@
 
         const serverRef = doc(db, "games", "Minecraft", "config", "server");
         const stateRef = doc(db, "games", "Minecraft", "data", "state");
+        const telemRef = doc(db, "games", "Minecraft", "data", "telemetry");
 
-        // Listen for connection config
+        // 1. Connection Config Subscription
         onSnapshot(serverRef, (snap) => {
             if (!snap.exists()) return;
             const d = snap.data();
@@ -225,29 +298,157 @@
             }
         };
 
-        // Listen for backups & lifecycle
+        // 2. Server Health, Telemetry & Backups
         onSnapshot(stateRef, (snap) => {
             if (!snap.exists()) return;
             const d = snap.data();
+            const status = d.status || {};
 
+            const isOnline = status.serverOnline === true;
+            const healthBadge = document.getElementById("healthBadge");
+            if (isOnline) {
+                healthBadge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                healthBadge.textContent = "ONLINE";
+            } else {
+                healthBadge.className = "text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30";
+                healthBadge.textContent = "OFFLINE";
+            }
+
+            const engStatus = document.getElementById("liveEngineStatus");
+            engStatus.textContent = isOnline ? "Running" : "Stopped";
+            engStatus.className = isOnline ? "text-emerald-400 font-bold" : "text-rose-400 font-bold";
+
+            document.getElementById("liveFlavorStatus").textContent = (status.activeType || "--").toUpperCase();
+            document.getElementById("liveSlotStatus").textContent = (status.activeWorld || "--").toUpperCase();
+            document.getElementById("liveHeartbeat").textContent = status.lastHeartbeat ? new Date(status.lastHeartbeat).toLocaleTimeString() : "--";
+
+            // Render Backups
             const bContainer = document.getElementById('backupsListContainer');
             const backups = d.backups || [];
             if (backups.length === 0) {
                 bContainer.innerHTML = `<p class="text-slate-500 text-center py-4">No backups recorded yet.</p>`;
+            } else {
+                bContainer.innerHTML = backups.map(b => `
+                    <div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                        <div>
+                            <span class="text-white font-bold block">${b.filename}</span>
+                            <span class="text-[10px] text-slate-500">${b.timestamp ? new Date(b.timestamp).toLocaleString() : ''} | ${(b.sizeBytes / 1024 / 1024).toFixed(2)} MB</span>
+                        </div>
+                        <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Saved</span>
+                    </div>
+                `).join('');
+            }
+        });
+
+        // 3. Player Activity & Online Telemetry
+        onSnapshot(telemRef, (snap) => {
+            if (!snap.exists()) return;
+            const data = snap.data();
+            const players = data.players || {};
+            const playerList = document.getElementById("playerListContainer");
+            const entries = Object.values(players);
+
+            let activeCount = 0;
+            if (entries.length === 0) {
+                playerList.innerHTML = `<p class="text-slate-500 text-center py-4">No player activity recorded yet.</p>`;
+            } else {
+                playerList.innerHTML = entries.map(p => {
+                    if (p.online) activeCount++;
+                    return `
+                        <div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full ${p.online ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-slate-600'}"></span>
+                                <span class="text-white font-bold">${p.name}</span>
+                            </div>
+                            <span class="text-[10px] text-slate-400">${Math.round(p.playTimeMinutes || 0)}m total (${p.sessions || 0} logins)</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+            document.getElementById("playerOnlineCount").textContent = `${activeCount} Online`;
+        });
+
+        // 4. Remote Command Execution via maincom/wm/messages
+        const cmdForm = document.getElementById('remoteCmdForm');
+        const cmdInput = document.getElementById('remoteCmdInput');
+        const cmdOutput = document.getElementById('cmdOutputBox');
+
+        cmdForm.onsubmit = async (e) => {
+            e.preventDefault();
+            if (!verifyAdminAuth("execute remote server commands")) return;
+
+            const command = cmdInput.value.trim();
+            if (!command) return;
+
+            cmdOutput.classList.remove('hidden');
+            cmdOutput.textContent = `[Sending]: ${command}\nWaiting for daemon pickup...`;
+
+            try {
+                const wmCol = collection(db, "maincom", "wm", "messages");
+                const docRef = await addDoc(wmCol, {
+                    action: "RUN_COMMAND",
+                    payload: { command: command },
+                    adminEmail: currentUser.email || "Admin",
+                    status: "pending",
+                    createdAt: new Date().toISOString()
+                });
+
+                cmdInput.value = '';
+
+                // Listen for completed field from daemon
+                const unsub = onSnapshot(docRef, (snap) => {
+                    if (!snap.exists()) return;
+                    const cData = snap.data();
+                    if (cData.status === "completed") {
+                        cmdOutput.textContent = `[Command]: ${command}\n[Executed At]: ${cData.completedAt || 'Done'}\n\n[Console Return]:\n${cData.output || '(Command injected into console)'}`;
+                        unsub();
+                    }
+                });
+            } catch (err) {
+                cmdOutput.textContent = `[Error]: ${err.message}`;
+            }
+        };
+
+        // 5. World & Flavor Switcher Dispatcher
+        document.getElementById('btnTriggerSwitch').onclick = async () => {
+            if (!verifyAdminAuth("switch server environment")) return;
+
+            const targetType = document.getElementById('switchFlavorSelect').value;
+            const targetWorld = document.getElementById('switchSlotSelect').value;
+
+            if (!confirm(`Switch host engine to ${targetType.toUpperCase()} on ${targetWorld.toUpperCase()}?\nThis will save the current active world and yield the daemon.`)) {
                 return;
             }
 
-            bContainer.innerHTML = backups.map(b => `
-                <div class="p-2.5 bg-slate-900 border border-slate-800 rounded-xl flex items-center justify-between">
-                    <div>
-                        <span class="text-white font-bold block">${b.filename}</span>
-                        <span class="text-[10px] text-slate-500">${b.timestamp} | ${(b.sizeBytes / 1024 / 1024).toFixed(2)} MB</span>
-                    </div>
-                    <span class="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Saved</span>
-                </div>
-            `).join('');
-        });
+            const btn = document.getElementById('btnTriggerSwitch');
+            btn.disabled = true;
+            btn.textContent = "Switching Environment...";
 
+            try {
+                const wmCol = collection(db, "maincom", "wm", "messages");
+                await addDoc(wmCol, {
+                    action: "SWITCH_SERVER_TYPE",
+                    payload: {
+                        targetType: targetType,
+                        targetWorld: targetWorld
+                    },
+                    adminEmail: currentUser.email || "Admin",
+                    status: "pending",
+                    createdAt: new Date().toISOString()
+                });
+
+                alert(`Switch request dispatched. The daemon is saving and stopping ${targetType.toUpperCase()}.`);
+            } catch (err) {
+                alert("Failed to submit switch request: " + err.message);
+            } finally {
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = `<span class="material-icons text-xs">restart_alt</span> Deploy &amp; Switch Server`;
+                }, 3000);
+            }
+        };
+
+        // 6. World Lifecycle List Additions
         document.getElementById('btnAddStandardWorld').onclick = async () => {
             if (!verifyAdminAuth("create a new world")) return;
             const input = document.getElementById('newStandardWorldInput');
@@ -255,7 +456,7 @@
             if (!name) return;
 
             try {
-                const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
+                const snap = await getDoc(stateRef);
                 const data = snap.exists() ? snap.data() : {};
                 const existing = data.worlds || [];
                 if (!existing.includes(name)) {
@@ -274,7 +475,7 @@
             if (!name) return;
 
             try {
-                const snap = await (await import("../web-info/firebase.js")).getDoc(stateRef);
+                const snap = await getDoc(stateRef);
                 const data = snap.exists() ? snap.data() : {};
                 const existing = data.restoredWorlds || [];
                 if (!existing.includes(name)) {
@@ -283,46 +484,6 @@
                 }
             } catch (err) {
                 alert("Write failed: " + err.message);
-            }
-        };
-
-        // Remote Terminal Command Submitter
-        const cmdForm = document.getElementById('remoteCmdForm');
-        const cmdInput = document.getElementById('remoteCmdInput');
-        const cmdOutput = document.getElementById('cmdOutputBox');
-
-        cmdForm.onsubmit = async (e) => {
-            e.preventDefault();
-            if (!verifyAdminAuth("execute remote server commands")) return;
-
-            const command = cmdInput.value.trim();
-            if (!command) return;
-
-            cmdOutput.classList.remove('hidden');
-            cmdOutput.textContent = `[Sending]: ${command}\nWaiting for host execution...`;
-
-            try {
-                const commandsCol = collection(db, "games", "Minecraft", "data", "run", "commands");
-                const docRef = await addDoc(commandsCol, {
-                    command: command,
-                    state: "not",
-                    requestedBy: currentUser.email || "Admin",
-                    createdAt: new Date().toISOString()
-                });
-
-                cmdInput.value = '';
-
-                // Listen for execution completion
-                const unsub = onSnapshot(docRef, (snap) => {
-                    if (!snap.exists()) return;
-                    const cData = snap.data();
-                    if (cData.state === "completed") {
-                        cmdOutput.textContent = `[Command]: ${cData.command}\n[Executed At]: ${cData.executedAt || 'Done'}\n\n[Console Output]:\n${cData.output || '(No console output returned)'}`;
-                        unsub();
-                    }
-                });
-            } catch (err) {
-                cmdOutput.textContent = `[Error]: ${err.message}`;
             }
         };
     </script>
