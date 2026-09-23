@@ -47,47 +47,68 @@
     </nav>
 
     <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 space-y-6 relative z-10">
-        <!-- Live Log Viewer -->
-        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-emerald-500/20 space-y-4">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
-                <div class="flex items-center gap-2">
-                    <span class="material-icons text-emerald-400 text-base">receipt_long</span>
-                    <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400">Latest Console Output</h2>
-                </div>
-                <div class="flex items-center gap-2 font-mono text-[11px]">
-                    <span class="text-slate-400">Last Synced:</span>
-                    <span id="lastUploadBadge" class="text-amber-400 font-bold">Connecting...</span>
-                </div>
+        <!-- 3rd-Party Server Logs Notice (Shown when 3rd-p is true) -->
+        <div id="tpLogsNotice" class="hidden glass-panel rounded-3xl p-8 sm:p-12 shadow-2xl border border-amber-500/30 text-center space-y-4">
+            <div class="w-12 h-12 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                <span class="material-icons text-2xl">cloud_off</span>
             </div>
-
-            <!-- Terminal Output Window -->
-            <div id="logsTerminal" class="h-[480px] bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-y-auto custom-scroll font-mono text-xs leading-relaxed space-y-1">
-                <div class="text-slate-500 text-center py-10">Waiting for live events from daemon...</div>
+            <div class="space-y-1">
+                <h2 class="text-base sm:text-lg font-black text-white">Logs are not available for 3rd party app</h2>
+                <p class="text-xs text-slate-400 max-w-md mx-auto">
+                    Live log streaming and remote command injection are disabled because the server is hosted externally on a third-party platform.
+                </p>
             </div>
-
-            <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono pt-1">
-                <span id="logCount">0 lines</span>
-                <span>Auto-refreshed via Firebase snapshot</span>
+            <div class="pt-2">
+                <a href="index.html" class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs font-bold text-slate-300 rounded-xl transition">
+                    <span class="material-icons text-xs">arrow_back</span> Return to Hub
+                </a>
             </div>
         </div>
 
-        <!-- Inline Terminal Command Dispatcher -->
-        <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-xl border border-slate-800 space-y-4">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
-                    <span class="material-icons text-sky-400 text-sm">terminal</span> Run Command via Host Daemon
-                </h2>
-                <span id="cmdAuthLabel" class="text-[10px] font-mono text-slate-400">Requires Admin Sign-In</span>
+        <!-- Native Host Logs & Command Dispatcher Wrapper (Hidden when 3rd-p is true) -->
+        <div id="nativeLogsWrapper" class="space-y-6">
+            <!-- Live Log Viewer -->
+            <div class="glass-panel rounded-3xl p-6 shadow-xl border border-emerald-500/20 space-y-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-3 border-b border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <span class="material-icons text-emerald-400 text-base">receipt_long</span>
+                        <h2 class="text-xs font-black uppercase tracking-wider text-emerald-400">Latest Console Output</h2>
+                    </div>
+                    <div class="flex items-center gap-2 font-mono text-[11px]">
+                        <span class="text-slate-400">Last Synced:</span>
+                        <span id="lastUploadBadge" class="text-amber-400 font-bold">Connecting...</span>
+                    </div>
+                </div>
+
+                <!-- Terminal Output Window -->
+                <div id="logsTerminal" class="h-[480px] bg-slate-900 border border-slate-800 rounded-2xl p-4 overflow-y-auto custom-scroll font-mono text-xs leading-relaxed space-y-1">
+                    <div class="text-slate-500 text-center py-10">Waiting for live events from daemon...</div>
+                </div>
+
+                <div class="flex justify-between items-center text-[10px] text-slate-500 font-mono pt-1">
+                    <span id="logCount">0 lines</span>
+                    <span>Auto-refreshed via Firebase snapshot</span>
+                </div>
             </div>
 
-            <form id="remoteCmdForm" class="flex gap-2">
-                <input type="text" id="remoteCmdInput" placeholder="e.g. list, op PlayerName, save-all" required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
-                <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-md">
-                    <span class="material-icons text-xs">send</span> Run
-                </button>
-            </form>
+            <!-- Inline Terminal Command Dispatcher -->
+            <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-xl border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <h2 class="text-xs font-black uppercase tracking-wider text-white flex items-center gap-1.5">
+                        <span class="material-icons text-sky-400 text-sm">terminal</span> Run Command via Host Daemon
+                    </h2>
+                    <span id="cmdAuthLabel" class="text-[10px] font-mono text-slate-400">Requires Admin Sign-In</span>
+                </div>
 
-            <div id="cmdOutputBox" class="hidden p-3 bg-black/60 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 max-h-40 overflow-y-auto custom-scroll whitespace-pre-wrap"></div>
+                <form id="remoteCmdForm" class="flex gap-2">
+                    <input type="text" id="remoteCmdInput" placeholder="e.g. list, op PlayerName, save-all" required class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-emerald-500">
+                    <button type="submit" class="px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition flex items-center gap-1 shadow-md">
+                        <span class="material-icons text-xs">send</span> Run
+                    </button>
+                </form>
+
+                <div id="cmdOutputBox" class="hidden p-3 bg-black/60 border border-slate-800 rounded-xl text-xs font-mono text-slate-300 max-h-40 overflow-y-auto custom-scroll whitespace-pre-wrap"></div>
+            </div>
         </div>
     </main>
 
@@ -100,8 +121,11 @@
         const logCount = document.getElementById("logCount");
         const authBadge = document.getElementById("authBadge");
         const cmdAuthLabel = document.getElementById("cmdAuthLabel");
+        const tpNotice = document.getElementById("tpLogsNotice");
+        const nativeLogsWrapper = document.getElementById("nativeLogsWrapper");
 
         let currentUser = null;
+        let is3rdPartyActive = false;
 
         // Track Auth State
         if (auth) {
@@ -121,10 +145,27 @@
             });
         }
 
-        // Live Log Stream (reads telemetry recentLogs)
+        // Listen for 3rd-Party toggle state from /games/Minecraft/data/state
+        const stateRef = doc(db, "games", "Minecraft", "data", "state");
+        onSnapshot(stateRef, (snap) => {
+            const data = snap.exists() ? snap.data() : {};
+            is3rdPartyActive = Boolean(data['3rd-p']);
+
+            if (is3rdPartyActive) {
+                nativeLogsWrapper.classList.add("hidden");
+                tpNotice.classList.remove("hidden");
+            } else {
+                tpNotice.classList.add("hidden");
+                nativeLogsWrapper.classList.remove("hidden");
+            }
+        });
+
+        // Live Log Stream (reads telemetry recentLogs when in native mode)
         const telemRef = doc(db, "games", "Minecraft", "data", "telemetry");
 
         onSnapshot(telemRef, (snap) => {
+            if (is3rdPartyActive) return;
+
             if (!snap.exists()) {
                 uploadBadge.innerText = "No Document";
                 logsTerminal.innerHTML = `<div class="text-slate-500 text-center py-10">No telemetry document found.</div>`;

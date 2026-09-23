@@ -60,6 +60,50 @@
             </div>
         </div>
 
+        <!-- 3rd-Party Server Settings Switcher -->
+        <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h2 class="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                    <span class="material-icons text-sm">public</span> 3rd-Party Server Configuration
+                </h2>
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <span class="text-[10px] font-mono font-bold text-slate-400 uppercase">3rd-Party Mode</span>
+                    <input type="checkbox" id="switch3rdParty" class="w-4 h-4 accent-amber-500 rounded cursor-pointer">
+                </label>
+            </div>
+
+            <form id="thirdPartyForm" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">3rd-Party IP</label>
+                    <input type="text" id="thirdPartyIp" placeholder="e.g. server.aternos.me" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">3rd-Party Port</label>
+                    <input type="text" id="thirdPartyPort" placeholder="e.g. 25565 or 19132" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-sky-400 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">3rd-Party Type</label>
+                    <select id="thirdPartyType" class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500">
+                        <option value="java">Java Edition</option>
+                        <option value="bedrock">Bedrock Edition</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Control Panel Link (Optional)</label>
+                    <input type="url" id="thirdPartyControlLink" placeholder="https://aternos.org/server/..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-amber-500">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Connect Button Link (Optional)</label>
+                    <input type="url" id="thirdPartyConnectLink" placeholder="minecraft://?addExternalServer=..." class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-amber-500">
+                </div>
+                <div class="sm:col-span-3 flex justify-end pt-1">
+                    <button type="submit" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-xs transition shadow-md flex items-center gap-1.5">
+                        <span class="material-icons text-xs">save</span> Save 3rd-Party Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
         <!-- 0. Live Host & Server Status Telemetry -->
         <div class="glass-panel rounded-3xl p-6 shadow-xl border border-slate-800 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
@@ -273,6 +317,41 @@
         const stateRef = doc(db, "games", "Minecraft", "data", "state");
         const telemRef = doc(db, "games", "Minecraft", "data", "telemetry");
 
+        // 3rd-Party Settings Form Save Handler to /games/Minecraft/data/state
+        document.getElementById('thirdPartyForm').onsubmit = async (e) => {
+            e.preventDefault();
+            if (!verifyAdminAuth("update 3rd-party server settings")) return;
+
+            try {
+                await setDoc(stateRef, {
+                    '3rd-p': document.getElementById('switch3rdParty').checked,
+                    '3rd-ip': document.getElementById('thirdPartyIp').value.trim(),
+                    '3rd-port': document.getElementById('thirdPartyPort').value.trim(),
+                    '3rd-type': document.getElementById('thirdPartyType').value,
+                    'control-link': document.getElementById('thirdPartyControlLink').value.trim(),
+                    'connect-link': document.getElementById('thirdPartyConnectLink').value.trim()
+                }, { merge: true });
+                alert("Updated 3rd-party settings.");
+            } catch (err) {
+                alert("Write failed: " + err.message);
+            }
+        };
+
+        // Instant toggle save for switch checkbox to /games/Minecraft/data/state
+        document.getElementById('switch3rdParty').onchange = async () => {
+            if (!verifyAdminAuth("toggle 3rd-party mode")) {
+                document.getElementById('switch3rdParty').checked = !document.getElementById('switch3rdParty').checked;
+                return;
+            }
+            try {
+                await setDoc(stateRef, {
+                    '3rd-p': document.getElementById('switch3rdParty').checked
+                }, { merge: true });
+            } catch (err) {
+                alert("Toggle update failed: " + err.message);
+            }
+        };
+
         // 1. Connection Config Subscription
         onSnapshot(serverRef, (snap) => {
             if (!snap.exists()) return;
@@ -298,11 +377,19 @@
             }
         };
 
-        // 2. Server Health, Telemetry & Backups
+        // 2. Server Health, Telemetry, Backups & 3rd-Party Settings from /games/Minecraft/data/state
         onSnapshot(stateRef, (snap) => {
             if (!snap.exists()) return;
             const d = snap.data();
             const status = d.status || {};
+
+            // Update 3rd-party form fields
+            document.getElementById('switch3rdParty').checked = Boolean(d['3rd-p']);
+            document.getElementById('thirdPartyIp').value = d['3rd-ip'] || "";
+            document.getElementById('thirdPartyPort').value = d['3rd-port'] || "";
+            document.getElementById('thirdPartyType').value = d['3rd-type'] || "java";
+            document.getElementById('thirdPartyControlLink').value = d['control-link'] || "";
+            document.getElementById('thirdPartyConnectLink').value = d['connect-link'] || "";
 
             const isOnline = status.serverOnline === true;
             const healthBadge = document.getElementById("healthBadge");
@@ -395,7 +482,6 @@
 
                 cmdInput.value = '';
 
-                // Listen for completed field from daemon
                 const unsub = onSnapshot(docRef, (snap) => {
                     if (!snap.exists()) return;
                     const cData = snap.data();
